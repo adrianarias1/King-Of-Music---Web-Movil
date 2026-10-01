@@ -1,0 +1,49 @@
+.ability-modal {
+  display: flex;
+  flex-direction: column;
+  gap: 1.35rem;
+}
+
+.ability-modal__desc {
+  font-size: var(--fs-body);
+  color: var(--color-gray-light);
+  line-height: var(--lh-body);
+}
+
+.ability-modal__combo {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  padding-top: 1.1rem;
+  border-top: 1px solid var(--color-line);
+  color: var(--color-gray-light);
+}
+
+.ability-modal__keys {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.ability-modal__keys kbd {
+  display: inline-grid;
+  place-items: center;
+  min-width: 2.4rem;
+  min-height: 2.4rem;
+  padding-inline: 0.6rem;
+  font-family: var(--font-body);
+  font-size: 0.8125rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  color: var(--color-white);
+  background: var(--color-surface-raised);
+  border: 1px solid var(--color-line-strong);
+  border-bottom-width: 2px;
+  border-radius: var(--radius-sm);
+}
+
+.ability-modal__nocombo {
+  padding-top: 1.1rem;
+  border-top: 1px solid var(--color-line);
+}

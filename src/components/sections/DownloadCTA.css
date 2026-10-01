@@ -1,0 +1,66 @@
+.download {
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+  text-align: center;
+  padding-block: clamp(5rem, 14vw, 10rem);
+}
+
+.download__bg {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background:
+    radial-gradient(70% 55% at 50% 100%, rgba(0, 47, 97, 0.75) 0%, transparent 70%),
+    linear-gradient(to bottom, #000 0%, #03070d 60%, #000 100%);
+}
+
+.download__glow {
+  position: absolute;
+  left: 50%;
+  bottom: -30%;
+  width: min(720px, 120vw);
+  aspect-ratio: 1;
+  transform: translateX(-50%);
+  background: radial-gradient(circle, rgba(0, 47, 97, 0.55) 0%, transparent 68%);
+  filter: blur(20px);
+}
+
+.download__inner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.25rem;
+}
+
+.download__kicker {
+  color: var(--color-gray-light);
+}
+
+.download__title {
+  font-size: clamp(2.75rem, 13vw, 8rem);
+}
+
+.download__lead {
+  max-width: 44ch;
+}
+
+.download__btn {
+  margin-top: 0.5rem;
+}
+
+.download__soon {
+  color: var(--color-gray-light);
+}
+
+.download__note {
+  margin-top: 0.75rem;
+  font-size: var(--fs-small);
+  color: var(--color-gray-dark);
+}
+
+.download__note code {
+  font-family: ui-monospace, 'SFMono-Regular', Menlo, monospace;
+  font-size: 0.9em;
+  color: var(--color-gray-light);
+}

@@ -1,0 +1,86 @@
+/* ==========================================================================
+   KING OF MUSIC — Tokens de diseño
+   Identidad oficial: negro, blanco, grises y navy.
+   ========================================================================== */
+
+:root {
+  /* --- Color ------------------------------------------------------------ */
+  --color-black: #000000;
+  --color-white: #ffffff;
+  --color-gray-light: #bababa;
+  --color-gray-dark: #333333;
+  --color-navy: #002f61;
+
+  /* Derivados de apoyo (no forman parte de la marca, son utilidades) */
+  --color-surface: #0a0a0a;
+  --color-surface-raised: #141414;
+  --color-line: rgba(186, 186, 186, 0.18);
+  --color-line-strong: rgba(186, 186, 186, 0.38);
+  --color-accent: var(--color-navy);
+
+  /* Secciones claras */
+  --color-ink-on-light: var(--color-black);
+  --color-muted-on-light: #4a4a4a;
+
+  /* --- Tipografía ------------------------------------------------------- */
+  /* Kings: fuente de marca. Colocar el archivo en /fonts/Kings.woff2 y
+     declararla en src/styles/fonts.css cuando esté disponible. */
+  --font-display: 'Kings', 'Georgia', 'Times New Roman', serif;
+  --font-body: 'Inter', 'Segoe UI', -apple-system, BlinkMacSystemFont, Arial,
+    sans-serif;
+
+  --fs-hero: clamp(2.75rem, 11vw, 9rem);
+  --fs-title: clamp(2rem, 6vw, 4.75rem);
+  --fs-subtitle: clamp(1.5rem, 3.4vw, 2.75rem);
+  --fs-lead: clamp(1rem, 1.6vw, 1.25rem);
+  --fs-body: clamp(0.9375rem, 1.15vw, 1.0625rem);
+  --fs-small: clamp(0.8125rem, 0.95vw, 0.875rem);
+  --fs-label: 0.6875rem;
+
+  --lh-tight: 0.94;
+  --lh-snug: 1.15;
+  --lh-body: 1.65;
+
+  --tracking-display: 0.02em;
+  --tracking-label: 0.24em;
+
+  /* --- Layout ----------------------------------------------------------- */
+  --container-max: 1440px;
+  --container-pad: clamp(1.125rem, 4.5vw, 4rem);
+  --section-pad-y: clamp(4rem, 10vw, 9rem);
+  --radius-sm: 2px;
+  --radius-md: 4px;
+  --header-h: 64px;
+
+  /* --- Movimiento ------------------------------------------------------- */
+  --dur-fast: 200ms;
+  --dur-base: 320ms;
+  --dur-slow: 560ms;
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+}
+
+/* ASSETS PENDIENTES — docs/CONTENT.md
+   Descomentar cuando exista /fonts/Kings.woff2
+@font-face {
+  font-family: 'Kings';
+  src: url('/fonts/Kings.woff2') format('woff2');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+*/
+
+@media (min-width: 768px) {
+  :root {
+    --header-h: 76px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --dur-fast: 1ms;
+    --dur-base: 1ms;
+    --dur-slow: 1ms;
+  }
+}

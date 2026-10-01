@@ -1,0 +1,273 @@
+/* ==========================================================================
+   Visor 3D de personajes
+   ========================================================================== */
+
+.viewer {
+  --tab-accent: var(--color-navy);
+}
+
+/* --- Selector ------------------------------------------------------------ */
+.viewer__selector {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: clamp(1.5rem, 4vw, 2.5rem);
+  overflow-x: auto;
+  padding-bottom: 0.5rem;
+  scroll-snap-type: x mandatory;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+
+.viewer__selector::-webkit-scrollbar {
+  display: none;
+}
+
+.viewer__tab {
+  flex: 0 0 auto;
+  scroll-snap-align: start;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  min-height: 56px;
+  padding: 0.6rem 1.1rem;
+  text-align: left;
+  color: var(--color-gray-light);
+  border: 1px solid var(--color-line);
+  border-radius: var(--radius-sm);
+  background: transparent;
+  transition:
+    color var(--dur-fast) var(--ease-out),
+    border-color var(--dur-fast) var(--ease-out),
+    background-color var(--dur-fast) var(--ease-out);
+}
+
+.viewer__tab:hover {
+  color: var(--color-white);
+  border-color: var(--color-line-strong);
+}
+
+.viewer__tab.is-active {
+  color: var(--color-white);
+  border-color: var(--tab-accent);
+  background: color-mix(in srgb, var(--tab-accent) 18%, transparent);
+}
+
+.viewer__tab-num {
+  color: var(--color-gray-dark);
+  flex: none;
+}
+
+.viewer__tab.is-active .viewer__tab-num {
+  color: var(--color-white);
+}
+
+.viewer__tab-body {
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+  white-space: nowrap;
+}
+
+.viewer__tab-name {
+  font-family: var(--font-display);
+  font-size: 1rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  line-height: 1.2;
+}
+
+.viewer__tab-tag {
+  font-size: 0.75rem;
+  color: var(--color-gray-light);
+}
+
+/* --- Layout -------------------------------------------------------------- */
+.viewer__layout {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: clamp(1.75rem, 4vw, 3rem);
+  align-items: start;
+}
+
+@media (min-width: 900px) {
+  .viewer__layout {
+    grid-template-columns: minmax(0, 1.15fr) minmax(0, 0.85fr);
+  }
+}
+
+.viewer__stage {
+  position: relative;
+  border-radius: var(--radius-md);
+}
+
+/* Area reservada antes de montar WebGL: evita layout shift */
+.viewer__placeholder {
+  width: 100%;
+  min-height: 320px;
+  border-radius: var(--radius-md);
+  background: var(--color-surface-raised);
+}
+
+@media (min-width: 768px) {
+  .viewer__placeholder {
+    min-height: 420px;
+  }
+}
+
+@media (min-width: 1024px) {
+  .viewer__placeholder {
+    min-height: 560px;
+  }
+}
+
+.viewer__stage-wrap {
+  min-width: 0;
+}
+
+.viewer__hint {
+  position: absolute;
+  left: 1rem;
+  bottom: 1rem;
+  pointer-events: none;
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+}
+
+.viewer__model-notice {
+  position: absolute;
+  right: 1rem;
+  bottom: 1rem;
+  max-width: min(320px, 70%);
+  text-align: right;
+  color: var(--color-gray-light);
+  pointer-events: none;
+}
+
+.viewer__model-notice code {
+  font-family: ui-monospace, 'SFMono-Regular', Menlo, monospace;
+  font-size: 0.9em;
+  color: var(--color-white);
+  word-break: break-all;
+}
+
+@media (max-width: 639px) {
+  .viewer__model-notice {
+    position: static;
+    margin-top: 0.75rem;
+    max-width: none;
+    text-align: left;
+  }
+}
+
+.viewer-fallback {
+  display: grid;
+  place-items: center;
+  min-height: 320px;
+  padding: 2rem;
+  text-align: center;
+  color: var(--color-gray-light);
+  background: var(--color-surface-raised);
+  border: 1px solid var(--color-line);
+  border-radius: var(--radius-md);
+}
+
+/* --- Informacion --------------------------------------------------------- */
+.viewer__info {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.viewer__info-kicker {
+  color: var(--color-gray-light);
+}
+
+.viewer__name {
+  font-family: var(--font-display);
+  font-size: clamp(2rem, 5.5vw, 3.25rem);
+  line-height: var(--lh-tight);
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+  margin-top: 0.5rem;
+}
+
+.viewer__desc {
+  margin-top: 1rem;
+  color: var(--color-gray-light);
+  line-height: var(--lh-body);
+  max-width: 46ch;
+}
+
+.viewer__abilities-title {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  margin-top: clamp(1.75rem, 4vw, 2.5rem);
+  padding-bottom: 0.75rem;
+  color: var(--color-gray-light);
+  border-bottom: 1px solid var(--color-line);
+}
+
+.viewer__abilities-count {
+  font-family: var(--font-display);
+  font-size: 0.875rem;
+  color: var(--color-white);
+  opacity: 0.6;
+}
+
+.viewer__abilities {
+  display: flex;
+  flex-direction: column;
+}
+
+/* --- Habilidad ----------------------------------------------------------- */
+.ability {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  min-height: 56px;
+  padding: 0.9rem 0.25rem;
+  text-align: left;
+  border-bottom: 1px solid var(--color-line);
+  transition: padding-left var(--dur-fast) var(--ease-out);
+}
+
+.ability:hover {
+  padding-left: 0.6rem;
+}
+
+.ability__main {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  min-width: 0;
+}
+
+.ability__name {
+  font-size: var(--fs-body);
+  font-weight: 500;
+  letter-spacing: 0.01em;
+}
+
+.ability__combo {
+  font-size: var(--fs-small);
+  color: var(--color-gray-light);
+  letter-spacing: 0.06em;
+}
+
+.ability__cue {
+  flex: none;
+  color: var(--color-gray-dark);
+  transition:
+    color var(--dur-fast) var(--ease-out),
+    transform var(--dur-fast) var(--ease-out);
+}
+
+.ability:hover .ability__cue,
+.ability:focus-visible .ability__cue {
+  color: var(--color-white);
+  transform: translateX(2px);
+}

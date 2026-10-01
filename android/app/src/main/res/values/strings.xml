@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">King of Music</string>
+    <string name="title_activity_main">King of Music</string>
+    <string name="package_name">com.kingofmusic.app</string>
+    <string name="custom_url_scheme">com.kingofmusic.app</string>
+</resources>

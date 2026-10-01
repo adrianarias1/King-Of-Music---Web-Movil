@@ -1,0 +1,100 @@
+.btn {
+  --btn-fg: var(--color-white);
+  --btn-bg: transparent;
+  --btn-border: rgba(255, 255, 255, 0.55);
+
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.6rem;
+  min-height: 46px;
+  padding: 0.75rem 1.6rem;
+  background: var(--btn-bg);
+  color: var(--btn-fg);
+  border: 1px solid var(--btn-border);
+  border-radius: var(--radius-sm);
+  font-size: var(--fs-small);
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  line-height: 1;
+  white-space: nowrap;
+  transition:
+    background-color var(--dur-base) var(--ease-out),
+    color var(--dur-base) var(--ease-out),
+    border-color var(--dur-base) var(--ease-out),
+    opacity var(--dur-base) var(--ease-out);
+}
+
+.btn--lg {
+  min-height: 54px;
+  padding: 1rem 2.2rem;
+  font-size: var(--fs-body);
+}
+
+.btn--full {
+  width: 100%;
+}
+
+.btn__label {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+}
+
+/* --- Variantes ----------------------------------------------------------- */
+.btn--primary {
+  --btn-bg: var(--color-white);
+  --btn-fg: var(--color-black);
+  --btn-border: var(--color-white);
+}
+
+.btn--primary:hover:not(:disabled) {
+  --btn-bg: var(--color-gray-light);
+  --btn-border: var(--color-gray-light);
+}
+
+.btn--secondary:hover:not(:disabled) {
+  --btn-bg: rgba(255, 255, 255, 0.08);
+  --btn-border: var(--color-white);
+}
+
+.btn--ghost {
+  --btn-border: transparent;
+  padding-inline: 0.5rem;
+}
+
+.btn--ghost:hover:not(:disabled) {
+  --btn-border: var(--color-line-strong);
+  --btn-bg: rgba(255, 255, 255, 0.05);
+}
+
+/* Contexto claro (secciones blancas) */
+.theme-light .btn {
+  --btn-fg: var(--color-black);
+  --btn-border: rgba(0, 0, 0, 0.45);
+}
+
+.theme-light .btn--primary {
+  --btn-bg: var(--color-black);
+  --btn-fg: var(--color-white);
+  --btn-border: var(--color-black);
+}
+
+.theme-light .btn--primary:hover:not(:disabled) {
+  --btn-bg: var(--color-navy);
+  --btn-border: var(--color-navy);
+}
+
+/* --- Estados ------------------------------------------------------------- */
+.btn:disabled,
+.btn[aria-disabled='true'] {
+  cursor: not-allowed;
+  opacity: 0.42;
+}
+
+.btn:focus-visible {
+  outline: 2px solid currentColor;
+  outline-offset: 3px;
+}

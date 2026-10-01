@@ -1,0 +1,11 @@
+/* ==========================================================================
+   KING OF MUSIC — Estilos globales
+   El orden importa: tokens -> base -> layout -> overlays -> componentes.
+   Los estilos de componentes se importan desde cada componente.
+   ========================================================================== */
+
+@import './tokens.css';
+@import './base.css';
+@import './layout.css';
+@import './overlays.css';
+@import '../fonts.css';

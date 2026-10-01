@@ -1,0 +1,120 @@
+/* Collage editorial: no es una cuadricula de e-commerce, cada pieza
+   ocupa un lugar distinto para construir un ritmo visual. */
+
+.collage__count {
+  display: flex;
+  align-items: baseline;
+  gap: 0.6rem;
+  color: var(--color-muted-on-light);
+}
+
+.collage__count-num {
+  font-family: var(--font-display);
+  font-size: clamp(1.75rem, 4vw, 2.5rem);
+  line-height: 1;
+  color: var(--color-black);
+}
+
+/* --- Mobile first: columna unica con ritmos variables ------------------- */
+.collage__grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: clamp(1.75rem, 6vw, 3rem);
+}
+
+.collage__item--1 .collage__figure {
+  width: 78%;
+}
+
+.collage__item--2 {
+  padding-left: 12%;
+}
+
+.collage__item--3 .collage__figure {
+  width: 88%;
+  margin-left: auto;
+}
+
+.collage__item--4 {
+  padding-right: 10%;
+}
+
+/* A partir de tablet: composicion en dos columnas con solapamientos */
+@media (min-width: 700px) {
+  .collage__grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: clamp(1.5rem, 4vw, 3rem);
+    align-items: start;
+  }
+
+  .collage__item--1 {
+    grid-column: 1;
+    transform: translateY(clamp(1rem, 3vw, 3rem));
+  }
+
+  .collage__item--1 .collage__figure {
+    width: 100%;
+  }
+
+  .collage__item--2 {
+    grid-column: 2;
+    padding-left: 0;
+    transform: translateY(clamp(2.5rem, 6vw, 5rem));
+  }
+
+  .collage__item--3 {
+    grid-column: 1;
+    padding-right: 0;
+  }
+
+  .collage__item--3 .collage__figure {
+    width: 84%;
+    margin-left: 0;
+    transform: translateY(clamp(-1rem, -2vw, 0rem));
+  }
+
+  .collage__item--4 {
+    grid-column: 2;
+    padding-right: 0;
+  }
+}
+
+@media (min-width: 1100px) {
+  .collage__grid {
+    grid-template-columns: 1.05fr 0.95fr;
+    column-gap: clamp(2rem, 5vw, 5rem);
+  }
+}
+
+/* --- Figura -------------------------------------------------------------- */
+.collage__figure {
+  margin: 0;
+}
+
+.collage__caption {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  padding-top: 0.85rem;
+}
+
+.collage__name {
+  font-family: var(--font-display);
+  font-size: clamp(1.125rem, 2vw, 1.5rem);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  line-height: 1.1;
+}
+
+.collage__tagline {
+  font-size: var(--fs-small);
+  color: var(--color-muted-on-light);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .collage__item--1,
+  .collage__item--2,
+  .collage__item--3 .collage__figure {
+    transform: none;
+  }
+}

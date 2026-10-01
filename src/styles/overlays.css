@@ -1,0 +1,57 @@
+/* ==========================================================================
+   KING OF MUSIC — Overlays y estados globales
+   ========================================================================== */
+
+/* Fallback global del ErrorBoundary */
+.boundary-fallback {
+  display: grid;
+  place-items: center;
+  min-height: 220px;
+  width: 100%;
+  padding: 2rem;
+  text-align: center;
+  color: var(--color-gray-light);
+  background:
+    radial-gradient(110% 80% at 50% 0%, rgba(0, 47, 97, 0.32) 0%, transparent 60%),
+    var(--color-surface-raised);
+  border: 1px solid var(--color-line);
+  border-radius: var(--radius-md);
+}
+
+/* Aviso discreto: asset pendiente, no es un error */
+.notice {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  font-size: var(--fs-label);
+  letter-spacing: var(--tracking-label);
+  text-transform: uppercase;
+  color: var(--color-gray-light);
+}
+
+.notice svg {
+  flex: none;
+}
+
+.notice--inline {
+  padding: 0.5rem 0.75rem;
+  border: 1px solid var(--color-line);
+  border-radius: var(--radius-sm);
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.theme-light .notice {
+  color: var(--color-muted-on-light);
+}
+
+/* Pantalla de carga generica */
+.loader {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  width: 100%;
+  min-height: 200px;
+  color: var(--color-gray-light);
+}

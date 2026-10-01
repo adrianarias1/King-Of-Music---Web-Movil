@@ -1,0 +1,23 @@
+/* ==========================================================================
+   KING OF MUSIC — Tipografias locales
+   --------------------------------------------------------------------------
+   La fuente de marca "Kings" todavia no esta disponible.
+   Cuando llegue el archivo, colocarlo en public/fonts/ y descomentar
+   el bloque de abajo (o definirlo aqui en lugar de en tokens.css).
+
+   ASSETS PENDIENTES: public/fonts/Kings.woff2
+   ========================================================================== */
+
+/*
+@font-face {
+  font-family: 'Kings';
+  src: url('/fonts/Kings.woff2') format('woff2');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+*/
+
+/* La tipografia de cuerpo (Inter) usa la pila del sistema para no
+   depender de una fuente remota. Si mas adelante se agrega Inter de forma
+   local, declararla aqui con font-display: swap. */

@@ -1,0 +1,26 @@
+.section-head__text {
+  display: flex;
+  flex-direction: column;
+  gap: 1.1rem;
+}
+
+.section-head__index span {
+  display: inline;
+}
+
+.section-head__index span[aria-hidden='true'] {
+  margin-inline: 0.35rem;
+  opacity: 0.5;
+}
+
+.section-head__aside {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+@media (min-width: 900px) {
+  .section-head__aside {
+    justify-content: flex-end;
+  }
+}
