@@ -13,6 +13,8 @@ interface Props {
   description?: string
   children: ReactNode
   labelId?: string
+  /** Panel mas ancho, para contenido visual (imagenes). */
+  wide?: boolean
 }
 
 /**
@@ -22,7 +24,7 @@ interface Props {
  * - foco atrapado y restaurado
  * - scroll del body bloqueado
  */
-export function Modal({ open, onClose, title, description, children, labelId }: Props) {
+export function Modal({ open, onClose, title, description, children, labelId, wide = false }: Props) {
   const reduced = useReducedMotion()
   const { panelRef, handleOverlayClick } = useDialog(open, onClose)
   const close = useCallback(() => onClose(), [onClose])
@@ -42,7 +44,7 @@ export function Modal({ open, onClose, title, description, children, labelId }: 
         >
           <motion.div
             ref={panelRef}
-            className="modal"
+            className={`modal${wide ? ' modal--wide' : ''}`}
             role="dialog"
             aria-modal="true"
             aria-labelledby={labelId ?? 'modal-title'}

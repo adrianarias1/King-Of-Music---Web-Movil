@@ -13,28 +13,28 @@ export const tools: Tool[] = [
     name: 'Unity',
     description:
       'Motor principal del proyecto. Render, fisica de combate, animacion y compilacion del juego para Android.',
-    logo: '/images/tools/unity.svg',
+    logo: '/images/tools/unity.png',
   },
   {
     id: 'blender',
     name: 'Blender',
     description:
       'Modelado, rigs, UVs y texturizado de los artistas y los escenarios del juego.',
-    logo: '/images/tools/blender.svg',
+    logo: '/images/tools/blender.png',
   },
   {
     id: 'maya',
     name: 'Maya',
     description:
       'Animacion de combate, captura de movimiento y limpieza de curvas para el estilo de pelea del juego.',
-    logo: '/images/tools/maya.svg',
+    logo: '/images/tools/maya.png',
   },
   {
     id: 'substance',
     name: 'Substance Painter',
     description:
       'Pintura de texturas y materiales PBR para mantener la consistencia visual del equipo.',
-    logo: '/images/tools/substance.svg',
+    logo: '/images/tools/substance.png',
   },
 ]
 

@@ -18,7 +18,7 @@ import type { Character } from '../types'
 export const characters: Character[] = [
   {
     id: 'azteca',
-    name: 'Azteca',
+    name: 'Peso Plomo',
     tagline: 'El origen del ritmo',
     description:
       'Primer guardian de la escena. Su estilo mezcla percusion tradicional con sintetizadores oscuros, y su furia concentra energia antes de cada golpe.',
@@ -64,7 +64,7 @@ export const characters: Character[] = [
   },
   {
     id: 'mariachi',
-    name: 'Mariachi',
+    name: 'José José José',
     tagline: 'Precision de filarmonica',
     description:
       'Equilibrado y rapido. Domina el combate a media distancia y convierte cada frase en una oportunidad.',
@@ -106,7 +106,7 @@ export const characters: Character[] = [
   },
   {
     id: 'banda',
-    name: 'Banda',
+    name: 'Juan Grabiel',
     tagline: 'Peso y volumen',
     description:
       'Tanque de combate. Menos velocidad, mas alcance y una defensa que absorbe combos completos.',
@@ -148,7 +148,93 @@ export const characters: Character[] = [
   },
   {
     id: 'electrica',
-    name: 'Electrica',
+    name: 'Alex Llora',
+    tagline: 'Velocidad sobrehumana',
+    description:
+      'El personaje mas tecnico del roster. Prioriza movilidad, cancelaciones y combos encadenados de baja duracion.',
+    model: '/models/electrica.glb',
+    preview: '/images/characters/electrica.jpg',
+    scale: 0.95,
+    cameraPosition: [0, 1.05, 3.1],
+    accent: '#002F61',
+    abilities: [
+      {
+        id: 'pulsacion',
+        name: 'Pulsacion',
+        description: 'Doble toque automatico. El segundo golpe sale con cancelacion activa.',
+        combo: 'A + A',
+        icon: 'Activity',
+      },
+      {
+        id: 'glitch',
+        name: 'Glitch',
+        description: 'Desplazamiento instantaneo a traves del rival. Ideal para reposicionarse.',
+        combo: 'Down + B',
+        icon: 'Ghost',
+      },
+      {
+        id: 'saturacion',
+        name: 'Saturacion',
+        description: 'Revierte el timing del rival durante 3 segundos. Rompe combos defensivos.',
+        combo: 'Hold C',
+        icon: 'Radio',
+      },
+      {
+        id: 'overdrive',
+        name: 'Overdrive',
+        description:
+          'Modo final. Todos los comandos se ejecutan el doble de rapido a cambio de agotar la barra de vida.',
+        combo: 'C + C',
+        icon: 'Gauge',
+      },
+    ],
+  },
+  {
+    id: 'electrica',
+    name: 'Natanael Chano',
+    tagline: 'Velocidad sobrehumana',
+    description:
+      'El personaje mas tecnico del roster. Prioriza movilidad, cancelaciones y combos encadenados de baja duracion.',
+    model: '/models/electrica.glb',
+    preview: '/images/characters/electrica.jpg',
+    scale: 0.95,
+    cameraPosition: [0, 1.05, 3.1],
+    accent: '#002F61',
+    abilities: [
+      {
+        id: 'pulsacion',
+        name: 'Pulsacion',
+        description: 'Doble toque automatico. El segundo golpe sale con cancelacion activa.',
+        combo: 'A + A',
+        icon: 'Activity',
+      },
+      {
+        id: 'glitch',
+        name: 'Glitch',
+        description: 'Desplazamiento instantaneo a traves del rival. Ideal para reposicionarse.',
+        combo: 'Down + B',
+        icon: 'Ghost',
+      },
+      {
+        id: 'saturacion',
+        name: 'Saturacion',
+        description: 'Revierte el timing del rival durante 3 segundos. Rompe combos defensivos.',
+        combo: 'Hold C',
+        icon: 'Radio',
+      },
+      {
+        id: 'overdrive',
+        name: 'Overdrive',
+        description:
+          'Modo final. Todos los comandos se ejecutan el doble de rapido a cambio de agotar la barra de vida.',
+        combo: 'C + C',
+        icon: 'Gauge',
+      },
+    ],
+  },
+  {
+    id: 'electrica',
+    name: '',
     tagline: 'Velocidad sobrehumana',
     description:
       'El personaje mas tecnico del roster. Prioriza movilidad, cancelaciones y combos encadenados de baja duracion.',

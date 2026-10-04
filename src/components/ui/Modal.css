@@ -37,6 +37,11 @@
   outline-offset: -3px;
 }
 
+/* Panel amplio: usado por la vista de imagen en primer plano. */
+.modal--wide {
+  max-width: min(1100px, 100%);
+}
+
 .modal__head {
   display: flex;
   align-items: flex-start;

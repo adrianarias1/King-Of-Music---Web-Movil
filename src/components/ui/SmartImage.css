@@ -17,6 +17,14 @@
   animation: smart-img-in var(--dur-slow) var(--ease-out) both;
 }
 
+/* Modo contain: la imagen se ve COMPLETA, sin recortar. La caja crece con la
+   proporción real del archivo (height: auto), por lo que puede quedar mas
+   pequena que el contenedor en lugar de deformarse o cortarse. */
+.smart-img.is-contain .smart-img__el {
+  height: auto;
+  object-fit: contain;
+}
+
 @keyframes smart-img-in {
   from {
     opacity: 0;

@@ -81,9 +81,9 @@ Editar el array `abilities` de cada personaje en `src/data/characters.ts`. Puede
 
 ### Actualizar el mapa
 
-1. Colocar la imagen del mapa conceptual en `public/images/map.jpg`.
+1. Colocar la imagen del mapa conceptual en `public/images/map.png`.
 2. Editar `src/data/locations.ts` y ajustar `x` e `y` (porcentajes 0-100) sobre esa imagen.
-3. Opcional: añadir fotos de cada lugar en `public/images/locations/<id>.jpg`.
+3. Opcional: añadir fotos de cada lugar en `public/images/locations/<id>.png`.
 
 ### Actualizar el Hero / Trailer / Storyboard
 

@@ -76,27 +76,29 @@
 .map__canvas {
   position: relative;
   width: 100%;
-  aspect-ratio: 4 / 3;
   border-radius: var(--radius-md);
   overflow: hidden;
   border: 1px solid var(--color-line);
   background: #050505;
 }
 
-.map__img,
-.map__schematic {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-}
-
+/* La imagen manda: define su propia relacion de aspecto a partir de sus
+   dimensiones intrinsecas. El contenedor se ajusta a ella, de modo que la
+   imagen nunca se recorta (object-fit: cover) ni se deforma, y los hotspots
+   en % siguen cayendo sobre el punto correcto. */
 .map__img {
-  object-fit: cover;
+  display: block;
+  width: 100%;
+  height: auto;
 }
 
-/* Esquema provisional hecho solo con CSS */
+/* Esquema provisional hecho solo con CSS.
+   Usa la misma proporcion que public/images/map.png (1672x941) para que no
+   haya salto de layout cuando la imagen real carga. */
 .map__schematic {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 1672 / 941;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -127,6 +129,82 @@
   position: relative;
   font-size: var(--fs-small);
   color: var(--color-gray-dark);
+}
+
+/* --- Imagen del escenario: ampliable -------------------------------------- */
+.map__media {
+  position: relative;
+}
+
+/* La imagen completa es un boton: al tocarla se abre en primer plano. */
+.map__media-open {
+  display: block;
+  width: 100%;
+  padding: 0;
+  text-align: left;
+  background: none;
+  border: 0;
+  cursor: zoom-in;
+}
+
+.map__media-open:disabled {
+  cursor: default;
+}
+
+.map__media-open:focus-visible {
+  outline: 2px solid var(--color-white);
+  outline-offset: 3px;
+}
+
+/* Boton de expandir */
+.map__media-expand {
+  position: absolute;
+  top: 0.6rem;
+  right: 0.6rem;
+  display: grid;
+  place-items: center;
+  width: 38px;
+  height: 38px;
+  color: var(--color-white);
+  background: rgba(0, 0, 0, 0.6);
+  border: 1px solid var(--color-line-strong);
+  border-radius: var(--radius-sm);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  cursor: pointer;
+  transition:
+    background-color var(--dur-fast) var(--ease-out),
+    border-color var(--dur-fast) var(--ease-out);
+}
+
+.map__media-expand:hover {
+  background: rgba(0, 0, 0, 0.82);
+  border-color: var(--color-white);
+}
+
+.map__media-expand:focus-visible {
+  outline: 2px solid var(--color-white);
+  outline-offset: 2px;
+}
+
+/* --- Vista ampliada ------------------------------------------------------- */
+.map__lightbox {
+  display: flex;
+  justify-content: center;
+}
+
+/* La imagen se limita en alto para que nunca desborde el modal, y se centra. */
+.map__lightbox .smart-img {
+  width: auto;
+  max-width: 100%;
+  background: transparent;
+}
+
+.map__lightbox .smart-img__el {
+  width: auto;
+  max-width: 100%;
+  max-height: 68svh;
+  object-fit: contain;
 }
 
 /* --- Hotspots ------------------------------------------------------------ */

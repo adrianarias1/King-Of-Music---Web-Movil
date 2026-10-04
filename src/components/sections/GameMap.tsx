@@ -1,6 +1,7 @@
-import { MapPin } from 'lucide-react'
+import { MapPin, Maximize2 } from 'lucide-react'
 import { useCallback, useState } from 'react'
 import { locations } from '../../data/locations'
+import { Modal } from '../ui/Modal'
 import { SmartImage } from '../ui/SmartImage'
 import './GameMap.css'
 
@@ -22,15 +23,18 @@ const copy = {
  * - Es una imagen (o un esquema hecho con CSS) + hotspots posicionados
  *   en porcentajes X/Y definidos en src/data/locations.ts
  *
- * ASSET PENDIENTE: public/images/map.jpg
+ * ASSET PENDIENTE: public/images/map.png
  */
 export function GameMap({ mapImage }: Props) {
   const [selectedId, setSelectedId] = useState(locations[0]?.id ?? '')
   const [hoveredId, setHoveredId] = useState<string | null>(null)
+  const [lightboxOpen, setLightboxOpen] = useState(false)
 
   const selected = locations.find((item) => item.id === selectedId)
 
   const select = useCallback((id: string) => setSelectedId(id), [])
+  const openLightbox = useCallback(() => setLightboxOpen(true), [])
+  const closeLightbox = useCallback(() => setLightboxOpen(false), [])
 
   return (
     <section id="mapa" className="section theme-dark map" aria-label={copy.title}>
@@ -82,7 +86,7 @@ export function GameMap({ mapImage }: Props) {
                 <span className="map__grid" aria-hidden="true" />
                 <span className="map__schematic-label label">Mapa provisional</span>
                 <span className="map__schematic-sub">
-                  Reemplazar con public/images/map.jpg
+                  Reemplazar con public/images/map.png
                 </span>
               </div>
             )}
@@ -120,12 +124,35 @@ export function GameMap({ mapImage }: Props) {
           <aside className="map__panel" aria-live="polite">
             {selected ? (
               <>
-                <SmartImage
-                  src={selected.image}
-                  alt={`Imagen de ${selected.name}`}
-                  placeholderLabel={selected.name}
-                  ratio="4 / 3"
-                />
+                <div className="map__media">
+                  <button
+                    type="button"
+                    className="map__media-open"
+                    onClick={openLightbox}
+                    disabled={!selected.image}
+                    aria-label={`Ampliar imagen de ${selected.name}`}
+                  >
+                    <SmartImage
+                      src={selected.image}
+                      alt={`Imagen de ${selected.name}`}
+                      placeholderLabel={selected.name}
+                      ratio="4 / 3"
+                      fit="contain"
+                    />
+                  </button>
+
+                  {selected.image ? (
+                    <button
+                      type="button"
+                      className="map__media-expand"
+                      onClick={openLightbox}
+                      aria-label={`Ampliar imagen de ${selected.name}`}
+                      title="Ampliar"
+                    >
+                      <Maximize2 size={16} strokeWidth={1.5} aria-hidden="true" />
+                    </button>
+                  ) : null}
+                </div>
                 <h3 className="map__panel-name">{selected.name}</h3>
                 <p className="map__panel-desc">{selected.description}</p>
                 <dl className="map__panel-meta">
@@ -147,6 +174,25 @@ export function GameMap({ mapImage }: Props) {
           </aside>
         </div>
       </div>
+
+      {/* Imagen del escenario en primer plano */}
+      <Modal
+        open={lightboxOpen}
+        onClose={closeLightbox}
+        title={selected?.name ?? ''}
+        description="Imagen ampliada del escenario"
+        wide
+      >
+        <div className="map__lightbox">
+          <SmartImage
+            src={selected?.image}
+            alt={selected ? `Imagen ampliada de ${selected.name}` : ''}
+            ratio="4 / 3"
+            fit="contain"
+            loading="eager"
+          />
+        </div>
+      </Modal>
     </section>
   )
 }

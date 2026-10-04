@@ -40,7 +40,7 @@ export function Hero({ heroImage, heroVideo }: Props) {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.4, delay: 0.05 }}
         >
-          Videojuego de combate
+          Desarrollo de Videojuegos - Desarrollo Móvil - Desarrollo Web - 2026
         </motion.p>
 
         <h1 className="hero__title display">

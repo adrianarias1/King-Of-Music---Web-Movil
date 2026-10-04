@@ -11,6 +11,13 @@ interface Props {
   loading?: 'lazy' | 'eager'
   /** Proporciona el ratio y evita layout shift. */
   ratio?: string
+  /**
+   * `cover` (por defecto) recorta la imagen para llenar la caja.
+   * `contain` muestra la imagen COMPLETA, sin recortar, aunque quede mas
+   * pequena. Con `contain` el ratio solo se aplica mientras se ve el
+   * placeholder; al cargar la imagen, la caja adopta su proporción real.
+   */
+  fit?: 'cover' | 'contain'
   /** Etiqueta corta que se ve sobre el placeholder. */
   placeholderLabel?: string
   /** Numero de identificacion estetico, p. ej. "01". */
@@ -37,10 +44,12 @@ function ImageBlock({
   className,
   loading = 'lazy',
   ratio,
+  fit = 'cover',
   placeholderLabel,
   index,
 }: Props) {
   const [status, setStatus] = useState<Status>(src ? 'checking' : 'missing')
+  const contain = fit === 'contain'
 
   // No se comprueba nada hasta que la imagen se acerca al viewport.
   const { ref, inView } = useInView<HTMLDivElement>({ rootMargin: '400px' })
@@ -60,11 +69,16 @@ function ImageBlock({
 
   const showPlaceholder = status !== 'ready'
 
+  // Con `contain` la caja se ajusta a la proporción real de la imagen, así que
+  // el ratio declarado solo se aplica durante el placeholder (evita layout shift).
+  const style = ratio ? { aspectRatio: ratio } : undefined
+  const boxStyle = contain && !showPlaceholder ? undefined : style
+
   return (
     <div
       ref={ref}
-      className={`smart-img${showPlaceholder ? ' is-placeholder' : ''}${className ? ` ${className}` : ''}`}
-      style={ratio ? { aspectRatio: ratio } : undefined}
+      className={`smart-img${showPlaceholder ? ' is-placeholder' : ''}${contain ? ' is-contain' : ''}${className ? ` ${className}` : ''}`}
+      style={boxStyle}
     >
       {src && status === 'ready' ? (
         <img

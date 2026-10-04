@@ -89,14 +89,18 @@
 .site-header__nav ul {
   display: flex;
   align-items: center;
-  gap: clamp(1.25rem, 2.4vw, 2.25rem);
+  gap: clamp(1.5rem, 2.5vw, 3rem);
 }
 
+/* MILESTONE 2 — escala tipografica de escritorio (>=1024px).
+   Mobile no se ve afectado: .site-header__nav esta oculto por debajo. */
 .site-header__link {
   position: relative;
   display: inline-block;
-  padding: 0.35rem 0;
-  font-size: var(--fs-small);
+  padding: 0.4rem 0;
+  font-size: clamp(0.95rem, 1vw, 1.05rem);
+  font-weight: 500;
+  letter-spacing: 0.06em;
   color: var(--color-gray-light);
   transition: color var(--dur-fast) var(--ease-out);
 }
@@ -111,7 +115,7 @@
   background: var(--color-white);
   transform: scaleX(0);
   transform-origin: right;
-  transition: transform var(--dur-base) var(--ease-out);
+  transition: transform var(--dur-fast) var(--ease-out);
 }
 
 .site-header__link:hover,
@@ -133,15 +137,17 @@
   flex: none;
 }
 
+/* MILESTONE 2 — CTA de escritorio. Solo se muestra >=768px, asi que estos
+   valores no afectan al panel movil (.mobile-menu__cta). */
 .site-header__cta {
   display: none;
-  min-height: 40px;
-  padding: 0 1.25rem;
+  min-height: 48px;
+  padding: 0.7rem 1.5rem;
   display: inline-flex;
   align-items: center;
-  font-size: var(--fs-label);
+  font-size: 0.95rem;
   font-weight: 600;
-  letter-spacing: 0.2em;
+  letter-spacing: 0.16em;
   text-transform: uppercase;
   color: var(--color-black);
   background: var(--color-white);
@@ -171,7 +177,46 @@
   border-color: var(--color-line-strong);
 }
 
+/* MILESTONE 2 — escritorio >=768px.
+   La marca y la altura crecen solo en desktop: el movil conserva intactos
+   sus 64px y su tipografia original. */
 @media (min-width: 768px) {
+  .site-header {
+    height: 80px;
+  }
+
+  .site-header__inner {
+    gap: 2rem;
+  }
+
+  .brand__mark {
+    height: 24px;
+  }
+
+  .brand__mark span {
+    width: 3.5px;
+  }
+
+  .brand__mark span:nth-child(1) {
+    height: 12px;
+  }
+  .brand__mark span:nth-child(2) {
+    height: 24px;
+  }
+  .brand__mark span:nth-child(3) {
+    height: 16px;
+  }
+
+  .brand__text {
+    font-size: clamp(1.1rem, 1.25vw, 1.35rem);
+    letter-spacing: 0.16em;
+  }
+
+  .brand__text em {
+    font-size: 0.6875rem;
+    letter-spacing: 0.22em;
+  }
+
   .site-header__burger {
     display: none;
   }

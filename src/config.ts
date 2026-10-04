@@ -50,8 +50,8 @@ export const heroVideoAsset: string | undefined = undefined
 export const trailerAsset: string | undefined = undefined
 /** Poster/thumbnail del trailer. Reemplazar con public/images/trailer-poster.jpg */
 export const trailerPosterAsset: string | undefined = undefined
-/** Imagen del mapa conceptual. Reemplazar con public/images/map.jpg */
-export const mapAsset: string | undefined = undefined
+/** Imagen del mapa conceptual. Reemplazar con public/images/map.png */
+export const mapAsset: string | undefined = '/images/map.png'
 
 /** Puede sobrescribirse con window.KING_OF_MUSIC en builds nativos. */
 declare global {
