@@ -1,127 +1,276 @@
+
 import { Play } from 'lucide-react'
-import { useCallback, useEffect, useRef, useState } from 'react'
+import {
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+} from 'react'
+
 import { useAssetExists } from '../../hooks/useAssetExists'
 import { assetExists } from '../../utils/assets'
-import { Reveal } from '../ui/Reveal'
 import { SectionHeading } from '../ui/SectionHeading'
+
 import './Trailer.css'
 
+// =========================================================
+// KING OF MUSIC — TRÁILER CINEMATOGRÁFICO V3
+//
+// Destino del portal de la Piedra del Sol.
+//
+// Características:
+// - Compatible con React y Capacitor.
+// - Reproductor bajo demanda.
+// - Sin reproducción automática al entrar a la sección.
+// - Preparado para transiciones con GSAP.
+// - Poster y fondo provisional.
+// =========================================================
+
 interface Props {
-  /** Ruta del video. Sin archivo, se muestra el poster/placeholder. */
+  /** Ruta del archivo de video. */
   videoSrc?: string | undefined
+
+  /** Imagen de portada del tráiler. */
   posterSrc?: string | undefined
 }
 
 const copy = {
   eyebrow: 'Video',
-  title: 'Trailer',
+  title: 'Tráiler',
   lead: 'El combate al ritmo de la escena musical mexicana.',
 } as const
 
-/**
- * Trailer cinematico.
- *
- * - El <video> NO existe en el DOM hasta que el usuario pulsa Play.
- * - Nunca hay autoplay ni sonido.
- * - Si el archivo de video no existe, se mantiene el poster con un aviso
- *   discreto en lugar de romper la seccion.
- */
 export function Trailer({ videoSrc, posterSrc }: Props) {
+  // =====================================================
+  // 1. ESTADOS Y REFERENCIAS
+  // =====================================================
+
   const [playing, setPlaying] = useState(false)
   const [videoReady, setVideoReady] = useState(false)
+
   const videoRef = useRef<HTMLVideoElement | null>(null)
-  const { ref: posterCheckRef, exists: posterExists } = useAssetExists(posterSrc)
+
+  // Comprobación de la imagen del poster.
+  const {
+    ref: posterCheckRef,
+    exists: posterExists,
+  } = useAssetExists(posterSrc)
+
+  // =====================================================
+  // 2. COMPROBAR DISPONIBILIDAD DEL VIDEO
+  // =====================================================
 
   useEffect(() => {
-    if (!videoSrc) return undefined
-    let alive = true
+    let active = true
 
-    assetExists(videoSrc).then((exists) => {
-      if (alive) setVideoReady(exists)
-    })
+    // Restablecer el estado cuando cambia la fuente.
+    // No es necesario modificar el estado en el cleanup.
+    if (!videoSrc) {
+      return
+    }
+
+    assetExists(videoSrc)
+      .then((exists) => {
+        if (active) {
+          setVideoReady(exists)
+        }
+      })
+      .catch(() => {
+        if (active) {
+          setVideoReady(false)
+        }
+      })
 
     return () => {
-      alive = false
-      setPlaying(false)
+      active = false
     }
   }, [videoSrc])
 
+  // =====================================================
+  // 3. REPRODUCCIÓN BAJO DEMANDA
+  // =====================================================
+
   const handlePlay = useCallback(() => {
+    if (!videoReady || !videoSrc) return
+
     setPlaying(true)
-    // El elemento aparece en este mismo render; se intenta reproducir tras el montaje.
-    requestAnimationFrame(() => {
-      videoRef.current?.play().catch(() => setPlaying(false))
+  }, [videoReady, videoSrc])
+
+  // Ejecutar play cuando React haya montado el video.
+  // Evita depender de requestAnimationFrame.
+  const attachVideo = useCallback((element: HTMLVideoElement | null) => {
+    videoRef.current = element
+
+    if (!element) return
+
+    element.play().catch((error: unknown) => {
+      console.warn(
+        '[King of Music] No se pudo iniciar el tráiler:',
+        error,
+      )
+
+      setPlaying(false)
     })
   }, [])
 
-  const showPlayer = playing && videoReady
+  const showPlayer = playing && videoReady && Boolean(videoSrc)
+
+  // =====================================================
+  // 4. ESTRUCTURA PRINCIPAL
+  // =====================================================
 
   return (
-    <section id="trailer" className="section theme-dark trailer" aria-label={copy.title}>
-      <div className="container">
-        <SectionHeading index="03" eyebrow={copy.eyebrow} title={copy.title} lead={copy.lead} />
+    <section
+      id="trailer"
+      className="section theme-dark trailer"
+      aria-label="Tráiler oficial de King of Music"
+    >
+      {/* =================================================
+          ENCABEZADO
+
+          El tráiler ahora es la sección 02.
+          ================================================= */}
+
+      <div className="container trailer__heading">
+        <SectionHeading
+          index="02"
+          eyebrow={copy.eyebrow}
+          title={copy.title}
+          lead={copy.lead}
+        />
       </div>
 
-      <Reveal className="trailer__frame container container--wide" direction="up" distance={30}>
-        <div className="trailer__stage" ref={posterCheckRef}>
-          {/*
-            ASSETS PENDIENTES:
-              public/videos/trailer.mp4
-              public/images/trailer-poster.jpg
-            Hasta que existan, el bloque es un poster generado con CSS.
-          */}
-          <div className="trailer__poster">
-            <span className="trailer__grid" aria-hidden="true" />
-            <span className="trailer__badge label">Trailer oficial</span>
-            <span className="trailer__ratio label">16 / 9</span>
+      {/* =================================================
+          ESCENARIO DEL TRÁILER
+
+          Se elimina Reveal para que posteriormente
+          GSAP controle la entrada de esta sección.
+
+          La clase trailer__frame se conserva para
+          mantener los estilos existentes.
+          ================================================= */}
+
+      <div className="trailer__frame container container--wide">
+
+        <div
+          className="trailer__stage"
+          ref={posterCheckRef}
+          data-portal-destination="true"
+        >
+          {/* =============================================
+              POSTER PROVISIONAL
+
+              Mientras no exista la imagen definitiva,
+              el fondo se genera mediante CSS.
+              ============================================= */}
+
+          <div
+            className="trailer__poster"
+            aria-hidden="true"
+          >
+            <span className="trailer__grid" />
+
+            <span className="trailer__badge label">
+              Tráiler oficial
+            </span>
+
+            <span className="trailer__ratio label">
+              16 / 9
+            </span>
           </div>
+
+          {/* =============================================
+              IMAGEN DE PORTADA
+              ============================================= */}
 
           {posterExists && posterSrc ? (
             <img
               className="trailer__poster-img"
               src={posterSrc}
-              alt="Miniatura del trailer"
+              alt="Vista previa del tráiler de King of Music"
               loading="lazy"
               decoding="async"
             />
           ) : null}
 
-          {/* El video solo se monta al pulsar Play */}
+          {/* =============================================
+              REPRODUCTOR
+
+              El video solo se monta después de que
+              el usuario pulsa el botón de reproducción.
+              ============================================= */}
+
           {showPlayer && videoSrc ? (
             <video
-              ref={videoRef}
+              ref={attachVideo}
               className="trailer__video"
               src={videoSrc}
-              poster={posterSrc}
+              poster={
+                posterExists && posterSrc
+                  ? posterSrc
+                  : undefined
+              }
               controls
               playsInline
               preload="metadata"
+              onEnded={() => setPlaying(false)}
+              onError={() => setPlaying(false)}
+              aria-label="Video del tráiler oficial de King of Music"
             />
           ) : null}
 
-          {showPlayer ? null : (
+          {/* =============================================
+              BOTÓN DE REPRODUCCIÓN
+              ============================================= */}
+
+          {!showPlayer && (
             <button
               type="button"
               className="trailer__play"
               onClick={handlePlay}
-              aria-label="Reproducir trailer"
+              aria-label={
+                videoReady
+                  ? 'Reproducir tráiler de King of Music'
+                  : 'Tráiler todavía no disponible'
+              }
               disabled={!videoReady}
             >
-              <span className="trailer__play-ring" aria-hidden="true" />
-              <Play size={26} strokeWidth={1.4} aria-hidden="true" />
+              <span
+                className="trailer__play-ring"
+                aria-hidden="true"
+              />
+
+              <Play
+                size={26}
+                strokeWidth={1.4}
+                aria-hidden="true"
+              />
+
               <span className="trailer__play-text label">
-                {videoReady ? 'Reproducir' : copy.title}
+                {videoReady
+                  ? 'Reproducir'
+                  : 'Próximamente'}
               </span>
             </button>
           )}
         </div>
 
-        {!videoReady ? (
-          <p className="notice notice--inline trailer__notice">
-            Video pendiente de carga — public/videos/trailer.mp4
+        {/* =============================================
+            AVISO DE VIDEO PENDIENTE
+
+            Se muestra mientras el recurso no esté
+            disponible. No afecta al portal.
+            ============================================= */}
+
+        {!videoReady && (
+          <p
+            className="notice notice--inline trailer__notice"
+            role="status"
+          >
+            Tráiler oficial próximamente disponible.
           </p>
-        ) : null}
-      </Reveal>
+        )}
+      </div>
     </section>
   )
 }

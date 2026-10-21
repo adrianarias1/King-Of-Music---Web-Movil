@@ -35,23 +35,34 @@ export const download = {
   comingSoonLabel: 'Próximamente',
 } as const
 
-/* --------------------------------------------------------------------------
-   ASSETS
-   Rutas declaradas aquí para que el reemplazo sea obvious.
-   Usa `undefined` cuando el asset todavía no existe: los componentes
-  shown placeholders y NO generan errores 404.
-   -------------------------------------------------------------------------- */
 
-/** Fondo del Hero. Reemplazar con public/images/hero.jpg */
+/* =========================================================
+   KING OF MUSIC — RECURSOS MULTIMEDIA
+   ========================================================= */
+
+// PORTADA PRINCIPAL
+
 export const heroAsset: string | undefined = undefined
-/** Video de fondo del Hero (loop silencioso). Reemplazar con public/videos/hero.mp4 */
+
 export const heroVideoAsset: string | undefined = undefined
-/** Video del trailer. Reemplazar con public/videos/trailer.mp4 */
-export const trailerAsset: string | undefined = undefined
-/** Poster/thumbnail del trailer. Reemplazar con public/images/trailer-poster.jpg */
-export const trailerPosterAsset: string | undefined = undefined
-/** Imagen del mapa conceptual. Reemplazar con public/images/map.png */
-export const mapAsset: string | undefined = '/images/map.png'
+
+// IDENTIDAD Y PORTAL
+
+export const gameLogoAsset = '/images/king-of-music-logo.png'
+
+export const portalImageAsset = '/images/imagen-hero.jpeg'
+
+// TRÁILER
+
+export const trailerAsset = '/videos/trailer.mp4'
+
+export const trailerPosterAsset = '/images/imagen-hero.jpeg'
+
+// MAPA
+
+export const mapAsset: string | undefined =
+  '/images/map.png'
+
 
 /** Puede sobrescribirse con window.KING_OF_MUSIC en builds nativos. */
 declare global {
