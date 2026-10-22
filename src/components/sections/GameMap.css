@@ -23,35 +23,14 @@
   color: #fff;
   background: #000;
 
-  padding-bottom: clamp(110px, 16vh, 190px);
+  padding-bottom: var(--section-pad-y);
 }
 
 /* =========================================================
    1. DEGRADADO INFERIOR
    ========================================================= */
 
-.map::after {
-  content: '';
-
-  position: absolute;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  z-index: 1;
-
-  height: clamp(70px, 11vh, 130px);
-
-  background: linear-gradient(
-    to bottom,
-    rgba(0, 0, 0, 0) 0%,
-    rgba(35, 35, 35, 0.55) 28%,
-    rgba(120, 120, 120, 0.8) 58%,
-    rgba(220, 220, 220, 0.95) 86%,
-    #fff 100%
-  );
-
-  pointer-events: none;
-}
+/* SectionBlend in App.tsx handles the transition to the next background. */
 
 .map > .container {
   position: relative;
@@ -829,9 +808,7 @@
     max-width: calc(100% - 1rem);
   }
 
-  .map::after {
-    height: clamp(60px, 9vh, 100px);
-  }
+  /* SectionBlend in App.tsx handles the transition to the next background. */
 }
 
 /* =========================================================

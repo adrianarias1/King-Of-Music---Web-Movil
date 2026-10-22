@@ -36,7 +36,7 @@
   background: #fff;
   color: #111;
 
-  padding-bottom: clamp(110px, 16vh, 190px);
+  padding-bottom: var(--section-pad-y);
 }
 
 .story > .container {
@@ -49,30 +49,7 @@
    2. DEGRADADO INFERIOR — BLANCO A NEGRO
    ========================================================= */
 
-.story::after {
-  content: '';
-
-  position: absolute;
-  left: 0;
-  right: 0;
-  bottom: 0;
-
-  z-index: 1;
-
-  width: 100%;
-  height: clamp(75px, 12vh, 145px);
-
-  background: linear-gradient(
-    to bottom,
-    rgba(255, 255, 255, 0) 0%,
-    rgba(235, 235, 235, 0.9) 20%,
-    rgba(160, 160, 160, 0.95) 55%,
-    rgba(65, 65, 65, 0.98) 82%,
-    #000 100%
-  );
-
-  pointer-events: none;
-}
+/* SectionBlend in App.tsx handles the transition to the next background. */
 
 
 /* =========================================================
@@ -808,9 +785,7 @@
 
   /* Degradado */
 
-  .story::after {
-    height: clamp(65px, 10vh, 110px);
-  }
+  /* SectionBlend in App.tsx handles the transition to the next background. */
 }
 
 

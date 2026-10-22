@@ -1,5 +1,5 @@
 
-import { lazy, Suspense } from 'react'
+import { lazy, Suspense, useState } from 'react'
 
 import {
   heroAsset,
@@ -37,9 +37,11 @@ import { DownloadCTA } from './components/sections/DownloadCTA'
 import { Reviews } from './features/reviews/Reviews'
 import { characters } from './data/characters'
 import { locations } from './data/locations'
+import { Login } from './features/auth/Login'
 
 // Manejo de errores
 import { ErrorBoundary } from './components/ui/ErrorBoundary'
+import { SectionBlend } from './components/ui/SectionBlend'
 
 // =========================================================
 // CARGA DIFERIDA DEL VISOR 3D
@@ -78,6 +80,7 @@ function SectionFallback() {
 // =========================================================
 
 export default function App() {
+  const [loginOpen, setLoginOpen] = useState(false)
   return (
     <>
       {/* Accesibilidad: salto al contenido principal */}
@@ -88,7 +91,7 @@ export default function App() {
 
       {/* Navegación superior */}
 
-      <Header />
+      <Header onLogin={() => setLoginOpen(true)} />
 
       <main id="contenido">
 
@@ -129,7 +132,9 @@ export default function App() {
             Presentación visual de los luchadores.
             ================================================= */}
 
+        <SectionBlend from="#000" to="#fff" />
         <CharacterCollage />
+        <SectionBlend from="#fff" to="#000" />
 
         {/* =================================================
             04. VISOR DE PERSONAJES 3D
@@ -148,7 +153,9 @@ export default function App() {
             05. HISTORIA Y STORYBOARD
             ================================================= */}
 
+        <SectionBlend from="#090909" to="#fff" />
         <Storyboard />
+        <SectionBlend from="#fff" to="#000" />
 
         {/* =================================================
             06. MAPA DEL VIDEOJUEGO
@@ -165,7 +172,9 @@ export default function App() {
             07. DETRÁS DEL JUEGO
             ================================================= */}
 
+        <SectionBlend from="#090909" to="#fff" />
         <BehindTheGame />
+        <SectionBlend from="#fff" to="#000" />
 
         {/* =================================================
             08. EQUIPO DE DESARROLLO
@@ -184,6 +193,7 @@ export default function App() {
       {/* Pie de página */}
 
       <Footer />
+      <Login open={loginOpen} onClose={() => setLoginOpen(false)} />
     </>
   )
 }

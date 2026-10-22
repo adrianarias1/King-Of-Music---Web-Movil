@@ -1,0 +1,15 @@
+.section-blend {
+  width: 100%;
+  height: clamp(75px, 12vh, 145px);
+  flex: none;
+  pointer-events: none;
+  background: linear-gradient(
+    to bottom,
+    var(--blend-from) 0%,
+    color-mix(in srgb, var(--blend-from) 92%, var(--blend-to)) 20%,
+    color-mix(in srgb, var(--blend-from) 62%, var(--blend-to)) 45%,
+    color-mix(in srgb, var(--blend-from) 25%, var(--blend-to)) 72%,
+    color-mix(in srgb, var(--blend-from) 6%, var(--blend-to)) 90%,
+    var(--blend-to) 100%
+  );
+}

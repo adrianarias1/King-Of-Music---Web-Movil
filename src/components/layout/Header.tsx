@@ -8,6 +8,7 @@ import {
 import {
   ArrowUpRight,
   Download,
+  UserRound,
   Menu,
   X,
 } from 'lucide-react'
@@ -15,6 +16,7 @@ import {
 import {
   useCallback,
   useEffect,
+  useRef,
   useState,
 } from 'react'
 
@@ -57,7 +59,8 @@ import './Header.css'
 // 7. Conserva el bloqueo de scroll.
 // =========================================================
 
-export function Header() {
+export function Header({ onLogin }: { onLogin: () => void }) {
+  const loginAfterMenu = useRef(false)
   // =====================================================
   // 1. ESTADOS
   // =====================================================
@@ -262,6 +265,17 @@ const overlayTransition = {
             ============================================= */}
 
         <div className="site-header__actions">
+          <button
+            className="site-header__login"
+            type="button"
+            onClick={onLogin}
+            aria-haspopup="dialog"
+            aria-controls="login-dialog"
+            tabIndex={menuOpen ? -1 : undefined}
+          >
+            <UserRound size={18} aria-hidden="true" />
+            Iniciar sesión
+          </button>
 
           {/* Descargar */}
 
@@ -317,7 +331,12 @@ const overlayTransition = {
           MENÚ LATERAL MÓVIL
           =============================================== */}
 
-      <AnimatePresence initial={false}>
+      <AnimatePresence initial={false} onExitComplete={() => {
+        if (loginAfterMenu.current) {
+          loginAfterMenu.current = false
+          onLogin()
+        }
+      }}>
         {menuOpen && (
           <>
 
@@ -495,6 +514,19 @@ const overlayTransition = {
                       </a>
                     </motion.li>
                   ))}
+                  <li>
+                    <button
+                      className="mobile-menu__link mobile-menu__login"
+                      type="button"
+                      aria-haspopup="dialog"
+                      aria-controls="login-dialog"
+                      onClick={() => { loginAfterMenu.current = true; closeMenu() }}
+                    >
+                      <UserRound size={18} aria-hidden="true" />
+                      <span className="mobile-menu__link-label">Iniciar sesión</span>
+                      <ArrowUpRight className="mobile-menu__arrow" size={18} aria-hidden="true" />
+                    </button>
+                  </li>
 
                 </ul>
               </nav>

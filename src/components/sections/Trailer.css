@@ -40,7 +40,7 @@
      Espacio para que el degradado inferior
      no interfiera con el reproductor.
   */
-  padding-bottom: clamp(100px, 15vh, 180px);
+  padding-bottom: var(--section-pad-y);
 }
 
 
@@ -76,30 +76,7 @@
 
    ========================================================= */
 
-.trailer::after {
-  content: '';
-
-  position: absolute;
-
-  left: 0;
-  right: 0;
-  bottom: 0;
-
-  z-index: 1;
-
-  height: clamp(65px, 10vh, 120px);
-
-  background: linear-gradient(
-    to bottom,
-    rgba(0, 0, 0, 0) 0%,
-    rgba(35, 35, 35, 0.55) 25%,
-    rgba(110, 110, 110, 0.8) 55%,
-    rgba(200, 200, 200, 0.95) 82%,
-    #ffffff 100%
-  );
-
-  pointer-events: none;
-}
+/* SectionBlend in App.tsx handles the transition into Personajes. */
 
 
 /* =========================================================
@@ -596,9 +573,7 @@
     font-size: 0.7rem;
   }
 
-  .trailer::after {
-    height: clamp(65px, 9vh, 100px);
-  }
+  /* SectionBlend in App.tsx handles the transition into Personajes. */
 }
 
 
