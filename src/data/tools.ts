@@ -10,31 +10,31 @@ import type { DevShot, Tool } from '../types'
 export const tools: Tool[] = [
   {
     id: 'unity',
-    name: 'Unity',
+    name: 'UNITY 6.3',
     description:
-      'Motor principal del proyecto. Render, fisica de combate, animacion y compilacion del juego para Android.',
+      'Motor principal donde se integran combate, escenarios, animaciones, interfaces, audio y mecánicas.',
     logo: '/images/tools/unity.png',
   },
   {
     id: 'blender',
-    name: 'Blender',
+    name: 'BLENDER 5.2',
     description:
-      'Modelado, rigs, UVs y texturizado de los artistas y los escenarios del juego.',
+      'Modelado, optimización, rigging y animación de personajes, objetos y escenarios.',
     logo: '/images/tools/blender.png',
   },
   {
-    id: 'maya',
-    name: 'Maya',
+    id: 'flstudio',
+    name: 'FL STUDIO 2024',
     description:
-      'Animacion de combate, captura de movimiento y limpieza de curvas para el estilo de pelea del juego.',
-    logo: '/images/tools/maya.png',
+      'Producción musical, efectos de sonido y diseño sonoro de King of Music.',
+    logo: '/images/tools/fl-studio.png',
   },
   {
-    id: 'substance',
-    name: 'Substance Painter',
+    id: 'photoshop',
+    name: 'ADOBE PHOTOSHOP 2020',
     description:
-      'Pintura de texturas y materiales PBR para mantener la consistencia visual del equipo.',
-    logo: '/images/tools/substance.png',
+      'Diseño y edición de interfaces, texturas, imágenes promocionales y recursos gráficos 2D.',
+    logo: '/images/tools/photoshop.png',
   },
 ]
 

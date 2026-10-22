@@ -11,43 +11,31 @@ import type { StoryboardPage } from '../types'
 export const storyboardPages: StoryboardPage[] = [
   {
     id: 'page-01',
-    caption: 'Pagina 1',
+    caption: 'Anuncio del torneo',
     image: '/images/storyboard/page-01.jpg',
-    text: 'Todo empieza con un sonido. En una ciudad donde la musica nunca se apaga, alguien decide ponerla en una arena.',
+    text: 'El gobierno presenta el Torneo del Bienestar como una celebración nacional de la música mexicana.',
   },
   {
     id: 'page-02',
-    caption: 'Pagina 2',
+    caption: 'Revelación de las reglas',
     image: '/images/storyboard/page-02.jpg',
-    text: 'Los artistas aparecen uno por uno. Cada uno trae un estilo, un ritmo y una razon para pelear.',
+    text: 'Los participantes descubren que cada uno representa la existencia de su género y que perder significa su eliminación.',
   },
   {
     id: 'page-03',
-    caption: 'Pagina 3',
+    caption: 'Veto musical',
     image: '/images/storyboard/page-03.jpg',
-    text: 'El torneo toma forma. Los escenarios se vuelven parte del combate: cada lugar tiene su propio sonido.',
+    text: 'Después de cada derrota, canciones, instrumentos y elementos culturales del género vencido comienzan a desaparecer.',
   },
   {
     id: 'page-04',
-    caption: 'Pagina 4',
+    caption: 'Batalla final',
     image: '/images/storyboard/page-04.jpg',
-    text: 'Rival a rival, ronda a ronda. Solo uno puede subir al escenario principal.',
-  },
-  {
-    id: 'page-05',
-    caption: 'Pagina 5',
-    image: '/images/storyboard/page-05.jpg',
-    text: 'El ultimo acorde define al campeon. King of Music.',
-  },
-  {
-    id: 'page-06',
-    caption: 'Pagina 6',
-    image: '/images/storyboard/page-06.jpg',
-    text: 'Fin del primer capitulo.',
+    text: 'El último representante debe descubrir el verdadero propósito del torneo y enfrentarse al jefe final.',
   },
 ]
 
 export const storyIntro = {
   title: 'Historia',
-  lead: 'El torneo que convierte cada cancion en una pelea. Asi empieza King of Music.',
+  lead: 'En un México alternativo, el Torneo del Bienestar convierte cada derrota en la pérdida de un género musical.',
 } as const

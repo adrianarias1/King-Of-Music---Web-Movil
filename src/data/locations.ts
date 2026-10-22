@@ -20,33 +20,32 @@ import type { Location } from '../types'
 
 export const locations: Location[] = [
   {
-    id: 'palacio-bellas-artes',
+    id: 'la-madrugadora',
     name: 'La Madrugadora',
     description:
-      'Punto de partida del torneo. La explanada funciona como arena tutorial y presenta a los artistas antes de la primera ronda.',
-    x: 26.5,
-    y: 69.5,
-    image: '/images/locations/madrugadora.png',
+      'Escenario inicial y tutorial del Torneo del Bienestar. Un espacio de transmisión gubernamental donde el jugador aprende las mecánicas fundamentales antes de regresar para la batalla final.',
+    x: 22,
+    y: 63,
+    image: '/images/locations/la-madrugadora.png',
   },
   {
-    id: 'palacio-nacional',
+    id: 'bellas-artes',
     name: 'Bellas Artes',
     description:
-      'Escenario principal de la ronda final. Zocalo amplio, publico denso y las mejores condiciones acusticas del juego.',
-    x: 35.4,
-    y: 36.8,
+      'Primera arena completa del torneo. Su plataforma circular, obstáculos e ítems obligan al jugador a controlar con precisión la distancia frente al rival.',
+    x: 56,
+    y: 27,
     image: '/images/locations/bellas-artes.png',
   },
   {
-    id: 'arena-forostage',
-    name: 'Zócalo',
+    id: 'zocalo-ciudad-de-mexico',
+    name: 'Zócalo de la Ciudad de México',
     description:
-      'Arena cerrada construida para el torneo. Escenario nocturno con gradas cercanas al ring.',
-    x: 74.8,
-    y: 69.5,
+      'Un escenario exterior amplio que favorece el desplazamiento, las persecuciones y los ataques de larga distancia.',
+    x: 78,
+    y: 68,
     image: '/images/locations/zocalo.png',
   },
-  
 ]
 
 export const defaultLocationId = locations[0]?.id ?? ''

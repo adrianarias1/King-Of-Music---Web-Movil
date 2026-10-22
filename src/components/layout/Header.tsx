@@ -22,11 +22,13 @@ export function Header() {
     <header className={`site-header${scrolled || menuOpen ? ' is-solid' : ''}`}>
       <div className="site-header__inner container container--wide">
         <a className="brand" href="#inicio" aria-label={`${siteConfig.name} — inicio`}>
-          <span className="brand__mark" aria-hidden="true">
-            <span />
-            <span />
-            <span />
-          </span>
+          <img
+            className="brand__logo"
+            src={`${import.meta.env.BASE_URL}images/king-of-music-logo.png`}
+            alt=""
+            width={40}
+            height={40}
+          />
           <span className="brand__text">
             King <em>of</em> Music
           </span>

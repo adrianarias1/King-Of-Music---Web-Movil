@@ -28,6 +28,9 @@ dist-ssr
 .env.local
 *.keystore
 *.jks
+android/keystore.properties
+release/
+*.apk
 
 # NOT ignored on purpose (checked in once generated):
 # android/  -> Capacidad Android nativo generado por Capacitor
