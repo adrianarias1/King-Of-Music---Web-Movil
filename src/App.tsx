@@ -34,6 +34,9 @@ import { GameMap } from './components/sections/GameMap'
 import { BehindTheGame } from './components/sections/BehindTheGame'
 import { TeamSection } from './components/sections/Team'
 import { DownloadCTA } from './components/sections/DownloadCTA'
+import { Reviews } from './features/reviews/Reviews'
+import { characters } from './data/characters'
+import { locations } from './data/locations'
 
 // Manejo de errores
 import { ErrorBoundary } from './components/ui/ErrorBoundary'
@@ -139,6 +142,7 @@ export default function App() {
             <CharacterViewer />
           </Suspense>
         </ErrorBoundary>
+        <Reviews section="personajes" title="Personajes" subjects={characters} />
 
         {/* =================================================
             05. HISTORIA Y STORYBOARD
@@ -151,6 +155,11 @@ export default function App() {
             ================================================= */}
 
         <GameMap mapImage={mapAsset} />
+        <Reviews
+          section="escenarios"
+          title="Mapa y escenarios"
+          subjects={[{ id: 'general', name: 'Mapa general', section: 'mapa' }, ...locations]}
+        />
 
         {/* =================================================
             07. DETRÁS DEL JUEGO
@@ -170,18 +179,7 @@ export default function App() {
 
         <DownloadCTA />
 
-        {/* =================================================
-            FUTURA IMPLEMENTACIÓN
-
-            Sección de opiniones y reseñas.
-
-            - Supabase Auth
-            - Inicio de sesión con Google
-            - Almacenamiento de comentarios
-            - Consulta de opiniones
-            ================================================= */}
-
-      </main>
+</main>
 
       {/* Pie de página */}
 
