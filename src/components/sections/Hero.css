@@ -1,30 +1,29 @@
 
 /* =========================================================
-   KING OF MUSIC — HERO CINEMATOGRÁFICO V6
+   KING OF MUSIC — HERO CINEMATOGRÁFICO V8
 
-   PORTAL DE LA PIEDRA DEL SOL
-   IMAGEN ANFITRIONA + CONTADOR DINÁMICO
+   MEJORAS:
+   - Poster completo en pantallas móviles.
+   - Composición responsive.
+   - Movimiento cinematográfico mediante GSAP.
+   - Salida progresiva hacia el tráiler.
+   - Botones dorados con iluminación suave.
 
-   Tecnologías:
-   React + TypeScript
-   GSAP + ScrollTrigger
-   Motion + CSS
-
-   Paleta:
-   Negro  #000000
-   Blanco #FFFFFF
-   Grises #BABABA / #333333
-   Dorado #C5A45B
-
+   Identidad:
+   Negro:  #000000
+   Blanco: #FFFFFF
+   Gris:   #BABABA
+   Dorado: #C5A45B
    ========================================================= */
 
 
 /* =========================================================
-   1. CONTENEDOR PRINCIPAL
+   1. HERO PRINCIPAL
    ========================================================= */
 
 .hero {
   position: relative;
+  isolation: isolate;
 
   display: flex;
   flex-direction: column;
@@ -38,7 +37,6 @@
     clamp(3.5rem, 9vh, 6rem);
 
   overflow: hidden;
-  isolation: isolate;
 
   background: #000;
   color: #fff;
@@ -52,11 +50,12 @@
 .hero__bg {
   position: absolute;
   inset: 0;
-
   z-index: -1;
 
-  transform-origin: center;
+  overflow: hidden;
+  background: #000;
 
+  transform-origin: center;
   pointer-events: none;
 }
 
@@ -65,15 +64,20 @@
   position: absolute;
   inset: 0;
 
+  display: block;
+
   width: 100%;
   height: 100%;
 
   object-fit: cover;
+  object-position: center;
+
+  pointer-events: none;
 }
 
 
 /* =========================================================
-   3. FONDO ARTÍSTICO PROVISIONAL
+   3. FONDO ALTERNATIVO
    ========================================================= */
 
 .hero__bg-art {
@@ -108,30 +112,19 @@
 
 @keyframes hero-drift {
   from {
-    transform:
-      scale(1)
-      translate3d(0, 0, 0);
+    transform: scale(1) translate3d(0, 0, 0);
   }
 
   to {
-    transform:
-      scale(1.06)
-      translate3d(-1.5%, -1.5%, 0);
+    transform: scale(1.06) translate3d(-1.5%, -1.5%, 0);
   }
 }
-
-
-/* =========================================================
-   4. REJILLA DEL HERO ORIGINAL
-   ========================================================= */
 
 .hero__bg-art::after {
   content: '';
 
   position: absolute;
   inset: 0;
-
-  pointer-events: none;
 
   background-image:
     linear-gradient(
@@ -147,45 +140,44 @@
 
   background-size: 88px 88px;
 
-  mask-image:
-    radial-gradient(
-      90% 70% at 50% 40%,
-      #000 10%,
-      transparent 85%
-    );
+  mask-image: radial-gradient(
+    90% 70% at 50% 40%,
+    #000 10%,
+    transparent 85%
+  );
 
-  -webkit-mask-image:
-    radial-gradient(
-      90% 70% at 50% 40%,
-      #000 10%,
-      transparent 85%
-    );
+  -webkit-mask-image: radial-gradient(
+    90% 70% at 50% 40%,
+    #000 10%,
+    transparent 85%
+  );
+
+  pointer-events: none;
 }
 
 
 /* =========================================================
-   5. VELO CINEMATOGRÁFICO ORIGINAL
+   4. VELO CINEMATOGRÁFICO
    ========================================================= */
 
 .hero__veil {
   position: absolute;
   inset: 0;
 
-  pointer-events: none;
+  background: linear-gradient(
+    to top,
+    #000 0%,
+    rgba(0, 0, 0, 0.72) 28%,
+    rgba(0, 0, 0, 0.28) 60%,
+    rgba(0, 0, 0, 0.55) 100%
+  );
 
-  background:
-    linear-gradient(
-      to top,
-      #000 0%,
-      rgba(0, 0, 0, 0.72) 28%,
-      rgba(0, 0, 0, 0.28) 60%,
-      rgba(0, 0, 0, 0.55) 100%
-    );
+  pointer-events: none;
 }
 
 
 /* =========================================================
-   6. CONTENIDO PRINCIPAL
+   5. CONTENIDO PRINCIPAL
    ========================================================= */
 
 .hero__content {
@@ -195,22 +187,20 @@
   display: flex;
   flex-direction: column;
 
-  gap: clamp(1.25rem, 2.6vw, 2rem);
+  gap: clamp(1.1rem, 2.2vw, 1.8rem);
 
   width: 100%;
-
   transform-origin: center;
 }
 
 
 /* =========================================================
-   7. TEXTO INTRODUCTORIO
+   6. TEXTO INTRODUCTORIO
    ========================================================= */
 
 .hero__eyebrow {
   display: flex;
   align-items: center;
-
   gap: 0.75rem;
 
   color: var(--color-gray-light);
@@ -230,20 +220,25 @@
 
 
 /* =========================================================
-   8. TÍTULO ORIGINAL
+   7. TÍTULO PRINCIPAL
    ========================================================= */
 
-.hero__title {
+.hero .hero__title {
   display: flex;
   flex-wrap: wrap;
   align-items: baseline;
 
-  gap:
-    0
-    clamp(0.5rem, 2vw, 1.5rem);
+  column-gap: clamp(0.5rem, 1.4vw, 1.2rem);
+  row-gap: 0;
 
-  margin-block: -0.1em 0;
+  max-width: 100%;
+  margin-block: 0;
 
+  font-size: clamp(3.3rem, 6.8vw, 6rem);
+  font-weight: 800;
+  line-height: 1.02;
+
+  letter-spacing: -0.045em;
   color: #fff;
 
   transform-origin: center;
@@ -256,43 +251,144 @@
 .hero__word--thin {
   font-family: var(--font-body);
 
-  font-size: 0.26em;
+  font-size: 0.24em;
   font-weight: 300;
-  letter-spacing: 0.3em;
+  letter-spacing: 0.22em;
 
   color: var(--color-gray-light);
 
-  transform: translateY(-0.9em);
+  transform: translateY(-0.65em);
 }
 
 
 /* =========================================================
-   9. ESLOGAN Y BOTONES
+   8. ESLOGAN
    ========================================================= */
 
 .hero__lead {
   max-width: 44ch;
-
   color: var(--color-gray-light);
 }
+
+
+/* =========================================================
+   9. BOTONES
+   ========================================================= */
 
 .hero__actions {
   display: flex;
   flex-wrap: wrap;
+  align-items: center;
 
   gap: 0.75rem;
   margin-top: 0.5rem;
 }
 
+.hero .hero__action-button {
+  position: relative;
+  isolation: isolate;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  min-width: 160px;
+  min-height: 52px;
+
+  padding: 0.9rem 1.6rem;
+
+  border: 1px solid #c5a45b;
+  border-radius: 4px;
+
+  background: rgba(0, 0, 0, 0.76);
+  color: #c5a45b;
+
+  font-family: var(--font-body);
+  font-size: 0.8rem;
+  font-weight: 600;
+  line-height: 1.3;
+  letter-spacing: 0.14em;
+
+  text-transform: uppercase;
+  text-decoration: none;
+
+  cursor: pointer;
+  overflow: hidden;
+
+  -webkit-tap-highlight-color: transparent;
+
+  box-shadow:
+    inset 0 0 0 rgba(197, 164, 91, 0),
+    0 0 0 rgba(197, 164, 91, 0);
+
+  transition:
+    background-color 260ms ease,
+    color 260ms ease,
+    border-color 260ms ease,
+    box-shadow 260ms ease;
+}
+
+.hero .hero__action-button .btn__label {
+  position: relative;
+  z-index: 1;
+
+  color: inherit;
+  font: inherit;
+  letter-spacing: inherit;
+  text-transform: inherit;
+}
+
+.hero .hero__action-button::before {
+  content: '';
+
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+
+  background: radial-gradient(
+    ellipse at 50% 100%,
+    rgba(197, 164, 91, 0.16),
+    transparent 75%
+  );
+
+  opacity: 0;
+  pointer-events: none;
+
+  transition: opacity 260ms ease;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .hero .hero__action-button:hover {
+    background: rgba(197, 164, 91, 0.075);
+    color: #e3c57b;
+    border-color: #d9bc79;
+
+    box-shadow:
+      inset 0 0 16px rgba(197, 164, 91, 0.06),
+      0 0 18px rgba(197, 164, 91, 0.16);
+  }
+
+  .hero .hero__action-button:hover::before {
+    opacity: 1;
+  }
+}
+
+.hero .hero__action-button:focus-visible {
+  outline: 2px solid #e3c57b;
+  outline-offset: 4px;
+
+  background: rgba(197, 164, 91, 0.09);
+
+  box-shadow: 0 0 18px rgba(197, 164, 91, 0.16);
+}
+
+.hero .hero__action-button:active {
+  background: rgba(197, 164, 91, 0.14);
+}
+
 
 /* =========================================================
-   10. COMPOSICIÓN CINEMATOGRÁFICA
-
-   Contiene el isotipo y el portal.
-
-   GSAP controla su aparición y el progreso
-   de la secuencia mediante ScrollTrigger.
-
+   10. REVELACIÓN CINEMATOGRÁFICA
    ========================================================= */
 
 .hero__reveal {
@@ -309,6 +405,7 @@
   height: 100%;
 
   overflow: hidden;
+  isolation: isolate;
 
   background: #000;
 
@@ -316,8 +413,6 @@
   visibility: hidden;
 
   pointer-events: none;
-
-  isolation: isolate;
 }
 
 
@@ -339,13 +434,12 @@
   height: 100%;
 
   overflow: hidden;
-
   pointer-events: none;
 }
 
 
 /* =========================================================
-   12. ISOTIPO KING OF MUSIC
+   12. PIEDRA DEL SOL
    ========================================================= */
 
 .hero__reveal-logo {
@@ -369,7 +463,6 @@
 
   backface-visibility: hidden;
   -webkit-backface-visibility: hidden;
-
   -webkit-user-drag: none;
 
   user-select: none;
@@ -381,12 +474,6 @@
 
 /* =========================================================
    13. PORTAL CENTRAL
-
-   El portal se encuentra por encima del isotipo.
-
-   GSAP expande el clip-path circular desde
-   el centro de la Piedra del Sol.
-
    ========================================================= */
 
 .hero__portal {
@@ -399,7 +486,6 @@
   height: 100%;
 
   overflow: hidden;
-
   pointer-events: none;
 
   clip-path: circle(0% at 50% 50%);
@@ -411,6 +497,10 @@
 
 /* =========================================================
    14. ESCENA INTERIOR DEL PORTAL
+
+   GSAP V8 modifica opacity al finalizar.
+   El fondo negro queda preparado para el tráiler.
+
    ========================================================= */
 
 .hero__portal-scene {
@@ -428,17 +518,12 @@
   isolation: isolate;
 
   background: #080808;
+  opacity: 1;
 }
 
 
 /* =========================================================
    15. IMAGEN ANFITRIONA
-
-   Archivo:
-   public/images/imagen-hero.jpeg
-
-   GSAP controla scale y opacity del contenedor.
-
    ========================================================= */
 
 .hero__portal-media {
@@ -455,30 +540,30 @@
   opacity: 0.65;
 
   transform-origin: center;
+  will-change: transform;
 
   pointer-events: none;
 }
 
 .hero__portal-media-img {
   position: absolute;
-
-  inset: -3%;
+  inset: -6%;
 
   display: block;
 
-  width: 106%;
-  height: 106%;
+  width: 112%;
+  height: 112%;
 
   object-fit: cover;
   object-position: center;
 
-  /* Desenfoque cinematográfico suave */
   filter:
     blur(4px)
     brightness(0.78)
     saturate(0.8);
 
-  transform: translateZ(0);
+  transform-origin: center;
+  backface-visibility: hidden;
 
   user-select: none;
   -webkit-user-select: none;
@@ -489,10 +574,6 @@
 
 /* =========================================================
    16. FONDO ALTERNATIVO
-
-   Se utiliza únicamente cuando imagen-hero.jpeg
-   todavía no está disponible.
-
    ========================================================= */
 
 .hero__portal-media-fallback {
@@ -520,15 +601,7 @@
 
 
 /* =========================================================
-   17. OVERLAY CINEMATOGRÁFICO
-
-   Tres funciones:
-   - Oscurecer la fotografía.
-   - Generar iluminación dorada.
-   - Mantener legibles los textos.
-
-   Su opacidad es controlada por GSAP.
-
+   17. OVERLAY CINEMATOGRÁFICO DEL PORTAL
    ========================================================= */
 
 .hero__portal-overlay {
@@ -552,7 +625,6 @@
     );
 
   opacity: 0.9;
-
   pointer-events: none;
 }
 
@@ -566,7 +638,6 @@
   inset: 0;
 
   z-index: 2;
-
   display: block;
 
   background-image:
@@ -583,37 +654,30 @@
 
   background-size: 88px 88px;
 
-  mask-image:
-    radial-gradient(
-      80% 70% at 50% 50%,
-      #000 5%,
-      transparent 90%
-    );
+  mask-image: radial-gradient(
+    80% 70% at 50% 50%,
+    #000 5%,
+    transparent 90%
+  );
 
-  -webkit-mask-image:
-    radial-gradient(
-      80% 70% at 50% 50%,
-      #000 5%,
-      transparent 90%
-    );
+  -webkit-mask-image: radial-gradient(
+    80% 70% at 50% 50%,
+    #000 5%,
+    transparent 90%
+  );
 
   pointer-events: none;
 }
 
 
 /* =========================================================
-   19. CONTENIDO NARRATIVO
+   19. CONTENIDO DEL PORTAL
 
-   Este bloque reemplaza al falso reproductor.
-
-   Los elementos aparecen escalonadamente
-   durante el recorrido con GSAP.
-
+   GSAP V8 controla la entrada y salida del contenido.
    ========================================================= */
 
 .hero__portal-content {
   position: relative;
-
   z-index: 3;
 
   display: flex;
@@ -656,8 +720,8 @@
   font-weight: 600;
 
   line-height: 1.5;
-
   letter-spacing: 0.35em;
+
   text-transform: uppercase;
 
   text-shadow:
@@ -666,16 +730,11 @@
 
 
 /* =========================================================
-   21. TÍTULO PRINCIPAL DEL PORTAL
-
-   Copy:
-   DONDE EL RITMO SE CONVIERTE EN BATALLA
-
+   21. TÍTULO DEL PORTAL
    ========================================================= */
 
 .hero__portal-title {
   max-width: 18ch;
-
   margin: 0;
 
   color: #fff;
@@ -686,11 +745,9 @@
   font-weight: 800;
 
   line-height: 1.04;
-
   letter-spacing: -0.045em;
 
   text-wrap: balance;
-
   text-transform: uppercase;
 
   text-shadow:
@@ -705,7 +762,6 @@
 
 .hero__portal-subtitle {
   max-width: 48ch;
-
   margin: 0;
 
   color: #d1d1d1;
@@ -716,7 +772,6 @@
   font-weight: 400;
 
   line-height: 1.6;
-
   letter-spacing: 0.04em;
 
   text-shadow:
@@ -726,9 +781,6 @@
 
 /* =========================================================
    23. BLOQUE DE ESTADÍSTICAS
-
-   Aparece después del título y subtítulo.
-
    ========================================================= */
 
 .hero__portal-stats {
@@ -740,7 +792,6 @@
   gap: 0.4rem;
 
   margin-top: clamp(0.25rem, 1.5vh, 1.25rem);
-
   opacity: 0;
 }
 
@@ -764,7 +815,6 @@
   font-weight: 800;
 
   line-height: 1;
-
   letter-spacing: -0.04em;
 
   font-variant-numeric: tabular-nums;
@@ -774,21 +824,14 @@
     0 4px 30px rgba(0, 0, 0, 0.65);
 }
 
-
-/* Número */
-
 .hero__portal-counter-value {
   display: inline-block;
 
   min-width: 4ch;
-
   text-align: right;
 
   font-variant-numeric: tabular-nums;
 }
-
-
-/* Signo + */
 
 .hero__portal-counter-plus {
   display: inline-block;
@@ -815,14 +858,14 @@
   font-weight: 500;
 
   line-height: 1.5;
-
   letter-spacing: 0.16em;
+
   text-transform: uppercase;
 }
 
 
 /* =========================================================
-   26. AVISO DE CIFRA DEMOSTRATIVA
+   26. ETIQUETA DEMOSTRATIVA
    ========================================================= */
 
 .hero__portal-counter-demo {
@@ -831,11 +874,9 @@
   color: rgba(255, 255, 255, 0.55);
 
   font-family: var(--font-body);
-
   font-size: clamp(0.6rem, 0.85vw, 0.75rem);
 
   line-height: 1.5;
-
   letter-spacing: 0.03em;
 
   margin-top: 0.25rem;
@@ -916,10 +957,17 @@
 
 /* =========================================================
    30. RESPONSIVE — MÓVILES
+
+   MEJORA PRINCIPAL:
+
+   El poster deja de utilizar object-fit: cover
+   y pasa a utilizar object-fit: contain.
+
+   De esta manera no recortamos los personajes.
+
    ========================================================= */
 
 @media (max-width: 767px) {
-
   .hero {
     min-height: 100svh;
 
@@ -932,29 +980,107 @@
     gap: 1.25rem;
   }
 
-  .hero__title {
-    gap: 0 0.5rem;
+  /* -----------------------------------------------
+     POSTER RESPONSIVE
+     ----------------------------------------------- */
+
+  .hero__bg {
+    background: #000;
+  }
+
+  .hero__bg-img {
+    width: 100%;
+    height: 100%;
+
+    object-fit: contain;
+    object-position: center 27%;
+  }
+
+  /*
+     El video ambiental, cuando exista, puede
+     seguir cubriendo la pantalla.
+  */
+
+  .hero__bg-video {
+    object-fit: cover;
+  }
+
+  /*
+     Reducimos ligeramente el velo en la zona
+     superior para no ocultar tanto el poster.
+     El oscurecimiento fuerte queda abajo,
+     detrás del texto y los botones.
+  */
+
+  .hero__veil {
+    background:
+      linear-gradient(
+        to bottom,
+        rgba(0, 0, 0, 0.42) 0%,
+        rgba(0, 0, 0, 0.05) 22%,
+        rgba(0, 0, 0, 0.12) 42%,
+        rgba(0, 0, 0, 0.68) 68%,
+        #000 100%
+      );
+  }
+
+  /* -----------------------------------------------
+     TEXTO DE LA PORTADA
+     ----------------------------------------------- */
+
+  .hero .hero__title {
+    font-size: clamp(2.4rem, 10vw, 4.5rem);
+    line-height: 1.05;
+
+    column-gap: 0.45rem;
+  }
+
+  .hero__word--thin {
+    font-size: 0.23em;
+    transform: translateY(-0.45em);
   }
 
   .hero__eyebrow {
     line-height: 1.6;
   }
 
+  /* -----------------------------------------------
+     BOTONES
+     ----------------------------------------------- */
+
   .hero__actions {
     gap: 0.75rem;
   }
+
+  .hero .hero__action-button {
+    min-width: 145px;
+    min-height: 48px;
+
+    padding: 0.85rem 1.3rem;
+
+    font-size: 0.75rem;
+    letter-spacing: 0.11em;
+  }
+
+  /* -----------------------------------------------
+     REJILLA DEL FONDO
+     ----------------------------------------------- */
 
   .hero__bg-art::after {
     background-size: 56px 56px;
   }
 
-  /* Logo proporcional a pantalla vertical */
+  /* -----------------------------------------------
+     PIEDRA DEL SOL
+     ----------------------------------------------- */
 
   .hero__reveal-logo {
     width: clamp(150px, 55vw, 290px);
   }
 
-  /* Fondo */
+  /* -----------------------------------------------
+     IMAGEN DEL PORTAL
+     ----------------------------------------------- */
 
   .hero__portal-media-img {
     filter:
@@ -965,11 +1091,12 @@
     object-position: center;
   }
 
-  /* Composición vertical */
+  /* -----------------------------------------------
+     CONTENIDO DEL PORTAL
+     ----------------------------------------------- */
 
   .hero__portal-content {
     width: 92%;
-
     gap: 1rem;
 
     padding: 1.5rem 0.5rem;
@@ -984,7 +1111,6 @@
     max-width: 15ch;
 
     font-size: clamp(1.9rem, 8vw, 3.5rem);
-
     line-height: 1.08;
   }
 
@@ -1019,9 +1145,20 @@
    ========================================================= */
 
 @media (max-width: 380px) {
-
   .hero__actions {
     gap: 0.5rem;
+  }
+
+  .hero .hero__title {
+    font-size: clamp(2rem, 9.2vw, 2.8rem);
+  }
+
+  .hero .hero__action-button {
+    min-width: 0;
+    flex: 1 1 125px;
+
+    padding-inline: 0.8rem;
+    font-size: 0.7rem;
   }
 
   .hero__eyebrow::before {
@@ -1048,14 +1185,9 @@
 
 /* =========================================================
    32. PANTALLAS BAJAS EN ALTURA
-
-   Evita recortes cuando se visualiza en
-   pantallas horizontales pequeñas.
-
    ========================================================= */
 
 @media (max-height: 650px) and (min-width: 768px) {
-
   .hero__portal-content {
     gap: 0.65rem;
     padding-block: 0.5rem;
@@ -1076,47 +1208,22 @@
 
 
 /* =========================================================
-   33. ACCESIBILIDAD
-
-   Si el usuario solicita menos movimiento,
-   mantenemos disponible la portada original.
-
-   ========================================================= */
-
-@media (prefers-reduced-motion: reduce) {
-
-  .hero__bg-art.is-animated,
-  .hero__scroll svg {
-    animation: none !important;
-  }
-
-  .hero__scroll {
-    transition: none;
-  }
-
-  .hero__reveal {
-    display: none;
-  }
-
-  .hero__portal-media-img {
-    filter: brightness(0.75);
-  }
-}
-
-
-/* =========================================================
    33. DEGRADADO FINAL — PORTAL HACIA TRÁILER
    ========================================================= */
 
 .hero__portal-scene::after {
   content: '';
+
   position: absolute;
+
   left: 0;
   right: 0;
   bottom: 0;
+
   z-index: 4;
 
   height: clamp(35px, 7vh, 75px);
+
   pointer-events: none;
 
   background: linear-gradient(
@@ -1134,3 +1241,35 @@
   }
 }
 
+
+/* =========================================================
+   34. ACCESIBILIDAD
+   ========================================================= */
+
+@media (prefers-reduced-motion: reduce) {
+  .hero__bg-art.is-animated,
+  .hero__scroll svg {
+    animation: none !important;
+  }
+
+  .hero__scroll {
+    transition: none;
+  }
+
+  .hero .hero__action-button,
+  .hero .hero__action-button::before {
+    transition: none !important;
+  }
+
+  .hero__reveal {
+    display: none;
+  }
+
+  .hero__portal-media {
+    will-change: auto;
+  }
+
+  .hero__portal-media-img {
+    filter: brightness(0.75);
+  }
+}

@@ -1,99 +1,854 @@
+
+/* =========================================================
+   KING OF MUSIC — STORYBOARD CINEMATOGRÁFICO V3
+
+   LIBRO DIGITAL INTERACTIVO
+
+   MEJORAS:
+   - Una página protagonista 16:9.
+   - Flechas flotantes sobre la imagen.
+   - Giro 3D en ambas direcciones.
+   - Desvanecimiento suave al finalizar.
+   - Sombras y profundidad cinematográfica.
+   - Contador centrado.
+   - Controles responsivos.
+   - Degradado blanco a negro.
+
+   PALETA:
+   Negro:  #000000
+   Blanco: #FFFFFF
+   Dorado: #C5A45B
+   ========================================================= */
+
+
+/* =========================================================
+   1. SECCIÓN PRINCIPAL
+   ========================================================= */
+
+.story {
+  position: relative;
+  isolation: isolate;
+
+  overflow: clip;
+
+  width: 100%;
+
+  background: #fff;
+  color: #111;
+
+  padding-bottom: clamp(110px, 16vh, 190px);
+}
+
+.story > .container {
+  position: relative;
+  z-index: 2;
+}
+
+
+/* =========================================================
+   2. DEGRADADO INFERIOR — BLANCO A NEGRO
+   ========================================================= */
+
+.story::after {
+  content: '';
+
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+
+  z-index: 1;
+
+  width: 100%;
+  height: clamp(75px, 12vh, 145px);
+
+  background: linear-gradient(
+    to bottom,
+    rgba(255, 255, 255, 0) 0%,
+    rgba(235, 235, 235, 0.9) 20%,
+    rgba(160, 160, 160, 0.95) 55%,
+    rgba(65, 65, 65, 0.98) 82%,
+    #000 100%
+  );
+
+  pointer-events: none;
+}
+
+
+/* =========================================================
+   3. VISOR PRINCIPAL
+
+   Mantiene la misma distribución horizontal
+   que el reproductor del tráiler.
+   ========================================================= */
+
+.story__viewer {
+  position: relative;
+
+  width: 100%;
+  max-width: 100%;
+
+  margin-top: clamp(2rem, 5vw, 3rem);
+}
+
+
+/* =========================================================
+   4. CONTENEDOR INTERACTIVO
+
+   Las flechas se posicionan respecto
+   a este contenedor.
+
+   IMPORTANTE:
+   No aplicamos overflow: hidden al viewport.
+   La hoja necesita espacio para girar en 3D.
+   ========================================================= */
+
 .story__viewport {
-  width: 100%;
-}
+  position: relative;
+  isolation: isolate;
 
-.story__pages {
   width: 100%;
+
   border-radius: var(--radius-md);
+
   touch-action: pan-y;
+
+  outline: none;
 }
 
-.story__pages:focus-visible {
-  outline: 2px solid var(--color-black);
-  outline-offset: 6px;
+.story__viewport:focus-visible {
+  outline: 2px solid #c5a45b;
+  outline-offset: 5px;
 }
 
-.story__row {
-  display: grid;
-  gap: clamp(0.75rem, 2vw, 1.5rem);
+
+/* =========================================================
+   5. LIBRO DIGITAL
+
+   El libro conserva proporción cinematográfica.
+
+   La perspectiva crea profundidad durante
+   el giro de página.
+   ========================================================= */
+
+.story__book {
+  position: relative;
+  z-index: 1;
+
+  width: 100%;
+  aspect-ratio: 16 / 9;
+
+  perspective: 1800px;
+  perspective-origin: 50% 50%;
+
+  border-radius: var(--radius-md);
+
+  background: #f3f3f3;
+
+  box-shadow:
+    0 25px 80px rgba(0, 0, 0, 0.12),
+    0 6px 20px rgba(0, 0, 0, 0.07);
 }
 
-/* --- Pagina -------------------------------------------------------------- */
-.story__page {
-  margin: 0;
-  display: flex;
-  flex-direction: column;
+
+/* =========================================================
+   6. PÁGINA BASE
+
+   Contiene la página que queda visible
+   cuando termina la animación.
+   ========================================================= */
+
+.story__base-page {
+  position: absolute;
+  inset: 0;
+
+  z-index: 1;
+
+  overflow: hidden;
+
+  border-radius: var(--radius-md);
+
+  background: #ededed;
 }
 
-.story__caption {
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-  padding-top: 0.9rem;
+
+/* =========================================================
+   7. IMAGEN DE LA PÁGINA
+   ========================================================= */
+
+.story__page-image {
+  position: absolute;
+  inset: 0;
+
+  width: 100%;
+  height: 100%;
+
+  overflow: hidden;
+
+  background: #ededed;
 }
 
-.story__caption .label {
-  color: var(--color-muted-on-light);
+.story__page-image .smart-img {
+  width: 100%;
+  height: 100%;
+
+  aspect-ratio: 16 / 9;
 }
 
-.story__text {
-  font-size: var(--fs-small);
-  line-height: 1.6;
-  color: var(--color-muted-on-light);
-  max-width: 52ch;
+.story__page-image .smart-img__el {
+  display: block;
+
+  width: 100%;
+  height: 100%;
+
+  object-fit: contain;
+  object-position: center;
 }
 
-/* --- Controles ----------------------------------------------------------- */
-.story__controls {
+
+/* =========================================================
+   8. NUMERACIÓN SOBRE LA PÁGINA
+   ========================================================= */
+
+.story__page-number {
+  position: absolute;
+
+  top: clamp(0.75rem, 2vw, 1.5rem);
+  left: clamp(0.75rem, 2vw, 1.5rem);
+
+  z-index: 3;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  min-width: 38px;
+  height: 38px;
+
+  padding-inline: 0.5rem;
+
+  color: #111;
+  background: rgba(255, 255, 255, 0.85);
+
+  border: 1px solid rgba(0, 0, 0, 0.12);
+  border-radius: var(--radius-sm);
+
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+
+  font-size: 0.7rem;
+  font-weight: 600;
+}
+
+
+/* =========================================================
+   9. HOJA QUE GIRA
+
+   Motion controla:
+   - rotateY
+   - opacity
+
+   La opacidad disminuye en la parte final
+   para permitir un desmontaje suave.
+
+   ========================================================= */
+
+.story__turning-page {
+  position: absolute;
+  inset: 0;
+
+  z-index: 5;
+
+  width: 100%;
+  height: 100%;
+
+  transform-style: preserve-3d;
+
+  backface-visibility: visible;
+  -webkit-backface-visibility: visible;
+
+  pointer-events: none;
+
+  will-change: transform, opacity;
+}
+
+
+/* =========================================================
+   10. DIRECCIÓN DEL GIRO
+
+   AVANZAR:
+   La hoja gira hacia la izquierda.
+
+   RETROCEDER:
+   La hoja gira hacia la derecha.
+   ========================================================= */
+
+.story__turning-page--next {
+  transform-origin: left center;
+}
+
+.story__turning-page--prev {
+  transform-origin: right center;
+}
+
+
+/* =========================================================
+   11. CARAS DE LA HOJA
+   ========================================================= */
+
+.story__page-front,
+.story__page-back {
+  position: absolute;
+  inset: 0;
+
+  width: 100%;
+  height: 100%;
+
+  overflow: hidden;
+
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+}
+
+
+/* =========================================================
+   12. CARA FRONTAL
+   ========================================================= */
+
+.story__page-front {
+  z-index: 2;
+
+  background: #fff;
+
+  border: 1px solid rgba(0, 0, 0, 0.08);
+
+  box-shadow:
+    8px 0 35px rgba(0, 0, 0, 0.12);
+}
+
+.story__page-front .smart-img {
+  width: 100%;
+  height: 100%;
+
+  aspect-ratio: 16 / 9;
+}
+
+.story__page-front .smart-img__el {
+  display: block;
+
+  width: 100%;
+  height: 100%;
+
+  object-fit: contain;
+  object-position: center;
+}
+
+
+/* =========================================================
+   13. SOMBRA DINÁMICA
+
+   Da profundidad al borde del papel.
+
+   La opacidad final de la hoja también
+   desvanece esta sombra.
+   ========================================================= */
+
+.story__page-shadow {
+  position: absolute;
+  inset: 0;
+
+  background: linear-gradient(
+    to right,
+    rgba(0, 0, 0, 0.02) 0%,
+    rgba(0, 0, 0, 0.05) 45%,
+    rgba(0, 0, 0, 0.32) 100%
+  );
+
+  pointer-events: none;
+}
+
+/* Sombra invertida al retroceder */
+
+.story__turning-page--prev .story__page-shadow {
+  background: linear-gradient(
+    to left,
+    rgba(0, 0, 0, 0.02) 0%,
+    rgba(0, 0, 0, 0.05) 45%,
+    rgba(0, 0, 0, 0.32) 100%
+  );
+}
+
+
+/* =========================================================
+   14. REVERSO DE LA HOJA
+   ========================================================= */
+
+.story__page-back {
+  z-index: 1;
+
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  gap: 1rem;
-  margin-top: clamp(1.5rem, 3vw, 2rem);
-  padding-top: 1rem;
-  border-top: 1px solid rgba(0, 0, 0, 0.16);
+  justify-content: center;
+
+  background: linear-gradient(
+    125deg,
+    #d8d8d8 0%,
+    #f8f8f8 38%,
+    #e3e3e3 100%
+  );
+
+  transform: rotateY(180deg);
+
+  border: 1px solid rgba(0, 0, 0, 0.12);
+
+  box-shadow:
+    -8px 0 35px rgba(0, 0, 0, 0.14);
 }
 
-.story__nav {
-  display: grid;
-  place-items: center;
-  width: 48px;
-  height: 48px;
-  color: var(--color-black);
-  border: 1px solid rgba(0, 0, 0, 0.3);
-  border-radius: var(--radius-sm);
+
+/* =========================================================
+   15. TEXTURA DEL PAPEL
+   ========================================================= */
+
+.story__paper-texture {
+  position: absolute;
+  inset: 0;
+
+  background-image:
+    linear-gradient(
+      to right,
+      rgba(0, 0, 0, 0.02) 1px,
+      transparent 1px
+    ),
+    linear-gradient(
+      to bottom,
+      rgba(0, 0, 0, 0.02) 1px,
+      transparent 1px
+    );
+
+  background-size: 14px 14px;
+  opacity: 0.5;
+}
+
+
+/* =========================================================
+   16. TEXTO DEL REVERSO
+   ========================================================= */
+
+.story__page-back-label {
+  position: relative;
+  z-index: 2;
+
+  color: rgba(0, 0, 0, 0.45);
+
+  font-family: var(--font-display);
+  font-size: clamp(0.7rem, 1.5vw, 1rem);
+  font-weight: 700;
+
+  letter-spacing: 0.35em;
+}
+
+
+/* =========================================================
+   17. FLECHAS FLOTANTES
+
+   CAMBIO PRINCIPAL V3:
+
+   Ambas flechas se encuentran dentro
+   de .story__viewport.
+
+   Se mantienen inmóviles mientras
+   la página gira por detrás.
+   ========================================================= */
+
+.story__viewport > .story__nav {
+  position: absolute;
+
+  top: 50%;
+  z-index: 10;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  width: 56px;
+  height: 56px;
+
+  padding: 0;
+
+  transform: translateY(-50%);
+
+  color: #111;
+
+  background: rgba(255, 255, 255, 0.9);
+
+  border: 1px solid rgba(0, 0, 0, 0.18);
+  border-radius: 50%;
+
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+
+  cursor: pointer;
+
+  box-shadow:
+    0 5px 24px rgba(0, 0, 0, 0.16),
+    0 0 0 rgba(197, 164, 91, 0);
+
   transition:
-    background-color var(--dur-fast) var(--ease-out),
-    border-color var(--dur-fast) var(--ease-out),
-    opacity var(--dur-fast) var(--ease-out);
+    background-color 260ms ease,
+    color 260ms ease,
+    border-color 260ms ease,
+    box-shadow 260ms ease,
+    opacity 260ms ease;
 }
 
-.story__nav:hover:not(:disabled) {
-  background: var(--color-black);
-  color: var(--color-white);
-  border-color: var(--color-black);
+
+/* =========================================================
+   18. POSICIÓN DE LAS FLECHAS
+   ========================================================= */
+
+.story__nav--prev {
+  left: clamp(0.5rem, 2vw, 1.5rem);
 }
+
+.story__nav--next {
+  right: clamp(0.5rem, 2vw, 1.5rem);
+}
+
+
+/* =========================================================
+   19. HOVER DORADO
+
+   Resplandor suave con identidad
+   visual de King of Music.
+   ========================================================= */
+
+@media (hover: hover) and (pointer: fine) {
+  .story__nav:hover:not(:disabled) {
+    color: #111;
+
+    background: #e3c57b;
+    border-color: #c5a45b;
+
+    box-shadow:
+      0 6px 26px rgba(0, 0, 0, 0.17),
+      0 0 24px rgba(197, 164, 91, 0.3);
+  }
+}
+
+
+/* =========================================================
+   20. ENFOQUE POR TECLADO
+   ========================================================= */
+
+.story__nav:focus-visible {
+  outline: 3px solid #c5a45b;
+  outline-offset: 4px;
+}
+
+
+/* =========================================================
+   21. FLECHAS DESHABILITADAS
+   ========================================================= */
 
 .story__nav:disabled {
   opacity: 0.3;
   cursor: not-allowed;
+  box-shadow: none;
+}
+
+
+/* =========================================================
+   22. INFORMACIÓN DE LA PÁGINA
+   ========================================================= */
+
+.story__details {
+  display: flex;
+  flex-direction: column;
+
+  gap: 0.75rem;
+
+  width: 100%;
+
+  padding-top: clamp(1.2rem, 2.5vw, 2rem);
+}
+
+.story__details-heading {
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+}
+
+.story__details-index {
+  color: #8a8a8a;
+
+  font-size: 0.7rem;
+  letter-spacing: 0.18em;
+}
+
+.story__details-title {
+  margin: 0;
+
+  color: #111;
+
+  font-family: var(--font-display);
+  font-size: clamp(1.5rem, 2.5vw, 2.4rem);
+  font-weight: 700;
+
+  line-height: 1.15;
+  text-transform: uppercase;
+}
+
+.story__text {
+  max-width: 75ch;
+
+  margin: 0;
+
+  color: #555;
+
+  font-family: var(--font-body);
+  font-size: clamp(0.85rem, 1.1vw, 1rem);
+
+  line-height: 1.7;
+}
+
+.story__text--pending {
+  color: #888;
+  font-style: italic;
+}
+
+
+/* =========================================================
+   23. CONTADOR DE PÁGINAS
+
+   CAMBIO PRINCIPAL V3:
+
+   Ya no contiene botones.
+   Lo centramos debajo del visor.
+   ========================================================= */
+
+.story__controls {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  width: 100%;
+
+  margin-top: clamp(1.5rem, 3vw, 2rem);
+  padding-top: 1.25rem;
+
+  border-top: 1px solid rgba(0, 0, 0, 0.16);
 }
 
 .story__counter {
   display: flex;
   align-items: center;
-  gap: 0.55rem;
-  color: var(--color-black);
+  justify-content: center;
+
+  gap: 0.6rem;
+
+  margin: 0;
+
+  color: #111;
+
+  font-family: var(--font-body);
+  font-size: 0.85rem;
+
   font-variant-numeric: tabular-nums;
 }
 
-.story__counter span[aria-hidden='true'] {
-  color: var(--color-muted-on-light);
-  opacity: 0.6;
+.story__counter-current {
+  color: #111;
+  font-weight: 700;
 }
 
+.story__counter-separator {
+  color: #aaa;
+}
+
+.story__counter-total {
+  color: #777;
+}
+
+
+/* =========================================================
+   24. INSTRUCCIÓN DE NAVEGACIÓN
+   ========================================================= */
+
+.story__hint {
+  margin-top: 1rem;
+
+  text-align: center;
+
+  color: #888;
+
+  font-size: 0.7rem;
+  line-height: 1.6;
+
+  letter-spacing: 0.12em;
+}
+
+
+/* =========================================================
+   25. ESTADO SIN PÁGINAS
+   ========================================================= */
+
+.story__empty {
+  margin-top: 2rem;
+  padding: 3rem 1.5rem;
+
+  text-align: center;
+
+  color: #777;
+  background: #f3f3f3;
+
+  border: 1px solid #ddd;
+  border-radius: var(--radius-md);
+}
+
+
+/* =========================================================
+   26. RESPONSIVE — TABLETS
+   ========================================================= */
+
 @media (max-width: 899px) {
-  .story__row {
-    gap: 0;
+  .story {
+    padding-bottom: clamp(95px, 13vh, 150px);
+  }
+
+  .story__viewer {
+    margin-top: 2rem;
+  }
+
+  .story__book {
+    perspective: 1300px;
+  }
+
+  .story__viewport > .story__nav {
+    width: 48px;
+    height: 48px;
+  }
+
+  .story__nav--prev {
+    left: 0.75rem;
+  }
+
+  .story__nav--next {
+    right: 0.75rem;
+  }
+}
+
+
+/* =========================================================
+   27. RESPONSIVE — MÓVILES
+   ========================================================= */
+
+@media (max-width: 600px) {
+  .story__book {
+    perspective: 900px;
+  }
+
+  /* Flechas más compactas */
+
+  .story__viewport > .story__nav {
+    width: 40px;
+    height: 40px;
+
+    background: rgba(255, 255, 255, 0.88);
+  }
+
+  .story__nav--prev {
+    left: 0.4rem;
+  }
+
+  .story__nav--next {
+    right: 0.4rem;
+  }
+
+  .story__nav svg {
+    width: 20px;
+    height: 20px;
+  }
+
+  /* Numeración */
+
+  .story__page-number {
+    min-width: 28px;
+    height: 28px;
+
+    top: 0.5rem;
+    left: 0.5rem;
+
+    font-size: 0.6rem;
+  }
+
+  /* Información */
+
+  .story__details {
+    padding-top: 1.25rem;
+  }
+
+  .story__details-title {
+    font-size: 1.35rem;
+  }
+
+  .story__text {
+    font-size: 0.85rem;
+  }
+
+  /* Contador */
+
+  .story__controls {
+    margin-top: 1.25rem;
+  }
+
+  .story__hint {
+    font-size: 0.6rem;
+  }
+
+  /* Degradado */
+
+  .story::after {
+    height: clamp(65px, 10vh, 110px);
+  }
+}
+
+
+/* =========================================================
+   28. PANTALLAS MUY PEQUEÑAS
+   ========================================================= */
+
+@media (max-width: 380px) {
+  .story__viewport > .story__nav {
+    width: 36px;
+    height: 36px;
+  }
+
+  .story__nav--prev {
+    left: 0.25rem;
+  }
+
+  .story__nav--next {
+    right: 0.25rem;
+  }
+
+  .story__page-back-label {
+    font-size: 0.6rem;
+    letter-spacing: 0.2em;
+  }
+}
+
+
+/* =========================================================
+   29. ACCESIBILIDAD
+   ========================================================= */
+
+@media (prefers-reduced-motion: reduce) {
+  .story__nav {
+    transition: none !important;
+  }
+
+  .story__turning-page {
+    will-change: auto;
   }
 }
