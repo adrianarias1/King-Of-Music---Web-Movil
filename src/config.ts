@@ -42,7 +42,7 @@ export const download = {
 
 // PORTADA PRINCIPAL
 
-export const heroAsset: string | undefined = undefined
+export const heroAsset: string | undefined = '/images/poster-hero.png'
 
 export const heroVideoAsset: string | undefined = undefined
 

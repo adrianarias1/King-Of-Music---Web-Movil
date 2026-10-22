@@ -7,52 +7,58 @@ import gsap from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import { useGSAP } from '@gsap/react'
 
-import { siteConfig, gameLogoAsset, portalImageAsset } from '../../config'
+import {
+  siteConfig,
+  gameLogoAsset,
+  portalImageAsset,
+} from '../../config'
+
 import { useAssetExists } from '../../hooks/useAssetExists'
 
 import './Hero.css'
 
 // =========================================================
-// KING OF MUSIC — HERO CINEMATOGRÁFICO V6
+// KING OF MUSIC — HERO CINEMATOGRÁFICO V8
 //
-// Experiencia:
-// 1. Presentación del videojuego
-// 2. Aparición de la Piedra del Sol
-// 3. Acercamiento cinematográfico
-// 4. Apertura del portal
-// 5. Imagen anfitriona con profundidad
-// 6. Texto y contador animado
-// 7. Continuación hacia el tráiler
+// MEJORAS:
+// - Movimiento de cámara durante el contador.
+// - Menor sensación de anclaje.
+// - Salida progresiva del texto.
+// - Fundido hacia el tráiler.
+// - Se conserva el portal de la Piedra del Sol.
+// - Compatible con el diseño responsive del Hero.
 //
-// Motion: animaciones iniciales
-// GSAP: recorrido vinculado al scroll
+// Motion: animaciones iniciales.
+// GSAP: recorrido cinematográfico con scroll.
 // =========================================================
 
 gsap.registerPlugin(ScrollTrigger, useGSAP)
 
 const DEBUG_SCROLL = false
 
-// Los recursos gráficos se administran desde src/config.ts.
+// =========================================================
+// CONTENIDO NARRATIVO DEL PORTAL
+//
+// La cifra de descargas es demostrativa.
+// No corresponde a descargas reales del videojuego.
+// =========================================================
 
-// Contenido promocional del prototipo.
-// IMPORTANTE: la cifra es ilustrativa, no una estadística real.
 const PORTAL_CONTENT = {
   eyebrow: 'KING OF MUSIC',
-  title: 'DONDE EL RITMO SE CONVIERTE EN BATALLA',
-  subtitle: 'La música tiene un nuevo escenario.',
+  title: 'ELIGE A TU ARTISTA FAVORITO',
+  subtitle: 'Y SALTA A A LA ARENA DE COMBATE.',
   downloads: 5000,
   downloadsLabel: 'Descargas en Steam',
-  demoLabel: 'Cifra ilustrativa · Prototipo',
 } as const
 
 interface Props {
   /** Imagen principal de la portada. */
   heroImage?: string | undefined
 
-  /** Video ambiental de la portada. */
+  /** Video ambiental opcional de la portada. */
   heroVideo?: string | undefined
 
-  /** Se conserva por compatibilidad con App.tsx. */
+  /** Propiedad conservada por compatibilidad. */
   trailerPoster?: string | undefined
 }
 
@@ -65,7 +71,7 @@ export function Hero({
   const heroRef = useRef<HTMLElement>(null)
 
   // =====================================================
-  // 1. VERIFICACIÓN DE RECURSOS
+  // 1. COMPROBACIÓN DE RECURSOS
   // =====================================================
 
   const { exists: hasImage } = useAssetExists(heroImage, {
@@ -82,7 +88,7 @@ export function Hero({
   )
 
   // =====================================================
-  // 2. ANIMACIÓN PRINCIPAL CON GSAP
+  // 2. ANIMACIÓN CINEMATOGRÁFICA
   // =====================================================
 
   useGSAP(
@@ -91,7 +97,10 @@ export function Hero({
 
       if (!hero || reduced) return
 
-      // Elementos principales
+      // -------------------------------------------------
+      // REFERENCIAS DEL HERO ORIGINAL
+      // -------------------------------------------------
+
       const background = hero.querySelector<HTMLElement>(
         '.hero__bg',
       )
@@ -104,7 +113,10 @@ export function Hero({
         '.hero__scroll',
       )
 
-      // Elementos de la revelación
+      // -------------------------------------------------
+      // REFERENCIAS DE LA PIEDRA DEL SOL
+      // -------------------------------------------------
+
       const reveal = hero.querySelector<HTMLElement>(
         '.hero__reveal',
       )
@@ -117,13 +129,29 @@ export function Hero({
         '.hero__portal',
       )
 
-      const portalImage = hero.querySelector<HTMLElement>(
+      // -------------------------------------------------
+      // REFERENCIAS DEL ESCENARIO
+      // -------------------------------------------------
+
+      const portalScene = hero.querySelector<HTMLElement>(
+        '.hero__portal-scene',
+      )
+
+      const portalMedia = hero.querySelector<HTMLElement>(
         '.hero__portal-media',
+      )
+
+      const portalMediaImage = hero.querySelector<HTMLElement>(
+        '.hero__portal-media-img',
       )
 
       const portalOverlay = hero.querySelector<HTMLElement>(
         '.hero__portal-overlay',
       )
+
+      // -------------------------------------------------
+      // REFERENCIAS DEL CONTENIDO NARRATIVO
+      // -------------------------------------------------
 
       const portalContent = hero.querySelector<HTMLElement>(
         '.hero__portal-content',
@@ -155,7 +183,8 @@ export function Hero({
         !reveal ||
         !logo ||
         !portal ||
-        !portalImage ||
+        !portalScene ||
+        !portalMedia ||
         !portalOverlay ||
         !portalContent ||
         !portalEyebrow ||
@@ -166,7 +195,7 @@ export function Hero({
       ) {
         if (DEBUG_SCROLL) {
           console.warn(
-            '[KOM] Faltan elementos para iniciar el portal.',
+            '[KOM] Faltan elementos del Hero cinematográfico.',
           )
         }
 
@@ -188,16 +217,28 @@ export function Hero({
         transformOrigin: '50% 50%',
       })
 
-      // El portal comienza completamente cerrado.
       gsap.set(portal, {
         clipPath: 'circle(0% at 50% 50%)',
       })
 
-      gsap.set(portalImage, {
+      gsap.set(portalScene, {
+        opacity: 1,
+      })
+
+      gsap.set(portalMedia, {
         scale: 1.18,
         opacity: 0.65,
-        transformOrigin: 'center center',
+        yPercent: 0,
+        transformOrigin: '50% 50%',
       })
+
+      if (portalMediaImage) {
+        gsap.set(portalMediaImage, {
+          scale: 1,
+          yPercent: 0,
+          transformOrigin: '50% 50%',
+        })
+      }
 
       gsap.set(portalOverlay, {
         opacity: 0.9,
@@ -205,6 +246,7 @@ export function Hero({
 
       gsap.set(portalContent, {
         autoAlpha: 0,
+        y: 0,
       })
 
       gsap.set(
@@ -220,9 +262,13 @@ export function Hero({
         },
       )
 
-      // Objeto numérico controlado por GSAP.
-      // El valor se actualiza también al hacer scroll
-      // en sentido contrario.
+      // -------------------------------------------------
+      // CONTADOR NUMÉRICO
+      //
+      // Se actualiza con el progreso del scroll.
+      // La animación funciona en ambas direcciones.
+      // -------------------------------------------------
+
       const counter = {
         value: 0,
       }
@@ -230,7 +276,7 @@ export function Hero({
       counterElement.textContent = '0'
 
       // ===================================================
-      // 4. TIMELINE CINEMATOGRÁFICA
+      // 4. TIMELINE PRINCIPAL
       // ===================================================
 
       const timeline = gsap.timeline({
@@ -239,16 +285,20 @@ export function Hero({
         },
 
         scrollTrigger: {
-          id: 'kom-hero-portal-v6',
+          id: 'kom-hero-portal-v8',
 
           trigger: hero,
 
           start: 'top top',
 
-          // Distancia narrativa del recorrido.
-          end: () => `+=${window.innerHeight * 3.2}`,
+          // V8:
+          // Reducimos la distancia fijada respecto
+          // a la versión anterior (3.2 pantallas).
+          end: () => `+=${window.innerHeight * 2.65}`,
 
-          scrub: 0.8,
+          // Seguimiento más cercano al movimiento
+          // real del usuario.
+          scrub: 0.55,
 
           pin: true,
           pinSpacing: true,
@@ -261,7 +311,7 @@ export function Hero({
       })
 
       // ===================================================
-      // FASE 1 — DESPEDIDA DEL HERO
+      // FASE 1 — DESPEDIDA DEL HERO ORIGINAL
       // ===================================================
 
       timeline.to(
@@ -273,9 +323,6 @@ export function Hero({
         0,
       )
 
-      // Animamos el contenedor completo para evitar
-      // conflictos con las animaciones individuales
-      // de entrada realizadas mediante Motion.
       timeline.to(
         content,
         {
@@ -299,7 +346,7 @@ export function Hero({
       }
 
       // ===================================================
-      // FASE 2 — APARICIÓN DEL ISOTIPO
+      // FASE 2 — APARICIÓN DE LA PIEDRA DEL SOL
       // ===================================================
 
       timeline.to(
@@ -324,7 +371,7 @@ export function Hero({
       )
 
       // ===================================================
-      // FASE 3 — ACERCAMIENTO CINEMATOGRÁFICO
+      // FASE 3 — ZOOM CINEMATOGRÁFICO
       // ===================================================
 
       timeline.to(
@@ -339,12 +386,9 @@ export function Hero({
       )
 
       // ===================================================
-      // FASE 4 — APERTURA DE LA PIEDRA DEL SOL
+      // FASE 4 — APERTURA DEL PORTAL
       // ===================================================
 
-      // Una única expansión continua.
-      // El radio de 150% cubre completamente
-      // la pantalla, incluidas las esquinas.
       timeline.to(
         portal,
         {
@@ -355,8 +399,6 @@ export function Hero({
         2.15,
       )
 
-      // El logo termina de acercarse y desaparece
-      // cuando el portal ocupa el centro de la pantalla.
       timeline.to(
         logo,
         {
@@ -370,24 +412,21 @@ export function Hero({
       )
 
       // ===================================================
-      // FASE 5 — REVELACIÓN DE LA IMAGEN ANFITRIONA
+      // FASE 5 — REVELACIÓN DE IMAGEN-HERO
       // ===================================================
 
-      // La imagen realiza un acercamiento ambiental
-      // contrario a la apertura del portal.
+      // La escena se acerca desde el fondo del portal.
       timeline.to(
-        portalImage,
+        portalMedia,
         {
-          scale: 1,
+          scale: 1.07,
           opacity: 1,
-          duration: 1.5,
+          duration: 1.4,
           ease: 'sine.inOut',
         },
         2.3,
       )
 
-      // El sombreado se ajusta para revelar
-      // progresivamente la imagen sin perder contraste.
       timeline.to(
         portalOverlay,
         {
@@ -398,7 +437,7 @@ export function Hero({
       )
 
       // ===================================================
-      // FASE 6 — MENSAJE PROMOCIONAL
+      // FASE 6 — APARICIÓN DEL MENSAJE
       // ===================================================
 
       timeline.set(
@@ -409,7 +448,6 @@ export function Hero({
         3.55,
       )
 
-      // Etiqueta superior
       timeline.to(
         portalEyebrow,
         {
@@ -421,7 +459,6 @@ export function Hero({
         3.6,
       )
 
-      // Frase principal
       timeline.to(
         portalTitle,
         {
@@ -433,7 +470,6 @@ export function Hero({
         3.7,
       )
 
-      // Subtítulo
       timeline.to(
         portalSubtitle,
         {
@@ -446,10 +482,47 @@ export function Hero({
       )
 
       // ===================================================
-      // FASE 7 — CONTADOR DINÁMICO
+      // FASE 7 — CÁMARA EN MOVIMIENTO
+      //
+      // CAMBIO PRINCIPAL V8:
+      //
+      // El fondo continúa moviéndose mientras aparece
+      // el contador.
+      //
+      // Así, aunque ScrollTrigger mantiene fijo el Hero,
+      // la escena conserva sensación de desplazamiento.
       // ===================================================
 
-      // Primero aparece el espacio del contador.
+      timeline.to(
+        portalMedia,
+        {
+          scale: 1.12,
+          yPercent: -2,
+          duration: 1.65,
+          ease: 'sine.inOut',
+        },
+        3.7,
+      )
+
+      // Movimiento adicional muy ligero de la fotografía.
+      // No modifica el texto ni la máscara circular.
+      if (portalMediaImage) {
+        timeline.to(
+          portalMediaImage,
+          {
+            scale: 1.025,
+            yPercent: -1.5,
+            duration: 1.5,
+            ease: 'sine.inOut',
+          },
+          3.85,
+        )
+      }
+
+      // ===================================================
+      // FASE 8 — CONTADOR DINÁMICO
+      // ===================================================
+
       timeline.to(
         portalStats,
         {
@@ -461,14 +534,11 @@ export function Hero({
         4.1,
       )
 
-      // Animación del número: 0 → 5000.
-      // Está vinculada al progreso del scroll,
-      // por lo que funciona también al retroceder.
       timeline.to(
         counter,
         {
           value: PORTAL_CONTENT.downloads,
-          duration: 1.1,
+          duration: 0.9,
           ease: 'power2.out',
 
           onUpdate: () => {
@@ -480,25 +550,68 @@ export function Hero({
       )
 
       // ===================================================
-      // FASE 8 — CIERRE DE LA SECUENCIA
+      // FASE 9 — SALIDA HACIA EL TRÁILER
+      //
+      // CAMBIO PRINCIPAL V8:
+      //
+      // En lugar de mantener una composición inmóvil
+      // hasta liberar el pin:
+      //
+      // 1. El contador termina.
+      // 2. El texto asciende y desaparece.
+      // 3. La imagen sigue moviéndose.
+      // 4. La escena se funde progresivamente a negro.
+      // 5. El scroll continúa hacia Trailer.tsx.
       // ===================================================
 
-      // Mantener la composición terminada durante
-      // un pequeño tramo del recorrido.
+      timeline.to(
+        portalContent,
+        {
+          y: -42,
+          autoAlpha: 0,
+          duration: 0.55,
+          ease: 'sine.inOut',
+        },
+        5.12,
+      )
+
+      // Último desplazamiento de cámara.
+      timeline.to(
+        portalMedia,
+        {
+          yPercent: -3,
+          scale: 1.15,
+          duration: 0.45,
+          ease: 'sine.inOut',
+        },
+        5.35,
+      )
+
+      // El fondo desaparece sobre el negro del Hero.
+      // Esto evita un cambio brusco de imagen cuando
+      // ScrollTrigger libera la sección.
+      timeline.to(
+        portalScene,
+        {
+          opacity: 0,
+          duration: 0.5,
+          ease: 'sine.inOut',
+        },
+        5.32,
+      )
+
+      // Final breve: no dejamos una pausa prolongada.
       timeline.to(
         {},
         {
-          duration: 0.45,
+          duration: 0.08,
         },
-        5.3,
+        5.82,
       )
-
-      // La siguiente sección aparece cuando se libera
-      // el pin. No introducimos otro reproductor aquí.
 
       if (DEBUG_SCROLL) {
         console.log(
-          '[KOM] Hero cinematográfico V6 inicializado.',
+          '[KOM] Hero cinematográfico V8 inicializado.',
         )
       }
     },
@@ -510,7 +623,7 @@ export function Hero({
   )
 
   // =========================================================
-  // 5. ESTRUCTURA VISUAL DEL HERO
+  // 5. ESTRUCTURA VISUAL
   // =========================================================
 
   return (
@@ -567,7 +680,7 @@ export function Hero({
             delay: 0.05,
           }}
         >
-          Desarrollo de Videojuegos - Desarrollo Móvil - Desarrollo Web - 2026
+          Proyecto Integrador 2026
         </motion.p>
 
         <h1 className="hero__title display">
@@ -633,7 +746,7 @@ export function Hero({
           }}
         >
           <a
-            className="btn btn--primary btn--lg"
+            className="hero__action-button"
             href="#personajes"
           >
             <span className="btn__label">
@@ -642,7 +755,7 @@ export function Hero({
           </a>
 
           <a
-            className="btn btn--secondary btn--lg"
+            className="hero__action-button"
             href="#descargar"
           >
             <span className="btn__label">
@@ -653,7 +766,7 @@ export function Hero({
       </div>
 
       {/* ===================================================
-          REVELACIÓN CINEMATOGRÁFICA
+          PIEDRA DEL SOL Y PORTAL
           =================================================== */}
 
       {!reduced && (
@@ -661,8 +774,6 @@ export function Hero({
           className="hero__reveal"
           aria-hidden="true"
         >
-          {/* Logotipo oficial */}
-
           <div className="hero__reveal-word-wrapper">
             <img
               className="hero__reveal-logo"
@@ -675,14 +786,10 @@ export function Hero({
             />
           </div>
 
-          {/* =================================================
-              PORTAL DE LA PIEDRA DEL SOL
-              ================================================= */}
-
           <div className="hero__portal">
             <div className="hero__portal-scene">
 
-              {/* Imagen anfitriona */}
+              {/* Imagen anfitriona del portal */}
 
               <div className="hero__portal-media">
                 {hasPortalImage ? (
@@ -699,7 +806,7 @@ export function Hero({
                 )}
               </div>
 
-              {/* Filtro oscuro y resplandor dorado */}
+              {/* Oscurecimiento ambiental */}
 
               <div className="hero__portal-overlay" />
 
@@ -710,12 +817,9 @@ export function Hero({
                 aria-hidden="true"
               />
 
-              {/* ===========================================
-                  CONTENIDO NARRATIVO DEL PORTAL
-                  =========================================== */}
+              {/* Contenido narrativo */}
 
               <div className="hero__portal-content">
-
                 <span className="hero__portal-eyebrow">
                   {PORTAL_CONTENT.eyebrow}
                 </span>
@@ -728,16 +832,11 @@ export function Hero({
                   {PORTAL_CONTENT.subtitle}
                 </p>
 
-                {/* =======================================
-                    CONTADOR DEMOSTRATIVO
-                    ======================================= */}
+                {/* Contador vinculado al scroll */}
 
                 <div className="hero__portal-stats">
-
                   <div className="hero__portal-counter">
-                    <span
-                      className="hero__portal-counter-value"
-                    >
+                    <span className="hero__portal-counter-value">
                       0
                     </span>
 
@@ -749,13 +848,9 @@ export function Hero({
                   <span className="hero__portal-counter-label">
                     {PORTAL_CONTENT.downloadsLabel}
                   </span>
-
-                  <span className="hero__portal-counter-demo">
-                    {PORTAL_CONTENT.demoLabel}
-                  </span>
                 </div>
-
               </div>
+
             </div>
           </div>
         </div>

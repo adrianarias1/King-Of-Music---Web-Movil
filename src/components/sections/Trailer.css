@@ -1,7 +1,21 @@
 
 /* =========================================================
-   KING OF MUSIC — TRÁILER CINEMATOGRÁFICO
+   KING OF MUSIC — TRÁILER CINEMATOGRÁFICO V4
+
+   MEJORAS:
+   - Póster desenfocado y oscurecido.
+   - Botón Play blanco de alto contraste.
+   - Video nítido durante la reproducción.
+   - Degradado negro → blanco hacia personajes.
+   - Diseño responsivo.
+   - Compatibilidad con Trailer.tsx V4.
+
+   PALETA:
+   Negro  #000000
+   Blanco #FFFFFF
+   Dorado #C5A45B
    ========================================================= */
+
 
 /* =========================================================
    1. SECCIÓN PRINCIPAL
@@ -21,11 +35,22 @@
     #000;
 
   color: #fff;
+
+  /*
+     Espacio para que el degradado inferior
+     no interfiera con el reproductor.
+  */
+  padding-bottom: clamp(100px, 15vh, 180px);
 }
 
-/* Resplandor ambiental decorativo */
+
+/* =========================================================
+   2. RESPLANDOR AMBIENTAL
+   ========================================================= */
+
 .trailer::before {
   content: '';
+
   position: absolute;
   inset: 0;
   z-index: -1;
@@ -40,18 +65,68 @@
   pointer-events: none;
 }
 
+
 /* =========================================================
-   2. CONTENEDOR DEL REPRODUCTOR
+   3. DEGRADADO INFERIOR — NEGRO A BLANCO
+
+   Transición hacia la sección de personajes.
+
+   Se posiciona en el borde inferior del tráiler.
+   No cubre el video ni el botón de reproducción.
+
+   ========================================================= */
+
+.trailer::after {
+  content: '';
+
+  position: absolute;
+
+  left: 0;
+  right: 0;
+  bottom: 0;
+
+  z-index: 1;
+
+  height: clamp(65px, 10vh, 120px);
+
+  background: linear-gradient(
+    to bottom,
+    rgba(0, 0, 0, 0) 0%,
+    rgba(35, 35, 35, 0.55) 25%,
+    rgba(110, 110, 110, 0.8) 55%,
+    rgba(200, 200, 200, 0.95) 82%,
+    #ffffff 100%
+  );
+
+  pointer-events: none;
+}
+
+
+/* =========================================================
+   4. ENCABEZADO
+   ========================================================= */
+
+.trailer__heading {
+  position: relative;
+  z-index: 2;
+}
+
+
+/* =========================================================
+   5. CONTENEDOR DEL REPRODUCTOR
    ========================================================= */
 
 .trailer__frame {
   position: relative;
+  z-index: 2;
+
   width: 100%;
   margin-inline: auto;
 }
 
+
 /* =========================================================
-   3. ESCENARIO DEL TRÁILER
+   6. ESCENARIO DEL TRÁILER
    ========================================================= */
 
 .trailer__stage {
@@ -73,13 +148,15 @@
     0 0 65px rgba(197, 164, 91, 0.07);
 }
 
+
 /* =========================================================
-   4. POSTER PROVISIONAL
+   7. PÓSTER PROVISIONAL
    ========================================================= */
 
 .trailer__poster {
   position: absolute;
   inset: 0;
+  z-index: 0;
 
   display: flex;
   align-items: center;
@@ -88,12 +165,12 @@
   background:
     radial-gradient(
       ellipse 65% 55% at 50% 45%,
-      rgba(197, 164, 91, 0.35),
+      rgba(197, 164, 91, 0.25),
       transparent 75%
     ),
     radial-gradient(
       ellipse 45% 55% at 80% 20%,
-      rgba(75, 57, 29, 0.22),
+      rgba(75, 57, 29, 0.18),
       transparent 80%
     ),
     linear-gradient(
@@ -104,8 +181,9 @@
     );
 }
 
+
 /* =========================================================
-   5. REJILLA DECORATIVA
+   8. REJILLA DECORATIVA
    ========================================================= */
 
 .trailer__grid {
@@ -143,8 +221,14 @@
     );
 }
 
+
 /* =========================================================
-   6. IMAGEN Y VIDEO
+   9. IMAGEN Y VIDEO
+
+   IMPORTANTE:
+   Solo el póster recibe blur y oscuridad.
+
+   El elemento video NO recibe filtros.
    ========================================================= */
 
 .trailer__poster-img,
@@ -152,23 +236,98 @@
   position: absolute;
   inset: 0;
 
+  display: block;
+
   width: 100%;
   height: 100%;
 
   object-fit: cover;
+  object-position: center;
 }
+
+
+/* =========================================================
+   10. PÓSTER OSCURO Y DESENFOCADO
+   ========================================================= */
 
 .trailer__poster-img {
   z-index: 1;
+
+  /*
+     Desenfoque moderado:
+     conserva la composición de la imagen,
+     pero dirige la atención hacia Play.
+  */
+  filter:
+    blur(5px)
+    brightness(0.44)
+    saturate(0.8);
+
+  /*
+     El ligero aumento evita que el blur
+     deje bordes transparentes.
+  */
+  transform: scale(1.035);
+
+  transform-origin: center;
+
+  pointer-events: none;
+  user-select: none;
 }
 
-.trailer__video {
-  z-index: 4;
-  background: #000;
-}
 
 /* =========================================================
-   7. ETIQUETA SUPERIOR
+   11. OSCURECIMIENTO COMPLEMENTARIO
+
+   Agregamos una viñeta utilizando ::after
+   sobre el escenario del reproductor.
+
+   ========================================================= */
+
+.trailer__stage::after {
+  content: '';
+
+  position: absolute;
+  inset: 0;
+
+  z-index: 2;
+
+  background:
+    radial-gradient(
+      ellipse at center,
+      rgba(0, 0, 0, 0.05) 0%,
+      rgba(0, 0, 0, 0.15) 55%,
+      rgba(0, 0, 0, 0.55) 100%
+    );
+
+  pointer-events: none;
+}
+
+
+/* =========================================================
+   12. VIDEO REAL
+
+   Sin blur ni oscuridad durante la reproducción.
+   ========================================================= */
+
+.trailer__video {
+  z-index: 5;
+
+  background: #000;
+
+  filter: none;
+  transform: none;
+}
+
+/* Ocultamos el decorado durante la reproducción */
+
+.trailer__stage--playing::after {
+  display: none;
+}
+
+
+/* =========================================================
+   13. ETIQUETA SUPERIOR
    ========================================================= */
 
 .trailer__badge {
@@ -192,8 +351,9 @@
   -webkit-backdrop-filter: blur(8px);
 }
 
+
 /* =========================================================
-   8. RELACIÓN DE ASPECTO
+   14. RELACIÓN DE ASPECTO
    ========================================================= */
 
 .trailer__ratio {
@@ -205,29 +365,35 @@
   z-index: 2;
 
   color: var(--color-gray-light);
-
   opacity: 0.65;
 }
 
+
 /* =========================================================
-   9. BOTÓN DE REPRODUCCIÓN
+   15. BOTÓN DE REPRODUCCIÓN
+
+   La superficie del botón cubre el escenario,
+   pero el símbolo principal es un círculo blanco.
+
    ========================================================= */
 
 .trailer__play {
   position: absolute;
   inset: 0;
 
-  z-index: 3;
+  z-index: 4;
 
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
 
-  gap: 0.85rem;
+  gap: 1rem;
 
   width: 100%;
   height: 100%;
+
+  padding: 0;
 
   border: 0;
 
@@ -241,7 +407,7 @@
 }
 
 .trailer__play:hover:not(:disabled) {
-  background: rgba(197, 164, 91, 0.045);
+  background: rgba(255, 255, 255, 0.025);
 }
 
 .trailer__play:focus-visible {
@@ -253,80 +419,128 @@
   cursor: default;
 }
 
+
 /* =========================================================
-   10. ANILLO DEL BOTÓN
+   16. CÍRCULO BLANCO DE PLAY
+
+   Sustituye el anillo dorado transparente.
+
    ========================================================= */
 
 .trailer__play-ring {
-  position: absolute;
+  position: relative;
 
-  top: 50%;
-  left: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 
-  width: clamp(72px, 8vw, 100px);
-  height: clamp(72px, 8vw, 100px);
+  width: clamp(76px, 8vw, 104px);
+  height: clamp(76px, 8vw, 104px);
 
-  border: 1px solid rgba(197, 164, 91, 0.75);
+  flex-shrink: 0;
+
+  border: 2px solid #fff;
   border-radius: 50%;
 
-  transform: translate(-50%, -60%);
+  background: #fff;
 
   box-shadow:
-    0 0 30px rgba(197, 164, 91, 0.12),
-    inset 0 0 25px rgba(197, 164, 91, 0.06);
+    0 6px 28px rgba(0, 0, 0, 0.35),
+    0 0 32px rgba(255, 255, 255, 0.2);
 
   pointer-events: none;
 
   transition:
-    transform 350ms ease,
-    border-color 350ms ease,
-    box-shadow 350ms ease;
+    transform 300ms ease,
+    box-shadow 300ms ease,
+    background-color 300ms ease;
 }
 
-.trailer__play:hover:not(:disabled) .trailer__play-ring {
-  transform: translate(-50%, -60%) scale(1.1);
-
-  border-color: #e3c57b;
-
-  box-shadow:
-    0 0 55px rgba(197, 164, 91, 0.2),
-    inset 0 0 30px rgba(197, 164, 91, 0.1);
-}
-
-.trailer__play:disabled .trailer__play-ring {
-  border-style: dashed;
-  opacity: 0.45;
-}
 
 /* =========================================================
-   11. ICONO Y TEXTO
+   17. ICONO PLAY
    ========================================================= */
 
-.trailer__play > svg {
+.trailer__play-icon {
   position: relative;
-  z-index: 1;
 
-  transition:
-    transform 350ms ease,
-    color 350ms ease;
+  display: block;
+
+  width: 34%;
+  height: 34%;
+
+  /*
+     Lucide dibuja el triángulo mediante stroke.
+     Añadimos relleno oscuro para hacerlo evidente.
+  */
+  color: #101010;
+  fill: #101010;
+
+  transform: translateX(2px);
+
+  pointer-events: none;
 }
 
-.trailer__play:hover:not(:disabled) > svg {
-  transform: scale(1.12);
-  color: #e3c57b;
-}
-
-.trailer__play-text {
-  color: var(--color-gray-light);
-
-  transform: translateY(1.6rem);
-
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-}
 
 /* =========================================================
-   12. AVISO DE VIDEO PENDIENTE
+   18. TEXTO DEL BOTÓN
+   ========================================================= */
+
+.trailer__play-text {
+  display: block;
+
+  color: #fff;
+
+  font-family: var(--font-body);
+  font-size: clamp(0.7rem, 1vw, 0.85rem);
+  font-weight: 600;
+
+  line-height: 1.4;
+  letter-spacing: 0.2em;
+
+  text-transform: uppercase;
+
+  text-shadow:
+    0 2px 16px rgba(0, 0, 0, 0.9);
+}
+
+
+/* =========================================================
+   19. HOVER
+
+   Ampliación leve e iluminación blanca.
+
+   ========================================================= */
+
+@media (hover: hover) and (pointer: fine) {
+  .trailer__play:hover:not(:disabled)
+  .trailer__play-ring {
+    transform: scale(1.08);
+
+    background: #fff;
+
+    box-shadow:
+      0 8px 36px rgba(0, 0, 0, 0.4),
+      0 0 48px rgba(255, 255, 255, 0.36);
+  }
+}
+
+
+/* =========================================================
+   20. ESTADO DESHABILITADO
+   ========================================================= */
+
+.trailer__play:disabled .trailer__play-ring {
+  opacity: 0.65;
+}
+
+.trailer__play:disabled .trailer__play-text {
+  color: var(--color-gray-light);
+}
+
+
+/* =========================================================
+   21. AVISO DE VIDEO PENDIENTE
    ========================================================= */
 
 .trailer__notice {
@@ -337,11 +551,16 @@
   color: var(--color-gray-light);
 }
 
+
 /* =========================================================
-   13. RESPONSIVE — TABLET
+   22. RESPONSIVE — TABLETS Y MÓVILES
    ========================================================= */
 
 @media (max-width: 767px) {
+  .trailer {
+    padding-bottom: clamp(90px, 12vh, 140px);
+  }
+
   .trailer__stage {
     border-radius: 10px;
   }
@@ -352,46 +571,66 @@
 
   .trailer__badge {
     padding: 0.35rem 0.6rem;
+    font-size: 0.65rem;
   }
 
   .trailer__ratio {
     right: 0.75rem;
     bottom: 0.75rem;
+    font-size: 0.65rem;
+  }
+
+  .trailer__poster-img {
+    filter:
+      blur(4px)
+      brightness(0.45)
+      saturate(0.8);
+  }
+
+  .trailer__play-ring {
+    width: clamp(60px, 14vw, 82px);
+    height: clamp(60px, 14vw, 82px);
   }
 
   .trailer__play-text {
     font-size: 0.7rem;
   }
+
+  .trailer::after {
+    height: clamp(65px, 9vh, 100px);
+  }
 }
 
+
 /* =========================================================
-   14. PANTALLAS MUY PEQUEÑAS
+   23. PANTALLAS MUY PEQUEÑAS
    ========================================================= */
 
 @media (max-width: 380px) {
   .trailer__play-ring {
-    width: 64px;
-    height: 64px;
+    width: 56px;
+    height: 56px;
   }
 
-  .trailer__play > svg {
-    width: 21px;
-    height: 21px;
+  .trailer__play-text {
+    font-size: 0.6rem;
+    letter-spacing: 0.12em;
   }
 
   .trailer__badge {
-    font-size: 0.65rem;
+    font-size: 0.6rem;
   }
 }
 
+
 /* =========================================================
-   15. ACCESIBILIDAD
+   24. ACCESIBILIDAD
    ========================================================= */
 
 @media (prefers-reduced-motion: reduce) {
   .trailer__play,
   .trailer__play-ring,
-  .trailer__play > svg {
-    transition: none;
+  .trailer__play-icon {
+    transition: none !important;
   }
 }

@@ -1,6 +1,71 @@
+
+/* =========================================================
+   KING OF MUSIC — MAPA INTERACTIVO V2
+
+   - Identidad negra y dorada.
+   - Zoom suave de cámara.
+   - Selección reversible de escenarios.
+   - Hotspots sincronizados con el mapa.
+   - Botón de vista general.
+   - Degradado inferior negro → blanco.
+   - Diseño responsive y accesible.
+   ========================================================= */
+
+.map {
+  --map-gold: #c5a45b;
+  --map-gold-light: #e3c57b;
+  --map-gold-soft: rgba(197, 164, 91, 0.18);
+
+  position: relative;
+  isolation: isolate;
+  overflow: clip;
+
+  color: #fff;
+  background: #000;
+
+  padding-bottom: clamp(110px, 16vh, 190px);
+}
+
+/* =========================================================
+   1. DEGRADADO INFERIOR
+   ========================================================= */
+
+.map::after {
+  content: '';
+
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 1;
+
+  height: clamp(70px, 11vh, 130px);
+
+  background: linear-gradient(
+    to bottom,
+    rgba(0, 0, 0, 0) 0%,
+    rgba(35, 35, 35, 0.55) 28%,
+    rgba(120, 120, 120, 0.8) 58%,
+    rgba(220, 220, 220, 0.95) 86%,
+    #fff 100%
+  );
+
+  pointer-events: none;
+}
+
+.map > .container {
+  position: relative;
+  z-index: 2;
+}
+
+/* =========================================================
+   2. ENCABEZADO
+   ========================================================= */
+
 .map__head {
   display: flex;
   flex-direction: column;
+
   gap: 2rem;
   margin-bottom: clamp(2rem, 5vw, 3rem);
 }
@@ -8,6 +73,7 @@
 .map__head > div:first-child {
   display: flex;
   flex-direction: column;
+
   gap: 1.1rem;
   max-width: 58ch;
 }
@@ -16,134 +82,586 @@
   color: var(--color-gray-light);
 }
 
-/* --- Leyenda ------------------------------------------------------------- */
+.map__head .section-head__index span:first-child {
+  color: var(--map-gold);
+}
+
+/* =========================================================
+   3. LEYENDA / SELECTOR DE ESCENARIOS
+   ========================================================= */
+
 .map__legend {
   display: flex;
   flex-wrap: wrap;
   gap: 0.5rem;
+
+  margin: 0;
+  padding: 0;
+
+  list-style: none;
 }
 
 .map__legend-item {
   display: inline-flex;
   align-items: center;
+  justify-content: center;
+
   gap: 0.5rem;
+
   min-height: 42px;
   padding: 0.5rem 0.95rem;
+
   font-size: var(--fs-small);
+  line-height: 1.4;
+
   color: var(--color-gray-light);
+  background: rgba(0, 0, 0, 0.55);
+
   border: 1px solid var(--color-line);
   border-radius: var(--radius-sm);
+
+  cursor: pointer;
+
   transition:
-    color var(--dur-fast) var(--ease-out),
-    border-color var(--dur-fast) var(--ease-out),
-    background-color var(--dur-fast) var(--ease-out);
+    color 260ms ease,
+    border-color 260ms ease,
+    background-color 260ms ease,
+    box-shadow 260ms ease;
 }
 
-.map__legend-item:hover {
-  color: var(--color-white);
-  border-color: var(--color-line-strong);
+.map__legend-item svg {
+  flex-shrink: 0;
+
+  transition:
+    color 260ms ease;
 }
 
 .map__legend-item.is-active {
-  color: var(--color-white);
-  border-color: var(--color-navy);
-  background: rgba(0, 47, 97, 0.4);
+  color: var(--map-gold-light);
+
+  border-color: var(--map-gold);
+  background: rgba(197, 164, 91, 0.11);
 }
 
-@media (min-width: 900px) {
-  .map__head {
-    flex-direction: row;
-    align-items: flex-end;
-    justify-content: space-between;
+.map__legend-item.is-focused {
+  box-shadow:
+    0 0 20px rgba(197, 164, 91, 0.15),
+    inset 0 0 14px rgba(197, 164, 91, 0.05);
+}
+
+.map__legend-item.is-active svg,
+.map__legend-item.is-focused svg {
+  color: var(--map-gold-light);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .map__legend-item:hover {
+    color: var(--map-gold-light);
+    border-color: var(--map-gold);
+
+    background: rgba(197, 164, 91, 0.08);
   }
 }
 
-/* --- Layout -------------------------------------------------------------- */
+.map__legend-item:focus-visible {
+  outline: 2px solid var(--map-gold-light);
+  outline-offset: 3px;
+}
+
+/* =========================================================
+   4. DISTRIBUCIÓN PRINCIPAL
+   ========================================================= */
+
 .map__layout {
   display: grid;
-  grid-template-columns: 1fr;
+  grid-template-columns: minmax(0, 1fr);
+
   gap: clamp(1.5rem, 3vw, 2.5rem);
   align-items: start;
 }
 
-@media (min-width: 900px) {
-  .map__layout {
-    grid-template-columns: minmax(0, 1.35fr) minmax(0, 0.65fr);
-  }
-}
+/* =========================================================
+   5. CONTENEDOR DEL MAPA
+   ========================================================= */
 
-/* --- Mapa ---------------------------------------------------------------- */
 .map__canvas {
   position: relative;
+  isolation: isolate;
+
   width: 100%;
-  border-radius: var(--radius-md);
+  min-width: 0;
+
   overflow: hidden;
-  border: 1px solid var(--color-line);
+
+  border: 1px solid rgba(197, 164, 91, 0.28);
+  border-radius: var(--radius-md);
+
   background: #050505;
+
+  box-shadow:
+    0 18px 50px rgba(0, 0, 0, 0.3),
+    0 0 30px rgba(197, 164, 91, 0.035);
 }
 
-/* La imagen manda: define su propia relacion de aspecto a partir de sus
-   dimensiones intrinsecas. El contenedor se ajusta a ella, de modo que la
-   imagen nunca se recorta (object-fit: cover) ni se deforma, y los hotspots
-   en % siguen cayendo sobre el punto correcto. */
-.map__img {
+/* =========================================================
+   6. CÁMARA INTERACTIVA
+
+   GameMap.tsx aplica transform directamente
+   sobre este elemento.
+
+   La imagen y los hotspots comparten el mismo
+   sistema de coordenadas.
+
+   No aplicar overflow:hidden aquí: el recorte
+   corresponde únicamente a map__canvas.
+   ========================================================= */
+
+.map__world {
+  position: relative;
+
+  display: block;
+
+  width: 100%;
+
+  transform-origin: 50% 50%;
+
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+}
+
+/* La cámara conserva la proporción de la imagen.
+   Su altura se determina por el contenido. */
+
+.map__world > .map__img {
   display: block;
   width: 100%;
   height: auto;
 }
 
-/* Esquema provisional hecho solo con CSS.
-   Usa la misma proporcion que public/images/map.png (1672x941) para que no
-   haya salto de layout cuando la imagen real carga. */
+/* Indicador ambiental de cámara enfocada */
+
+.map__canvas.is-zoomed {
+  border-color: rgba(197, 164, 91, 0.55);
+
+  box-shadow:
+    0 18px 55px rgba(0, 0, 0, 0.35),
+    0 0 26px rgba(197, 164, 91, 0.1);
+}
+
+/* =========================================================
+   7. IMAGEN PRINCIPAL
+
+   No usar object-fit: cover.
+
+   El mapa debe conservar su proporción original
+   para que los porcentajes de los hotspots
+   permanezcan correctamente alineados.
+   ========================================================= */
+
+.map__img {
+  display: block;
+
+  width: 100%;
+  height: auto;
+
+  user-select: none;
+  -webkit-user-select: none;
+
+  -webkit-user-drag: none;
+}
+
+/* =========================================================
+   8. MAPA ESQUEMÁTICO PROVISIONAL
+   ========================================================= */
+
 .map__schematic {
   position: relative;
-  width: 100%;
-  aspect-ratio: 1672 / 941;
+
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
+
   gap: 0.5rem;
+
+  width: 100%;
+  aspect-ratio: 1672 / 941;
+
   background:
-    radial-gradient(60% 50% at 50% 30%, rgba(0, 47, 97, 0.45) 0%, transparent 68%),
-    linear-gradient(170deg, #0d0d0d 0%, #060606 100%);
+    radial-gradient(
+      60% 50% at 50% 30%,
+      rgba(197, 164, 91, 0.25),
+      transparent 68%
+    ),
+    linear-gradient(
+      170deg,
+      #0d0d0d 0%,
+      #060606 100%
+    );
 }
 
 .map__grid {
   position: absolute;
   inset: 0;
+
   background-image:
-    linear-gradient(to right, rgba(186, 186, 186, 0.09) 1px, transparent 1px),
-    linear-gradient(to bottom, rgba(186, 186, 186, 0.09) 1px, transparent 1px);
+    linear-gradient(
+      to right,
+      rgba(186, 186, 186, 0.09) 1px,
+      transparent 1px
+    ),
+    linear-gradient(
+      to bottom,
+      rgba(186, 186, 186, 0.09) 1px,
+      transparent 1px
+    );
+
   background-size: 64px 64px;
-  mask-image: radial-gradient(75% 65% at 50% 50%, #000 10%, transparent 95%);
-  -webkit-mask-image: radial-gradient(75% 65% at 50% 50%, #000 10%, transparent 95%);
+
+  mask-image: radial-gradient(
+    75% 65% at 50% 50%,
+    #000 10%,
+    transparent 95%
+  );
+
+  -webkit-mask-image: radial-gradient(
+    75% 65% at 50% 50%,
+    #000 10%,
+    transparent 95%
+  );
 }
 
 .map__schematic-label {
   position: relative;
-  color: var(--color-gray-light);
+  color: var(--map-gold-light);
 }
 
 .map__schematic-sub {
   position: relative;
+
   font-size: var(--fs-small);
-  color: var(--color-gray-dark);
+  color: var(--color-gray-light);
 }
 
-/* --- Imagen del escenario: ampliable -------------------------------------- */
+/* =========================================================
+   9. HOTSPOTS
+   ========================================================= */
+
+.map__hotspot {
+  position: absolute;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+
+  gap: 0.4rem;
+  padding: 0.5rem;
+
+  color: #fff;
+
+  background: transparent;
+  border: 0;
+
+  transform: translate(-50%, -50%);
+
+  cursor: pointer;
+  z-index: 2;
+}
+
+/* =========================================================
+   10. PUNTO DEL ESCENARIO
+   ========================================================= */
+
+.map__hotspot-dot {
+  position: relative;
+
+  display: block;
+  flex-shrink: 0;
+
+  width: 14px;
+  height: 14px;
+
+  border-radius: 50%;
+
+  border: 2px solid #fff;
+  background: rgba(0, 0, 0, 0.75);
+
+  transition:
+    transform 300ms ease,
+    background-color 300ms ease,
+    border-color 300ms ease,
+    box-shadow 300ms ease;
+}
+
+.map__hotspot-dot::after {
+  content: '';
+
+  position: absolute;
+  inset: -6px;
+
+  border-radius: 50%;
+  border: 1px solid rgba(197, 164, 91, 0.5);
+
+  opacity: 0;
+
+  transition:
+    opacity 300ms ease,
+    transform 300ms ease;
+}
+
+/* =========================================================
+   11. HOVER Y FOCO
+   ========================================================= */
+
+.map__hotspot.is-hovered .map__hotspot-dot,
+.map__hotspot:focus-visible .map__hotspot-dot {
+  transform: scale(1.18);
+
+  background: var(--map-gold);
+  border-color: var(--map-gold-light);
+}
+
+.map__hotspot.is-hovered .map__hotspot-dot::after,
+.map__hotspot:focus-visible .map__hotspot-dot::after {
+  opacity: 1;
+}
+
+/* =========================================================
+   12. PUNTO ACTIVO
+   ========================================================= */
+
+.map__hotspot.is-active .map__hotspot-dot {
+  transform: scale(1.22);
+
+  background: var(--map-gold);
+  border-color: #fff;
+
+  box-shadow:
+    0 0 0 3px rgba(197, 164, 91, 0.3),
+    0 0 18px rgba(197, 164, 91, 0.3);
+}
+
+.map__hotspot.is-focused .map__hotspot-dot {
+  transform: scale(1.32);
+
+  background: var(--map-gold-light);
+
+  box-shadow:
+    0 0 0 4px rgba(197, 164, 91, 0.25),
+    0 0 24px rgba(197, 164, 91, 0.45);
+}
+
+.map__hotspot.is-focused .map__hotspot-dot::after {
+  opacity: 1;
+}
+
+/* =========================================================
+   13. ETIQUETAS DEL MAPA
+   ========================================================= */
+
+.map__hotspot-label {
+  position: relative;
+
+  font-size: 0.75rem;
+  letter-spacing: 0.06em;
+
+  white-space: nowrap;
+
+  padding: 0.2rem 0.5rem;
+
+  color: #fff;
+  background: rgba(0, 0, 0, 0.8);
+
+  border: 1px solid rgba(197, 164, 91, 0.2);
+  border-radius: var(--radius-sm);
+
+  opacity: 0;
+  transform: translateY(-4px);
+
+  transition:
+    opacity 260ms ease,
+    transform 260ms ease,
+    color 260ms ease,
+    border-color 260ms ease;
+}
+
+.map__hotspot.is-hovered .map__hotspot-label,
+.map__hotspot:focus-visible .map__hotspot-label {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.map__hotspot.is-active .map__hotspot-label {
+  color: var(--map-gold-light);
+  border-color: rgba(197, 164, 91, 0.55);
+}
+
+.map__hotspot:focus-visible {
+  outline: 2px solid var(--map-gold-light);
+  outline-offset: 2px;
+}
+
+/* La etiqueta solo aparece al hacer hover o focus */
+
+.map__hotspot.is-hovered .map__hotspot-label,
+.map__hotspot:focus-visible .map__hotspot-label {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* La selección mantiene el indicador dorado,
+   pero no deja el nombre permanentemente visible. */
+
+.map__hotspot.is-active:not(.is-hovered):not(:focus-visible)
+.map__hotspot-label,
+.map__hotspot.is-focused:not(.is-hovered):not(:focus-visible)
+.map__hotspot-label {
+  opacity: 0;
+  transform: translateY(-4px);
+}
+
+/* =========================================================
+   14. BOTÓN VISTA GENERAL
+
+   Está fuera de .map__world para no escalar
+   ni desplazarse junto con la imagen.
+   ========================================================= */
+
+.map__reset {
+  position: absolute;
+
+  right: 0.85rem;
+  bottom: 0.85rem;
+
+  z-index: 5;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  gap: 0.5rem;
+
+  min-height: 40px;
+  padding: 0.55rem 0.85rem;
+
+  color: var(--map-gold-light);
+  background: rgba(0, 0, 0, 0.9);
+
+  border: 1px solid var(--map-gold);
+  border-radius: var(--radius-sm);
+
+  font-family: var(--font-body);
+  font-size: 0.75rem;
+  line-height: 1.2;
+
+  letter-spacing: 0.04em;
+
+  cursor: pointer;
+
+  box-shadow:
+    0 4px 18px rgba(0, 0, 0, 0.4),
+    0 0 15px rgba(197, 164, 91, 0.08);
+
+  transition:
+    color 250ms ease,
+    background-color 250ms ease,
+    box-shadow 250ms ease;
+}
+
+.map__reset:hover {
+  color: #fff;
+  background: rgba(197, 164, 91, 0.17);
+
+  box-shadow:
+    0 4px 18px rgba(0, 0, 0, 0.4),
+    0 0 20px rgba(197, 164, 91, 0.17);
+}
+
+.map__reset:focus-visible {
+  outline: 2px solid var(--map-gold-light);
+  outline-offset: 3px;
+}
+
+/* =========================================================
+   15. PANEL DEL ESCENARIO
+   ========================================================= */
+
+.map__panel {
+  display: flex;
+  flex-direction: column;
+
+  gap: 0.9rem;
+  min-width: 0;
+}
+
+.map__panel-name {
+  font-family: var(--font-display);
+
+  font-size: clamp(1.375rem, 3vw, 1.875rem);
+  line-height: 1.1;
+
+  text-transform: uppercase;
+}
+
+.map__panel-desc {
+  color: var(--color-gray-light);
+  line-height: var(--lh-body);
+}
+
+/* =========================================================
+   16. INFORMACIÓN TÉCNICA
+   ========================================================= */
+
+.map__panel-meta {
+  display: flex;
+  flex-wrap: wrap;
+
+  gap: 1.5rem;
+
+  margin-top: 0.25rem;
+  padding-top: 0.9rem;
+
+  border-top: 1px solid rgba(197, 164, 91, 0.25);
+}
+
+.map__panel-meta div {
+  display: flex;
+  flex-direction: column;
+
+  gap: 0.2rem;
+}
+
+.map__panel-meta dt {
+  color: var(--color-gray-light);
+}
+
+.map__panel-meta dd {
+  margin: 0;
+
+  font-size: var(--fs-small);
+  font-variant-numeric: tabular-nums;
+}
+
+/* =========================================================
+   17. IMAGEN DEL ESCENARIO
+   ========================================================= */
+
 .map__media {
   position: relative;
 }
 
-/* La imagen completa es un boton: al tocarla se abre en primer plano. */
 .map__media-open {
   display: block;
+
   width: 100%;
   padding: 0;
+
   text-align: left;
+
   background: none;
   border: 0;
+
   cursor: zoom-in;
 }
 
@@ -152,48 +670,68 @@
 }
 
 .map__media-open:focus-visible {
-  outline: 2px solid var(--color-white);
+  outline: 2px solid var(--map-gold-light);
   outline-offset: 3px;
 }
 
-/* Boton de expandir */
+/* =========================================================
+   18. BOTÓN PARA AMPLIAR IMAGEN
+   ========================================================= */
+
 .map__media-expand {
   position: absolute;
+
   top: 0.6rem;
   right: 0.6rem;
+
   display: grid;
   place-items: center;
+
   width: 38px;
   height: 38px;
-  color: var(--color-white);
-  background: rgba(0, 0, 0, 0.6);
-  border: 1px solid var(--color-line-strong);
+
+  color: #fff;
+  background: rgba(0, 0, 0, 0.72);
+
+  border: 1px solid rgba(197, 164, 91, 0.5);
   border-radius: var(--radius-sm);
+
   backdrop-filter: blur(6px);
   -webkit-backdrop-filter: blur(6px);
+
   cursor: pointer;
+
   transition:
-    background-color var(--dur-fast) var(--ease-out),
-    border-color var(--dur-fast) var(--ease-out);
+    color 250ms ease,
+    background-color 250ms ease,
+    border-color 250ms ease,
+    box-shadow 250ms ease;
 }
 
 .map__media-expand:hover {
-  background: rgba(0, 0, 0, 0.82);
-  border-color: var(--color-white);
+  color: var(--map-gold-light);
+
+  background: rgba(0, 0, 0, 0.85);
+  border-color: var(--map-gold);
+
+  box-shadow:
+    0 0 15px rgba(197, 164, 91, 0.14);
 }
 
 .map__media-expand:focus-visible {
-  outline: 2px solid var(--color-white);
+  outline: 2px solid var(--map-gold-light);
   outline-offset: 2px;
 }
 
-/* --- Vista ampliada ------------------------------------------------------- */
+/* =========================================================
+   19. MODAL DE IMAGEN
+   ========================================================= */
+
 .map__lightbox {
   display: flex;
   justify-content: center;
 }
 
-/* La imagen se limita en alto para que nunca desborde el modal, y se centra. */
 .map__lightbox .smart-img {
   width: auto;
   max-width: 100%;
@@ -204,85 +742,105 @@
   width: auto;
   max-width: 100%;
   max-height: 68svh;
+
   object-fit: contain;
 }
 
-/* --- Hotspots ------------------------------------------------------------ */
-.map__hotspot {
-  position: absolute;
-  transform: translate(-50%, -50%);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 0.4rem;
-  padding: 0.5rem;
-  color: var(--color-white);
+/* =========================================================
+   20. RESPONSIVE — ESCRITORIO
+   ========================================================= */
+
+@media (min-width: 900px) {
+  .map__head {
+    flex-direction: row;
+    align-items: flex-end;
+    justify-content: space-between;
+  }
+
+  .map__layout {
+    grid-template-columns:
+      minmax(0, 1.35fr)
+      minmax(0, 0.65fr);
+  }
 }
 
-.map__hotspot-dot {
-  position: relative;
-  width: 14px;
-  height: 14px;
-  border-radius: 50%;
-  border: 2px solid var(--color-white);
-  background: rgba(0, 0, 0, 0.55);
-  transition:
-    transform var(--dur-base) var(--ease-out),
-    background-color var(--dur-base) var(--ease-out),
-    border-color var(--dur-base) var(--ease-out);
+/* =========================================================
+   21. RESPONSIVE — TABLETS Y MÓVILES
+   ========================================================= */
+
+@media (max-width: 899px) {
+  .map {
+    padding-bottom: clamp(95px, 13vh, 150px);
+  }
+
+  .map__legend {
+    gap: 0.5rem;
+  }
+
+  .map__legend-item {
+    min-height: 44px;
+    padding: 0.55rem 0.8rem;
+  }
+
+  .map__canvas {
+    border-radius: 8px;
+  }
+
+  .map__hotspot {
+    padding: 0.3rem;
+  }
+
+  .map__hotspot-label {
+    font-size: 0.64rem;
+    padding: 0.2rem 0.35rem;
+  }
+
+  .map__reset {
+    right: 0.5rem;
+    bottom: 0.5rem;
+
+    min-height: 36px;
+
+    padding: 0.45rem 0.65rem;
+    font-size: 0.68rem;
+  }
 }
 
-.map__hotspot-dot::after {
-  content: '';
-  position: absolute;
-  inset: -6px;
-  border-radius: 50%;
-  border: 1px solid rgba(255, 255, 255, 0.35);
-  opacity: 0;
-  transition: opacity var(--dur-base) var(--ease-out);
+/* =========================================================
+   22. PANTALLAS MUY PEQUEÑAS
+   ========================================================= */
+
+@media (max-width: 480px) {
+  .map__legend-item {
+    font-size: 0.72rem;
+  }
+
+  .map__hotspot-label {
+    font-size: 0.56rem;
+    letter-spacing: 0;
+  }
+
+  .map__hotspot-dot {
+    width: 12px;
+    height: 12px;
+  }
+
+  .map__reset {
+    max-width: calc(100% - 1rem);
+  }
+
+  .map::after {
+    height: clamp(60px, 9vh, 100px);
+  }
 }
 
-.map__hotspot.is-hovered .map__hotspot-dot,
-.map__hotspot:focus-visible .map__hotspot-dot {
-  transform: scale(1.2);
-  background: var(--color-white);
-}
+/* =========================================================
+   23. DISPOSITIVOS TÁCTILES
 
-.map__hotspot.is-hovered .map__hotspot-dot::after,
-.map__hotspot:focus-visible .map__hotspot-dot::after {
-  opacity: 1;
-}
+   Las etiquetas permanecen visibles porque
+   no existe un hover persistente.
+   ========================================================= */
 
-.map__hotspot.is-active .map__hotspot-dot {
-  transform: scale(1.25);
-  background: var(--color-navy);
-  border-color: var(--color-white);
-  box-shadow: 0 0 0 3px rgba(0, 47, 97, 0.55);
-}
-
-.map__hotspot-label {
-  font-size: 0.75rem;
-  letter-spacing: 0.06em;
-  white-space: nowrap;
-  padding: 0.2rem 0.5rem;
-  background: rgba(0, 0, 0, 0.7);
-  border: 1px solid var(--color-line);
-  border-radius: var(--radius-sm);
-  opacity: 0;
-  transform: translateY(-4px);
-  transition:
-    opacity var(--dur-base) var(--ease-out),
-    transform var(--dur-base) var(--ease-out);
-}
-
-.map__hotspot.is-hovered .map__hotspot-label,
-.map__hotspot:focus-visible .map__hotspot-label,
-.map__hotspot.is-active .map__hotspot-label {
-  opacity: 1;
-  transform: translateY(0);
-}
-
-/* En pantallas pequenas las etiquetas siempre visibles */
 @media (hover: none) {
   .map__hotspot-label {
     opacity: 1;
@@ -290,47 +848,21 @@
   }
 }
 
-/* --- Panel --------------------------------------------------------------- */
-.map__panel {
-  display: flex;
-  flex-direction: column;
-  gap: 0.9rem;
-  min-width: 0;
-}
+/* =========================================================
+   24. ACCESIBILIDAD
+   ========================================================= */
 
-.map__panel-name {
-  font-family: var(--font-display);
-  font-size: clamp(1.375rem, 3vw, 1.875rem);
-  text-transform: uppercase;
-  line-height: 1.1;
-}
+@media (prefers-reduced-motion: reduce) {
+  .map__legend-item,
+  .map__hotspot-dot,
+  .map__hotspot-dot::after,
+  .map__hotspot-label,
+  .map__reset,
+  .map__media-expand {
+    transition: none !important;
+  }
 
-.map__panel-desc {
-  color: var(--color-gray-light);
-  line-height: var(--lh-body);
-}
-
-.map__panel-meta {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 1.5rem;
-  margin-top: 0.25rem;
-  padding-top: 0.9rem;
-  border-top: 1px solid var(--color-line);
-}
-
-.map__panel-meta div {
-  display: flex;
-  flex-direction: column;
-  gap: 0.2rem;
-}
-
-.map__panel-meta dt {
-  color: var(--color-gray-light);
-}
-
-.map__panel-meta dd {
-  margin: 0;
-  font-size: var(--fs-small);
-  font-variant-numeric: tabular-nums;
+  .map__world {
+    transition: none !important;
+  }
 }

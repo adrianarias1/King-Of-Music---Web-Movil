@@ -1,87 +1,225 @@
+
+/* =========================================================
+   KING OF MUSIC — HEADER V3
+
+   CORRECCIONES:
+   - Evitar superposición entre header y menú lateral.
+   - Evitar superposición entre hamburguesa y botón X.
+   - Corregir jerarquía de z-index.
+   - Mantener panel lateral por encima del encabezado.
+   - Evitar conflictos de backdrop-filter.
+   - Conservar animaciones y diseño original.
+   - Responsive desde móviles hasta escritorio.
+
+   PALETA:
+   Negro:  #000000
+   Blanco: #FFFFFF
+   Dorado: #C5A45B
+
+   BREAKPOINT:
+   Móvil / tablet: < 1024px
+   Escritorio: >= 1024px
+   ========================================================= */
+
+
+/* =========================================================
+   1. HEADER PRINCIPAL
+   ========================================================= */
+
 .site-header {
+  --header-gold: #c5a45b;
+  --header-gold-light: #e3c57b;
+  --header-panel-width: min(85vw, 360px);
+
   position: fixed;
+
   top: 0;
   left: 0;
   right: 0;
-  z-index: 100;
-  height: var(--header-h);
+
+  z-index: 1000;
+
   display: flex;
   align-items: center;
-  transition:
-    background-color var(--dur-base) var(--ease-out),
-    border-color var(--dur-base) var(--ease-out),
-    backdrop-filter var(--dur-base) var(--ease-out);
+
+  width: 100%;
+  height: var(--header-h);
+
   border-bottom: 1px solid transparent;
+
+  transition:
+    background-color 300ms ease,
+    border-color 300ms ease,
+    backdrop-filter 300ms ease;
 }
 
-/* Estado con scroll: negro semitransparente + blur moderado */
+
+/* =========================================================
+   2. HEADER CON SCROLL
+   ========================================================= */
+
 .site-header.is-solid {
-  background-color: rgba(0, 0, 0, 0.72);
+  background-color: rgba(0, 0, 0, 0.82);
+
   backdrop-filter: blur(14px);
   -webkit-backdrop-filter: blur(14px);
-  border-bottom-color: var(--color-line);
+
+  border-bottom-color: rgba(197, 164, 91, 0.16);
 }
 
+
+/* =========================================================
+   3. HEADER CUANDO EL MENÚ ESTÁ ABIERTO
+
+   CORRECCIÓN IMPORTANTE:
+
+   El backdrop-filter del header puede generar
+   un nuevo bloque contenedor para elementos
+   position: fixed.
+
+   Lo desactivamos durante la apertura del menú
+   para permitir que el panel se posicione
+   correctamente respecto al viewport.
+   ========================================================= */
+
+
+.site-header.is-menu-open {
+  background-color: transparent;
+
+  /*
+   * Mantener el desenfoque desactivado mientras
+   * el panel esté abierto evita combinar filtros.
+   */
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+
+  border-bottom-color: transparent;
+
+  transition: none;
+}
+
+
+/* Ocultar barra original mientras el menú está
+   abierto. Es una protección adicional al
+   estilo aplicado desde Header.tsx V3. */
+
+.site-header.is-menu-open .site-header__inner {
+  visibility: hidden;
+  pointer-events: none;
+
+  z-index: 0;
+}
+
+
+/* =========================================================
+   4. CONTENEDOR SUPERIOR
+   ========================================================= */
+
 .site-header__inner {
+  position: relative;
+
+  z-index: 3;
+
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 1.5rem;
+
+  gap: 1rem;
+
   width: 100%;
+  min-width: 0;
 }
 
-/* --- Marca --------------------------------------------------------------- */
+
+/* =========================================================
+   5. MARCA
+   ========================================================= */
+
 .brand {
   display: inline-flex;
   align-items: center;
+
   gap: 0.65rem;
-  flex: none;
+
+  flex: 0 1 auto;
+
+  min-width: 0;
+
+  color: #fff;
+
+  text-decoration: none;
 }
 
 .brand__mark {
   display: flex;
   align-items: flex-end;
+
   gap: 3px;
+
   height: 20px;
+
+  flex-shrink: 0;
 }
 
 .brand__mark span {
   display: block;
+
   width: 3px;
-  background: var(--color-white);
+
+  background: #fff;
+
   border-radius: 1px;
 }
 
 .brand__mark span:nth-child(1) {
   height: 10px;
 }
+
 .brand__mark span:nth-child(2) {
   height: 20px;
 }
+
 .brand__mark span:nth-child(3) {
   height: 14px;
 }
 
 .brand__text {
+  display: block;
+
   font-family: var(--font-display);
+
   font-size: 0.9375rem;
   letter-spacing: 0.18em;
-  text-transform: uppercase;
   line-height: 1;
+
+  text-transform: uppercase;
+
   white-space: nowrap;
 }
 
 .brand__text em {
-  font-style: normal;
   font-family: var(--font-body);
+  font-style: normal;
+
   font-size: 0.625rem;
   letter-spacing: 0.24em;
-  opacity: 0.6;
+
+  opacity: 0.65;
   vertical-align: middle;
+
   padding-inline: 0.15em;
 }
 
-/* --- Navegacion de escritorio -------------------------------------------- */
+.brand:focus-visible {
+  outline: 2px solid var(--header-gold);
+  outline-offset: 5px;
+}
+
+
+/* =========================================================
+   6. NAVEGACIÓN DE ESCRITORIO
+   ========================================================= */
+
 .site-header__nav {
   display: none;
 }
@@ -89,38 +227,55 @@
 .site-header__nav ul {
   display: flex;
   align-items: center;
+
   gap: clamp(1.5rem, 2.5vw, 3rem);
+
+  margin: 0;
+  padding: 0;
+
+  list-style: none;
 }
 
-/* MILESTONE 2 — escala tipografica de escritorio (>=1024px).
-   Mobile no se ve afectado: .site-header__nav esta oculto por debajo. */
 .site-header__link {
   position: relative;
+
   display: inline-block;
+
   padding: 0.4rem 0;
+
+  color: var(--color-gray-light);
+
   font-size: clamp(0.95rem, 1vw, 1.05rem);
   font-weight: 500;
   letter-spacing: 0.06em;
-  color: var(--color-gray-light);
-  transition: color var(--dur-fast) var(--ease-out);
+
+  text-decoration: none;
+
+  transition: color 220ms ease;
 }
 
 .site-header__link::after {
   content: '';
+
   position: absolute;
+
   left: 0;
   bottom: 0;
-  height: 1px;
+
   width: 100%;
-  background: var(--color-white);
+  height: 1px;
+
+  background: var(--header-gold);
+
   transform: scaleX(0);
   transform-origin: right;
-  transition: transform var(--dur-fast) var(--ease-out);
+
+  transition: transform 250ms ease;
 }
 
 .site-header__link:hover,
 .site-header__link:focus-visible {
-  color: var(--color-white);
+  color: #fff;
 }
 
 .site-header__link:hover::after,
@@ -129,57 +284,604 @@
   transform-origin: left;
 }
 
-/* --- Acciones ------------------------------------------------------------ */
+
+/* =========================================================
+   7. ACCIONES DEL HEADER
+   ========================================================= */
+
 .site-header__actions {
   display: flex;
   align-items: center;
+  justify-content: flex-end;
+
   gap: 0.75rem;
-  flex: none;
+
+  flex-shrink: 0;
 }
 
-/* MILESTONE 2 — CTA de escritorio. Solo se muestra >=768px, asi que estos
-   valores no afectan al panel movil (.mobile-menu__cta). */
+
+/* =========================================================
+   8. BOTÓN DESCARGAR SUPERIOR
+   ========================================================= */
+
 .site-header__cta {
   display: none;
-  min-height: 48px;
-  padding: 0.7rem 1.5rem;
-  display: inline-flex;
+
   align-items: center;
-  font-size: 0.95rem;
+  justify-content: center;
+
+  min-height: 44px;
+
+  padding: 0.7rem 1.25rem;
+
+  color: #000;
+  background: #fff;
+
+  border: 1px solid #fff;
+  border-radius: var(--radius-sm);
+
+  font-family: var(--font-body);
+  font-size: 0.78rem;
   font-weight: 600;
   letter-spacing: 0.16em;
+
+  text-decoration: none;
   text-transform: uppercase;
-  color: var(--color-black);
-  background: var(--color-white);
-  border-radius: var(--radius-sm);
-  transition: background-color var(--dur-fast) var(--ease-out);
+  white-space: nowrap;
+
+  transition:
+    color 250ms ease,
+    background-color 250ms ease,
+    border-color 250ms ease;
 }
 
 .site-header__cta:hover {
-  background: var(--color-gray-light);
+  color: #000;
+
+  background: var(--header-gold-light);
+  border-color: var(--header-gold-light);
 }
+
+.site-header__cta:focus-visible {
+  outline: 2px solid var(--header-gold-light);
+  outline-offset: 3px;
+}
+
+
+/* =========================================================
+   9. BOTÓN HAMBURGUESA
+   ========================================================= */
 
 .site-header__burger {
   display: grid;
   place-items: center;
+
   width: 44px;
   height: 44px;
-  color: var(--color-white);
-  border: 1px solid var(--color-line);
+
+  flex-shrink: 0;
+
+  color: #fff;
+
+  background: rgba(255, 255, 255, 0.035);
+
+  border: 1px solid rgba(255, 255, 255, 0.24);
   border-radius: var(--radius-sm);
+
+  cursor: pointer;
+
   transition:
-    background-color var(--dur-fast) var(--ease-out),
-    border-color var(--dur-fast) var(--ease-out);
+    color 250ms ease,
+    background-color 250ms ease,
+    border-color 250ms ease;
 }
 
 .site-header__burger:hover {
-  background: rgba(255, 255, 255, 0.07);
-  border-color: var(--color-line-strong);
+  color: var(--header-gold-light);
+
+  background: rgba(197, 164, 91, 0.09);
+
+  border-color: var(--header-gold);
 }
 
-/* MILESTONE 2 — escritorio >=768px.
-   La marca y la altura crecen solo en desktop: el movil conserva intactos
-   sus 64px y su tipografia original. */
+.site-header__burger:focus-visible {
+  outline: 2px solid var(--header-gold-light);
+  outline-offset: 3px;
+}
+
+
+/* =========================================================
+   10. OCULTAR HAMBURGUESA CUANDO ABRIMOS EL MENÚ
+
+   Evita que se superponga con el botón de cerrar.
+   ========================================================= */
+
+.site-header.is-menu-open .site-header__burger {
+  visibility: hidden;
+
+  opacity: 0;
+
+  pointer-events: none;
+}
+
+
+/* =========================================================
+   11. FONDO OSCURECIDO
+
+   El backdrop queda por debajo del panel,
+   pero por encima del contenido de la página.
+   ========================================================= */
+
+
+/* =========================================================
+   BACKDROP — V4
+   Oscurecimiento progresivo y rendimiento optimizado
+   ========================================================= */
+
+.mobile-menu__backdrop {
+  position: fixed;
+  inset: 0;
+
+  z-index: 10;
+
+  /* El oscurecimiento será controlado por opacity */
+  background: rgba(0, 0, 0, 0.76);
+
+  /* Evitamos animar el desenfoque en móviles */
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+
+  pointer-events: auto;
+
+  /* Motion controla la opacidad */
+  will-change: opacity;
+}
+
+
+
+/* =========================================================
+   12. PANEL LATERAL
+
+   PRIORIDAD DE CAPAS:
+
+   Header principal:    1000
+   Barra original:         3
+   Fondo oscurecido:      10
+   Menú lateral:          20
+
+   Estos valores son relativos al contexto
+   de apilamiento del header.
+
+   El panel queda encima de todos los elementos
+   de la barra original.
+   ========================================================= */
+
+.mobile-menu {
+  position: fixed;
+
+  top: 0;
+  right: 0;
+  bottom: 0;
+
+  z-index: 20;
+
+  display: flex;
+  flex-direction: column;
+
+  gap: 0;
+
+  width: var(--header-panel-width);
+
+  max-width: 100%;
+
+  height: 100vh;
+  height: 100dvh;
+
+  padding:
+    calc(1.5rem + env(safe-area-inset-top, 0px))
+    clamp(1.2rem, 5vw, 2rem)
+    calc(1.5rem + env(safe-area-inset-bottom, 0px));
+
+  color: #fff;
+
+  background:
+    radial-gradient(
+      ellipse 90% 55% at 100% 0%,
+      rgba(197, 164, 91, 0.11),
+      transparent 75%
+    ),
+    #0b0b0b;
+
+  border-left: 1px solid rgba(197, 164, 91, 0.35);
+
+  box-shadow:
+    -25px 0 85px rgba(0, 0, 0, 0.55),
+    -1px 0 20px rgba(197, 164, 91, 0.05);
+
+  overflow-x: hidden;
+  overflow-y: auto;
+
+  overscroll-behavior: contain;
+
+  -webkit-overflow-scrolling: touch;
+}
+
+
+/* =========================================================
+   13. CABECERA DEL PANEL
+   ========================================================= */
+
+.mobile-menu__top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+
+  gap: 1rem;
+
+  flex-shrink: 0;
+
+  padding-bottom: 1.5rem;
+}
+
+.mobile-menu__heading {
+  display: flex;
+  flex-direction: column;
+
+  gap: 0.45rem;
+
+  min-width: 0;
+}
+
+.mobile-menu__eyebrow {
+  color: var(--header-gold);
+
+  font-size: 0.65rem;
+  letter-spacing: 0.22em;
+
+  text-transform: uppercase;
+}
+
+.mobile-menu__title {
+  color: #fff;
+
+  font-family: var(--font-display);
+
+  font-size: clamp(1.3rem, 5vw, 1.75rem);
+  font-weight: 500;
+
+  letter-spacing: 0.05em;
+  line-height: 1.2;
+
+  text-transform: uppercase;
+
+  overflow-wrap: anywhere;
+}
+
+
+/* =========================================================
+   14. BOTÓN CERRAR
+
+   El botón X queda encima del resto del panel.
+   ========================================================= */
+
+.mobile-menu__close {
+  position: relative;
+
+  z-index: 2;
+
+  display: grid;
+  place-items: center;
+
+  width: 42px;
+  height: 42px;
+
+  flex-shrink: 0;
+
+  color: #fff;
+
+  background: rgba(255, 255, 255, 0.035);
+
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: var(--radius-sm);
+
+  cursor: pointer;
+
+  transition:
+    color 250ms ease,
+    border-color 250ms ease,
+    background-color 250ms ease;
+}
+
+.mobile-menu__close:hover {
+  color: var(--header-gold-light);
+
+  background: rgba(197, 164, 91, 0.08);
+
+  border-color: var(--header-gold);
+}
+
+.mobile-menu__close:focus-visible {
+  outline: 2px solid var(--header-gold-light);
+  outline-offset: 3px;
+}
+
+
+/* =========================================================
+   15. DIVISOR DORADO
+   ========================================================= */
+
+.mobile-menu__divider {
+  width: 100%;
+  height: 1px;
+
+  flex-shrink: 0;
+
+  margin-bottom: clamp(1.25rem, 4vh, 2rem);
+
+  background: linear-gradient(
+    to right,
+    var(--header-gold),
+    rgba(197, 164, 91, 0.22) 65%,
+    transparent
+  );
+}
+
+
+/* =========================================================
+   16. NAVEGACIÓN DEL PANEL
+   ========================================================= */
+
+.mobile-menu__nav {
+  width: 100%;
+}
+
+.mobile-menu__list {
+  display: flex;
+  flex-direction: column;
+
+  gap: 0.15rem;
+
+  margin: 0;
+  padding: 0;
+
+  list-style: none;
+}
+
+
+/* =========================================================
+   17. ENLACES MÓVILES
+   ========================================================= */
+
+.mobile-menu__link {
+  display: flex;
+  align-items: center;
+
+  gap: 0.85rem;
+
+  width: 100%;
+  min-height: 56px;
+
+  padding: 0.9rem 0.15rem;
+
+  color: #fff;
+
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+
+  text-decoration: none;
+
+  transition:
+    color 260ms ease,
+    border-color 260ms ease,
+    background-color 260ms ease;
+}
+
+.mobile-menu__link:hover {
+  color: var(--header-gold-light);
+
+  border-bottom-color: rgba(197, 164, 91, 0.55);
+}
+
+.mobile-menu__link:focus-visible {
+  outline: 2px solid var(--header-gold);
+  outline-offset: 3px;
+}
+
+
+/* =========================================================
+   18. NUMERACIÓN DORADA
+   ========================================================= */
+
+.mobile-menu__num {
+  flex-shrink: 0;
+
+  min-width: 22px;
+
+  color: var(--header-gold);
+
+  font-family: var(--font-body);
+
+  font-size: 0.65rem;
+  letter-spacing: 0.1em;
+}
+
+
+/* =========================================================
+   19. NOMBRE DEL APARTADO
+   ========================================================= */
+
+.mobile-menu__link-label {
+  flex: 1;
+
+  min-width: 0;
+
+  font-family: var(--font-display);
+
+  font-size: clamp(1rem, 4vw, 1.35rem);
+
+  line-height: 1.15;
+  letter-spacing: 0.04em;
+
+  text-transform: uppercase;
+
+  overflow-wrap: anywhere;
+}
+
+
+/* =========================================================
+   20. INDICADOR DE NAVEGACIÓN
+   ========================================================= */
+
+.mobile-menu__arrow {
+  flex-shrink: 0;
+
+  color: var(--header-gold);
+
+  opacity: 0.65;
+
+  transition:
+    opacity 250ms ease,
+    transform 250ms ease;
+}
+
+.mobile-menu__link:hover .mobile-menu__arrow {
+  opacity: 1;
+
+  transform: translate(2px, -2px);
+}
+
+
+/* =========================================================
+   21. PARTE INFERIOR DEL PANEL
+   ========================================================= */
+
+.mobile-menu__bottom {
+  display: flex;
+  flex-direction: column;
+
+  gap: 1.25rem;
+
+  margin-top: auto;
+
+  padding-top: clamp(2rem, 6vh, 3rem);
+}
+
+
+/* =========================================================
+   22. BOTÓN DESCARGAR DEL PANEL
+   ========================================================= */
+
+.mobile-menu__cta {
+  display: inline-flex;
+  align-items: center;
+  justify-content: space-between;
+
+  gap: 0.75rem;
+
+  width: 100%;
+  min-height: 52px;
+
+  padding: 0.85rem 1rem;
+
+  color: #101010;
+  background: var(--header-gold);
+
+  border: 1px solid var(--header-gold);
+  border-radius: var(--radius-sm);
+
+  font-family: var(--font-body);
+
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+
+  text-decoration: none;
+  text-transform: uppercase;
+
+  transition:
+    background-color 250ms ease,
+    border-color 250ms ease,
+    box-shadow 250ms ease;
+}
+
+.mobile-menu__cta:hover {
+  background: var(--header-gold-light);
+
+  border-color: var(--header-gold-light);
+
+  box-shadow:
+    0 0 24px rgba(197, 164, 91, 0.2);
+}
+
+.mobile-menu__cta:focus-visible {
+  outline: 2px solid #fff;
+  outline-offset: 3px;
+}
+
+.mobile-menu__footer-text {
+  margin: 0;
+
+  color: rgba(255, 255, 255, 0.4);
+
+  font-size: 0.6rem;
+  letter-spacing: 0.18em;
+
+  text-align: center;
+}
+
+
+/* =========================================================
+   23. MÓVILES MUY ESTRECHOS
+   ========================================================= */
+
+@media (max-width: 359px) {
+  .site-header__inner {
+    gap: 0.5rem;
+  }
+
+  .brand {
+    gap: 0.45rem;
+  }
+
+  .brand__text {
+    font-size: 0.78rem;
+    letter-spacing: 0.09em;
+  }
+
+  .brand__text em {
+    font-size: 0.52rem;
+    letter-spacing: 0.1em;
+  }
+
+  .site-header__burger {
+    width: 40px;
+    height: 40px;
+  }
+
+  .mobile-menu {
+    --header-panel-width: min(90vw, 320px);
+  }
+
+  .mobile-menu__link-label {
+    font-size: 1rem;
+  }
+}
+
+
+/* =========================================================
+   24. MÓVILES MEDIANOS
+   ========================================================= */
+
+@media (min-width: 480px) {
+  .site-header__cta {
+    display: inline-flex;
+  }
+}
+
+
+/* =========================================================
+   25. TABLETS
+   ========================================================= */
+
 @media (min-width: 768px) {
   .site-header {
     height: 80px;
@@ -200,9 +902,11 @@
   .brand__mark span:nth-child(1) {
     height: 12px;
   }
+
   .brand__mark span:nth-child(2) {
     height: 24px;
   }
+
   .brand__mark span:nth-child(3) {
     height: 16px;
   }
@@ -217,106 +921,88 @@
     letter-spacing: 0.22em;
   }
 
-  .site-header__burger {
-    display: none;
-  }
-
   .site-header__cta {
     display: inline-flex;
+
+    min-height: 48px;
+
+    padding: 0.7rem 1.5rem;
+
+    font-size: 0.95rem;
+  }
+
+  .mobile-menu {
+    --header-panel-width: min(65vw, 400px);
   }
 }
+
+
+/* =========================================================
+   26. ESCRITORIO
+   ========================================================= */
 
 @media (min-width: 1024px) {
   .site-header__nav {
     display: block;
   }
+
+  .site-header__burger {
+    display: none;
+  }
+
+  .mobile-menu,
+  .mobile-menu__backdrop {
+    display: none;
+  }
 }
 
-/* --- Panel movil --------------------------------------------------------- */
-.mobile-menu {
-  position: fixed;
-  inset: 0;
-  top: var(--header-h);
-  z-index: 99;
-  display: flex;
-  flex-direction: column;
-  gap: 1.5rem;
-  padding: clamp(1.25rem, 5vw, 2.5rem) var(--container-pad) calc(var(--header-h) + env(safe-area-inset-bottom, 0px));
-  background: rgba(0, 0, 0, 0.97);
-  backdrop-filter: blur(18px);
-  -webkit-backdrop-filter: blur(18px);
-  overflow-y: auto;
-  overscroll-behavior: contain;
+
+/* =========================================================
+   27. DISPOSITIVOS CON POCA ALTURA
+   ========================================================= */
+
+@media (max-height: 620px) and (max-width: 1023px) {
+  .mobile-menu {
+    padding-top:
+      calc(0.8rem + env(safe-area-inset-top, 0px));
+
+    padding-bottom:
+      calc(0.8rem + env(safe-area-inset-bottom, 0px));
+  }
+
+  .mobile-menu__top {
+    padding-bottom: 0.8rem;
+  }
+
+  .mobile-menu__divider {
+    margin-bottom: 0.75rem;
+  }
+
+  .mobile-menu__link {
+    min-height: 46px;
+    padding-block: 0.65rem;
+  }
+
+  .mobile-menu__bottom {
+    padding-top: 1rem;
+  }
 }
 
-.mobile-menu__top {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding-bottom: 1rem;
-  border-bottom: 1px solid var(--color-line);
-  color: var(--color-gray-light);
-}
 
-.mobile-menu__close {
-  display: grid;
-  place-items: center;
-  width: 44px;
-  height: 44px;
-  margin-right: -8px;
-  color: var(--color-white);
-  border: 1px solid var(--color-line);
-  border-radius: var(--radius-sm);
-  transition: background-color var(--dur-fast) var(--ease-out);
-}
+/* =========================================================
+   28. ACCESIBILIDAD
+   ========================================================= */
 
-.mobile-menu__close:hover {
-  background: rgba(255, 255, 255, 0.07);
-}
-
-.mobile-menu__list {
-  display: flex;
-  flex-direction: column;
-}
-
-.mobile-menu__link {
-  display: flex;
-  align-items: baseline;
-  gap: 1rem;
-  padding: 0.85rem 0;
-  font-family: var(--font-display);
-  font-size: clamp(1.5rem, 7vw, 2rem);
-  line-height: 1.1;
-  text-transform: uppercase;
-  border-bottom: 1px solid rgba(186, 186, 186, 0.12);
-  transition: color var(--dur-fast) var(--ease-out);
-}
-
-.mobile-menu__link:hover {
-  color: var(--color-gray-light);
-}
-
-.mobile-menu__num {
-  color: var(--color-gray-dark);
-  flex: none;
-}
-
-.mobile-menu__cta {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  min-height: 52px;
-  margin-top: auto;
-  font-size: var(--fs-small);
-  font-weight: 600;
-  letter-spacing: 0.2em;
-  text-transform: uppercase;
-  color: var(--color-black);
-  background: var(--color-white);
-  border-radius: var(--radius-sm);
-  transition: background-color var(--dur-fast) var(--ease-out);
-}
-
-.mobile-menu__cta:hover {
-  background: var(--color-gray-light);
+@media (prefers-reduced-motion: reduce) {
+  .site-header,
+  .site-header__link,
+  .site-header__link::after,
+  .site-header__cta,
+  .site-header__burger,
+  .mobile-menu__close,
+  .mobile-menu__link,
+  .mobile-menu__arrow,
+  .mobile-menu__cta {
+    transition: none !important;
+  }
 }
