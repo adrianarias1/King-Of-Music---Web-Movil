@@ -1,7 +1,10 @@
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
+import { Capacitor } from '@capacitor/core'
 import App from './App'
 import './styles/index.css'
+
+document.documentElement.classList.toggle('android-app', Capacitor.getPlatform() === 'android')
 
 const container = document.getElementById('root')
 

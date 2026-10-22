@@ -14,6 +14,29 @@
   border-bottom: 1px solid transparent;
 }
 
+/* Capacitor supplies the current status bar / display cutout inset on Android. */
+.android-app {
+  --app-header-offset: calc(var(--safe-area-inset-top, env(safe-area-inset-top, 0px)) + 8px);
+  scroll-padding-top: calc(var(--header-h) + var(--app-header-offset) + 12px);
+}
+
+.android-app .site-header {
+  top: 0;
+  height: calc(var(--app-header-content-height, var(--header-h)) + var(--app-header-offset));
+  padding-top: var(--app-header-offset);
+  background-color: rgba(0, 0, 0, 0.72);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+}
+
+.android-app .site-header__inner {
+  padding-inline: max(var(--header-side-space, var(--container-pad)), var(--safe-area-inset-left, env(safe-area-inset-left, 0px)), var(--safe-area-inset-right, env(safe-area-inset-right, 0px)));
+}
+
+.android-app .mobile-menu {
+  top: calc(var(--app-header-content-height, var(--header-h)) + var(--app-header-offset));
+}
+
 /* Estado con scroll: negro semitransparente + blur moderado */
 .site-header.is-solid {
   background-color: rgba(0, 0, 0, 0.72);
@@ -127,7 +150,6 @@
   display: none;
   min-height: 48px;
   padding: 0.7rem 1.5rem;
-  display: inline-flex;
   align-items: center;
   font-size: 0.95rem;
   font-weight: 600;
@@ -141,6 +163,10 @@
 
 .site-header__cta:hover {
   background: var(--color-gray-light);
+}
+
+.site-header__download-icon {
+  display: none;
 }
 
 .site-header__burger {
@@ -161,10 +187,80 @@
   border-color: var(--color-line-strong);
 }
 
+@media (max-width: 767px) {
+  :root {
+    --header-h: 80px;
+    --app-header-content-height: 80px;
+  }
+
+  .site-header__inner {
+    --header-side-space: clamp(12px, 4vw, 20px);
+    padding-inline: var(--header-side-space);
+    gap: 8px;
+    flex-wrap: nowrap;
+  }
+
+  .brand {
+    gap: 6px;
+    min-width: 0;
+  }
+
+  .brand__logo {
+    width: clamp(40px, 15vw, 60px);
+    height: clamp(40px, 15vw, 60px);
+  }
+
+  .brand__text {
+    font-size: clamp(14px, calc(8vw - 10px), 28px);
+    letter-spacing: 0.1em;
+  }
+
+  .brand__text em {
+    font-size: 0.65em;
+    letter-spacing: 0.1em;
+  }
+
+  .site-header__actions {
+    gap: 8px;
+    justify-content: flex-end;
+  }
+
+  .site-header__cta {
+    display: inline-flex;
+    justify-content: center;
+    min-height: 40px;
+    padding: 8px;
+    font-size: clamp(10px, 2.6vw, 12px);
+    letter-spacing: 0.08em;
+    white-space: nowrap;
+    width: 40px;
+    height: 40px;
+    flex: none;
+  }
+
+  .site-header__download-icon {
+    display: block;
+  }
+
+  .site-header__download-label {
+    display: none;
+  }
+
+  .site-header__burger {
+    width: 40px;
+    height: 40px;
+    flex: none;
+  }
+}
+
 /* MILESTONE 2 — escritorio >=768px.
    La marca y la altura crecen solo en desktop: el movil conserva intactos
    sus 64px y su tipografia original. */
 @media (min-width: 768px) {
+  .android-app {
+    --app-header-content-height: 80px;
+  }
+
   .site-header {
     height: 80px;
   }

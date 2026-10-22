@@ -1,5 +1,5 @@
 import { AnimatePresence, motion, useReducedMotion } from 'motion/react'
-import { Menu, X } from 'lucide-react'
+import { Download, Menu, X } from 'lucide-react'
 import { useCallback, useState } from 'react'
 import { desktopNav, mobileNav } from '../../data/navigation'
 import { siteConfig } from '../../config'
@@ -48,8 +48,9 @@ export function Header() {
         </nav>
 
         <div className="site-header__actions">
-          <a className="site-header__cta" href="#descargar">
-            Descargar
+          <a className="site-header__cta" href="#descargar" aria-label="Descargar">
+            <Download className="site-header__download-icon" size={22} strokeWidth={1.5} aria-hidden="true" />
+            <span className="site-header__download-label">Descargar</span>
           </a>
           <button
             type="button"
