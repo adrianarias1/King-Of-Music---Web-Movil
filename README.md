@@ -64,6 +64,12 @@ docs/            # Documentacion del proyecto (ver mas abajo)
 
 ## Como anadir contenido
 
+### Instalar la PWA
+
+La web genera un manifiesto y un Service Worker con Workbox al ejecutar `npm run build`. Los recursos estáticos se precargan para que la interfaz principal pueda abrirse sin conexión después de la primera visita; los modelos GLB de Cloudflare R2 se solicitan en línea y no forman parte del caché. `src/main.tsx` registra el Service Worker solo en navegadores web, no en Capacitor Android. El proyecto incluye `wrangler.jsonc` para servir `dist/` como assets estáticos de Cloudflare Workers con fallback SPA.
+
+En Chrome o Edge de Windows, abre el sitio desplegado por HTTPS y usa el icono **Instalar King of Music** de la barra de direcciones, o el menú **Instalar aplicación**. Para revisar el manifiesto y la instalación, abre DevTools → **Application** → **Manifest**; en **Service Workers** verifica que `sw.js` esté activo y en **Cache Storage** revisa el precaché `workbox-precache`. Activa **Offline** desde la pestaña Network y recarga para comprobar la interfaz guardada.
+
 ### Anadir un personaje
 
 1. Editar `src/data/characters.ts` y añadir una entrada `Character`.
