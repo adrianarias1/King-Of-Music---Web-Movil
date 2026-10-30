@@ -34,8 +34,8 @@ export interface Character {
   /** Alias o subtítulo corto (género / estilo). */
   tagline?: string
   description: string
-  /** Ruta al .glb/.gltf. Si no existe el archivo, el visor usa un placeholder 3D. */
-  model: string
+  /** Ruta al .glb/.gltf. Si falta, el visor usa un placeholder 3D. */
+  model?: string
   /** Ruta a la ilustración/portrait. Placeholder si no existe. */
   preview: string
   scale: number

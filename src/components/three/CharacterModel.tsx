@@ -1,6 +1,14 @@
 import { useGLTF } from '@react-three/drei'
 import { useEffect, useMemo } from 'react'
-import { Box3, Vector3, type Group as ThreeGroup } from 'three'
+import {
+  Box3,
+  Vector3,
+  type BufferGeometry,
+  type Group as ThreeGroup,
+  type Material,
+  type Mesh,
+  type Texture,
+} from 'three'
 import { assetUrl } from '../../utils/assets'
 
 interface Props {
@@ -29,15 +37,39 @@ export function CharacterModel({ url, scale = 1, onLoaded }: Props) {
   const fittedScale = (2.25 / bounds.height) * scale
 
   useEffect(() => {
-    if (!scene) return
     const root = model as ThreeGroup
+    const geometries = new Set<BufferGeometry>()
+    const materials = new Set<Material>()
+    const textures = new Set<Texture>()
+
     root.traverse((child) => {
-      const mesh = child as unknown as { castShadow?: boolean; receiveShadow?: boolean }
-      if (typeof mesh.castShadow === 'boolean') mesh.castShadow = true
-      if (typeof mesh.receiveShadow === 'boolean') mesh.receiveShadow = true
+      const mesh = child as Mesh
+      if (!mesh.isMesh) return
+
+      mesh.castShadow = true
+      mesh.receiveShadow = true
+      geometries.add(mesh.geometry)
+
+      const meshMaterials = Array.isArray(mesh.material) ? mesh.material : [mesh.material]
+      meshMaterials.forEach((material) => {
+        materials.add(material)
+        Object.values(material).forEach((value) => {
+          if (value && typeof value === 'object' && 'isTexture' in value && value.isTexture) {
+            textures.add(value as Texture)
+          }
+        })
+      })
     })
+
     onLoaded?.()
-  }, [model, onLoaded])
+
+    return () => {
+      textures.forEach((texture) => texture.dispose())
+      materials.forEach((material) => material.dispose())
+      geometries.forEach((geometry) => geometry.dispose())
+      useGLTF.clear(assetUrl(url))
+    }
+  }, [model, onLoaded, url])
 
   return (
     <group

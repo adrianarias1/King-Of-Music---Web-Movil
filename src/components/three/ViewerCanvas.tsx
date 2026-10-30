@@ -5,7 +5,6 @@ import type { PointerEvent as ReactPointerEvent } from 'react'
 import type { Group as ThreeGroup } from 'three'
 import { ACESFilmicToneMapping } from 'three'
 import type { Character } from '../../types'
-import { assetExists } from '../../utils/assets'
 import { CharacterModel } from './CharacterModel'
 import { PlaceholderFigure } from './PlaceholderFigure'
 import './ViewerCanvas.css'
@@ -38,7 +37,6 @@ export function ViewerCanvas({
   reduced = false,
   onModelStateChange,
 }: Props) {
-  const [modelAvailable, setModelAvailable] = useState<boolean | null>(null)
   const [dragging, setDragging] = useState(false)
   const modelRef = useRef<ThreeGroup>(null)
   const dragRef = useRef<{ pointerId: number; lastX: number } | null>(null)
@@ -47,22 +45,7 @@ export function ViewerCanvas({
     (state: ModelState) => onModelStateChange?.(state),
     [onModelStateChange],
   )
-
-  // Comprueba el modelo antes de montarlo para no provocar 404.
-  useEffect(() => {
-    let alive = true
-    setModelState('placeholder')
-
-    assetExists(character.model).then((exists) => {
-      if (!alive) return
-      setModelAvailable(exists)
-      setModelState(exists ? 'loading' : 'placeholder')
-    })
-
-    return () => {
-      alive = false
-    }
-  }, [character.model, setModelState])
+  const handleModelLoaded = useCallback(() => setModelState('loaded'), [setModelState])
 
   const handlePointerDown = useCallback((event: ReactPointerEvent<HTMLDivElement>) => {
     if (event.button !== 0) return
@@ -121,12 +104,12 @@ export function ViewerCanvas({
             <PlaceholderFigure accent={character.accent} animate={false} scale={character.scale} />
           }
         >
-          {modelAvailable === true ? (
+          {character.model ? (
             <group ref={modelRef}>
               <CharacterModel
                 url={character.model}
                 scale={character.scale}
-                onLoaded={() => setModelState('loaded')}
+                onLoaded={handleModelLoaded}
               />
             </group>
           ) : (

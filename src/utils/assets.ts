@@ -14,7 +14,9 @@ export function assetUrl(path: string): string {
 }
 
 /** Cachea las comprobaciones HEAD para no repetir peticiones. */
-const availability = new Map<string, boolean>()
+const availability = new Map<string, { exists: boolean; expiresAt: number }>()
+const NEGATIVE_CACHE_TTL_MS = 5_000
+const RETRY_DELAY_MS = 250
 
 /**
  * Comprueba si un asset existe antes de cargarlo.
@@ -26,36 +28,62 @@ const availability = new Map<string, boolean>()
  * el esperado para un asset binario/de imagen; de lo contrario se intentaria
  * cargar HTML como si fuera un GLB.
  *
- * Las comprobaciones fallidas se cachean como `false` durante la sesion.
+ * Las respuestas positivas se cachean durante la sesion. Los 404 y los
+ * fallbacks HTML se cachean brevemente; los errores de red no se cachean.
  */
 export async function assetExists(path: string | undefined): Promise<boolean> {
   if (!path) return false
 
   const cached = availability.get(path)
-  if (cached !== undefined) return cached
+  if (cached && cached.expiresAt > Date.now()) return cached.exists
 
-  try {
-    const response = await fetch(assetUrl(path), {
-      method: 'HEAD',
-      cache: 'no-cache',
-    })
+  for (let attempt = 0; attempt < 2; attempt += 1) {
+    try {
+      const response = await fetch(assetUrl(path), {
+        method: 'HEAD',
+        cache: 'no-cache',
+      })
 
-    if (!response.ok) {
-      availability.set(path, false)
-      return false
+      if (!response.ok) {
+        if (response.status === 404) {
+          availability.set(path, {
+            exists: false,
+            expiresAt: Date.now() + NEGATIVE_CACHE_TTL_MS,
+          })
+          return false
+        }
+
+        if (attempt === 0) {
+          await new Promise((resolve) => setTimeout(resolve, RETRY_DELAY_MS))
+          continue
+        }
+
+        return false
+      }
+
+      // Fallback SPA: devolvieron HTML en lugar del asset solicitado.
+      const contentType = response.headers.get('content-type') ?? ''
+      const isHtml = contentType.includes('text/html')
+      if (isHtml) {
+        availability.set(path, {
+          exists: false,
+          expiresAt: Date.now() + NEGATIVE_CACHE_TTL_MS,
+        })
+        return false
+      }
+
+      availability.set(path, { exists: true, expiresAt: Number.POSITIVE_INFINITY })
+      return true
+    } catch {
+      if (attempt === 0) {
+        await new Promise((resolve) => setTimeout(resolve, RETRY_DELAY_MS))
+      }
     }
-
-    // Fallback SPA: devolvieron HTML en lugar del asset solicitado.
-    const contentType = response.headers.get('content-type') ?? ''
-    const isHtml = contentType.includes('text/html')
-    const exists = !isHtml
-
-    availability.set(path, exists)
-    return exists
-  } catch {
-    availability.set(path, false)
-    return false
   }
+
+  // Los fallos transitorios de red no se cachean: la siguiente comprobacion
+  // puede recuperar el asset sin necesitar una recarga completa.
+  return false
 }
 
 /** Permite reiniciar el cache (util en desarrollo). */

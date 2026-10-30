@@ -1,5 +1,5 @@
 import { Info, MousePointer2, Move3d } from 'lucide-react'
-import { useCallback, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { characters, defaultCharacterId } from '../../data/characters'
 import { useInView } from '../../hooks/useInView'
 import { useReducedMotion } from '../../hooks/useReducedMotion'
@@ -26,7 +26,9 @@ const FALLBACK = (
 export function CharacterViewer() {
   const [activeId, setActiveId] = useState(defaultCharacterId)
   const [ability, setAbility] = useState<Ability | null>(null)
-  const [modelState, setModelState] = useState<ModelState>('placeholder')
+  const [modelState, setModelState] = useState<ModelState>(
+    characters[0]?.model ? 'loading' : 'placeholder',
+  )
   const reduced = useReducedMotion()
 
   // El Canvas se monta cerca del viewport, no al cargar la pagina.
@@ -34,6 +36,11 @@ export function CharacterViewer() {
     rootMargin: '300px 0px',
     threshold: 0.01,
   })
+  const [hasMounted, setHasMounted] = useState(inView)
+
+  useEffect(() => {
+    if (inView) setHasMounted(true)
+  }, [inView])
 
   // Pausa el render 3D cuando la seccion sale de pantalla.
   const { ref: activeRef, inView: onScreen } = useInView<HTMLDivElement>({
@@ -51,6 +58,7 @@ export function CharacterViewer() {
 
   const handleSelect = useCallback((id: string) => {
     setActiveId(id)
+    setModelState(characters.find((item) => item.id === id)?.model ? 'loading' : 'placeholder')
     setAbility(null)
   }, [])
 
@@ -101,7 +109,7 @@ export function CharacterViewer() {
               tabIndex={-1}
             >
               <ErrorBoundary label="Visor 3D no disponible" fallback={FALLBACK}>
-                {inView ? (
+                {hasMounted ? (
                   <ViewerCanvas
                     character={character}
                     active={onScreen}
@@ -121,7 +129,8 @@ export function CharacterViewer() {
               {modelState === 'placeholder' ? (
                 <p className="viewer__model-notice notice">
                   <Info size={14} strokeWidth={1.5} aria-hidden="true" />
-                  Modelo provisional — pendiente <code>{character.model}</code>
+                  Modelo provisional — pendiente{' '}
+                  {character.model ? <code>{character.model}</code> : 'archivo 3D'}
                 </p>
               ) : null}
             </div>
