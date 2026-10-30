@@ -1,6 +1,8 @@
 import { Canvas } from '@react-three/fiber'
-import { ContactShadows, OrbitControls } from '@react-three/drei'
-import { Suspense, useCallback, useEffect, useState } from 'react'
+import { ContactShadows } from '@react-three/drei'
+import { Suspense, useCallback, useEffect, useRef, useState } from 'react'
+import type { PointerEvent as ReactPointerEvent } from 'react'
+import type { Group as ThreeGroup } from 'three'
 import { ACESFilmicToneMapping } from 'three'
 import type { Character } from '../../types'
 import { assetExists } from '../../utils/assets'
@@ -19,13 +21,14 @@ interface Props {
   onModelStateChange?: (state: ModelState) => void
 }
 
-const DEFAULT_CAMERA: [number, number, number] = [0, 1.05, 3.2]
+const CAMERA_POSITION: [number, number, number] = [0, 0, 3.3]
 
 /**
  * Lienzo 3D del personaje.
  *
  * - Iluminacion propia (sin HDR externo: cero peticiones de red)
- * - OrbitControls con limites y zoom acotado
+ * - Modelos centrados y ajustados automaticamente al escenario
+ * - Cámara y escenario fijos; el arrastre gira solo el modelo sobre su eje Y
  * - frameloop="never" cuando la seccion no es visible
  * - dpr limitado para no castigar moviles
  */
@@ -36,6 +39,9 @@ export function ViewerCanvas({
   onModelStateChange,
 }: Props) {
   const [modelAvailable, setModelAvailable] = useState<boolean | null>(null)
+  const [dragging, setDragging] = useState(false)
+  const modelRef = useRef<ThreeGroup>(null)
+  const dragRef = useRef<{ pointerId: number; lastX: number } | null>(null)
 
   const setModelState = useCallback(
     (state: ModelState) => onModelStateChange?.(state),
@@ -58,15 +64,50 @@ export function ViewerCanvas({
     }
   }, [character.model, setModelState])
 
-  const cameraPosition = character.cameraPosition ?? DEFAULT_CAMERA
+  const handlePointerDown = useCallback((event: ReactPointerEvent<HTMLDivElement>) => {
+    if (event.button !== 0) return
+    event.preventDefault()
+    event.currentTarget.setPointerCapture(event.pointerId)
+    dragRef.current = { pointerId: event.pointerId, lastX: event.clientX }
+    setDragging(true)
+  }, [])
+
+  const handlePointerMove = useCallback((event: ReactPointerEvent<HTMLDivElement>) => {
+    const drag = dragRef.current
+    if (!drag || drag.pointerId !== event.pointerId || !modelRef.current) return
+    const deltaX = event.clientX - drag.lastX
+    modelRef.current.rotation.y += deltaX * 0.01
+    drag.lastX = event.clientX
+  }, [])
+
+  const handlePointerUp = useCallback((event: ReactPointerEvent<HTMLDivElement>) => {
+    if (dragRef.current?.pointerId !== event.pointerId) return
+    dragRef.current = null
+    setDragging(false)
+    if (event.currentTarget.hasPointerCapture(event.pointerId)) {
+      event.currentTarget.releasePointerCapture(event.pointerId)
+    }
+  }, [])
+
+  useEffect(() => {
+    if (modelRef.current) modelRef.current.rotation.y = 0
+    dragRef.current = null
+    setDragging(false)
+  }, [character.model])
 
   return (
-    <div className="viewer-canvas">
+    <div
+      className={`viewer-canvas${dragging ? ' is-dragging' : ''}`}
+      onPointerDown={handlePointerDown}
+      onPointerMove={handlePointerMove}
+      onPointerUp={handlePointerUp}
+      onPointerCancel={handlePointerUp}
+    >
       <Canvas
         // Pausa total cuando la seccion no esta en pantalla.
         frameloop={active ? 'always' : 'never'}
         dpr={[1, 1.75]}
-        camera={{ position: cameraPosition, fov: 38, near: 0.1, far: 60 }}
+        camera={{ position: CAMERA_POSITION, fov: 40, near: 0.1, far: 60 }}
         gl={{
           antialias: true,
           alpha: true,
@@ -81,11 +122,13 @@ export function ViewerCanvas({
           }
         >
           {modelAvailable === true ? (
-            <CharacterModel
-              url={character.model}
-              scale={character.scale}
-              onLoaded={() => setModelState('loaded')}
-            />
+            <group ref={modelRef}>
+              <CharacterModel
+                url={character.model}
+                scale={character.scale}
+                onLoaded={() => setModelState('loaded')}
+              />
+            </group>
           ) : (
             <PlaceholderFigure
               accent={character.accent}
@@ -102,7 +145,7 @@ export function ViewerCanvas({
         <pointLight position={[0, 1.6, 2.4]} intensity={12} distance={9} color="#ffffff" />
 
         <ContactShadows
-          position={[0, 0, 0]}
+          position={[0, -1.1, 0]}
           opacity={0.55}
           scale={6}
           blur={2.6}
@@ -111,24 +154,11 @@ export function ViewerCanvas({
           frames={active ? undefined : 1}
         />
 
-        <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -0.02, 0]} receiveShadow>
+        <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -1.14, 0]} receiveShadow>
           <planeGeometry args={[24, 24]} />
           <shadowMaterial transparent opacity={0.4} />
         </mesh>
 
-        <OrbitControls
-          makeDefault
-          enablePan={false}
-          enableDamping={!reduced}
-          dampingFactor={0.08}
-          minDistance={1.6}
-          maxDistance={6}
-          minPolarAngle={Math.PI * 0.12}
-          maxPolarAngle={Math.PI * 0.62}
-          target={[0, 0.85, 0]}
-          rotateSpeed={0.75}
-          zoomSpeed={0.6}
-        />
       </Canvas>
     </div>
   )

@@ -1,6 +1,6 @@
 import { useGLTF } from '@react-three/drei'
-import { useEffect } from 'react'
-import type { Group as ThreeGroup } from 'three'
+import { useEffect, useMemo } from 'react'
+import { Box3, Vector3, type Group as ThreeGroup } from 'three'
 import { assetUrl } from '../../utils/assets'
 
 interface Props {
@@ -18,17 +18,36 @@ interface Props {
  */
 export function CharacterModel({ url, scale = 1, onLoaded }: Props) {
   const { scene } = useGLTF(assetUrl(url))
+  const model = useMemo(() => scene.clone(true), [scene])
+  const bounds = useMemo(() => {
+    const box = new Box3().setFromObject(model)
+    return {
+      center: box.getCenter(new Vector3()),
+      height: Math.max(box.getSize(new Vector3()).y, 0.001),
+    }
+  }, [model])
+  const fittedScale = (2.25 / bounds.height) * scale
 
   useEffect(() => {
     if (!scene) return
-    const root = scene as ThreeGroup
+    const root = model as ThreeGroup
     root.traverse((child) => {
       const mesh = child as unknown as { castShadow?: boolean; receiveShadow?: boolean }
       if (typeof mesh.castShadow === 'boolean') mesh.castShadow = true
       if (typeof mesh.receiveShadow === 'boolean') mesh.receiveShadow = true
     })
     onLoaded?.()
-  }, [scene, onLoaded])
+  }, [model, onLoaded])
 
-  return <primitive object={scene} scale={scale} />
+  return (
+    <group
+      position={[
+        -bounds.center.x * fittedScale,
+        -bounds.center.y * fittedScale,
+        -bounds.center.z * fittedScale,
+      ]}
+    >
+      <primitive object={model} scale={fittedScale} />
+    </group>
+  )
 }

@@ -1,13 +1,10 @@
 import type { Character } from '../types'
 
 /* ==========================================================================
-   PERSONAJES — DATOS REALES (condensados)
+   PERSONAJES — DATOS DEL ROSTER
    --------------------------------------------------------------------------
-   IMPORTANTE: los modelos `.glb` definitivos todavia NO existen.
-   `model` apunta a la ruta donde ira el archivo final:
-       public/models/<id>.glb
-   Mientras el archivo no exista, el visor 3D muestra un placeholder
-   geometrico y un aviso discreto (sin errores 404).
+   Los modelos disponibles viven en public/models/characters. Los personajes
+   cuyo modelo aun no se ha agregado conservan el placeholder en el visor.
    ========================================================================== */
 
 export const characters: Character[] = [
@@ -17,9 +14,9 @@ export const characters: Character[] = [
     tagline: 'Balada mexicana',
     description:
       'Combatiente de largo alcance que transforma la fuerza de su interpretación en ondas sonoras para controlar el espacio.',
-    model: '/models/juan-grabriel.glb',
+    model: '/models/characters/juangrabriel.glb',
     preview: '/images/characters/juan-grabriel.jpg',
-    scale: 1.08,
+    scale: 0.95,
     cameraPosition: [0, 1.25, 3.8],
     accent: '#002F61',
     abilities: [
@@ -38,7 +35,7 @@ export const characters: Character[] = [
     tagline: 'Balada romántica',
     description:
       'Utiliza la intensidad emocional de sus interpretaciones para generar ataques de energía y efectos musicales.',
-    model: '/models/jose-jose-jose.glb',
+    model: '/models/characters/JoseJose.glb',
     preview: '/images/characters/jose-jose-jose.jpg',
     scale: 0.98,
     cameraPosition: [0, 1.1, 3.2],
@@ -59,7 +56,7 @@ export const characters: Character[] = [
     tagline: 'Rock mexicano',
     description:
       'Combatiente ofensivo de corta distancia basado en potencia, guitarras, amplificadores y ataques de alto impacto.',
-    model: '/models/alex-llora.glb',
+    model: '/models/characters/AlexLLora.glb',
     preview: '/images/characters/alex-llora.jpg',
     scale: 0.95,
     cameraPosition: [0, 1.05, 3.1],
@@ -80,7 +77,7 @@ export const characters: Character[] = [
     tagline: 'Música norteña',
     description:
       'Especialista en alcance medio que utiliza su acordeón para generar ráfagas de energía y ataques musicales.',
-    model: '/models/roman-ayala.glb',
+    model: '/models/characters/Roman.glb',
     preview: '/images/characters/roman-ayala.jpg',
     scale: 0.98,
     cameraPosition: [0, 1.1, 3.2],
@@ -122,7 +119,7 @@ export const characters: Character[] = [
     tagline: 'Corridos bélicos',
     description:
       'Combatiente de ofensiva constante basado en velocidad, requintos y combinaciones rápidas de ataques.',
-    model: '/models/peso-plomo.glb',
+    model: '/models/characters/PesoPumba.glb',
     preview: '/images/characters/peso-plomo.jpg',
     scale: 1,
     cameraPosition: [0, 1.15, 3.4],
@@ -136,6 +133,18 @@ export const characters: Character[] = [
         icon: 'Zap',
       },
     ],
+  },
+  {
+    id: 'flavia',
+    name: 'Flavia',
+    tagline: 'Artista',
+    description: 'Personaje del roster de King of Music.',
+    model: '/models/characters/Flavia.glb',
+    preview: '/images/characters/flavia.jpg',
+    scale: 1,
+    cameraPosition: [0, 1.1, 3.2],
+    accent: '#BABABA',
+    abilities: [],
   },
 ]
 

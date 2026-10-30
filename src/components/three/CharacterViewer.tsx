@@ -14,7 +14,7 @@ import './CharacterViewer.css'
 const copy = {
   eyebrow: 'Seleccion',
   title: 'Elige a tu artista',
-  lead: 'Arrastra para rotar, usa la rueda o el pellizco para acercar. Cada personaje tiene su propio conjunto de habilidades.',
+  lead: 'Desliza horizontalmente para girar cada modelo sobre su eje vertical. La vista permanece centrada.',
 } as const
 
 const FALLBACK = (
@@ -115,7 +115,7 @@ export function CharacterViewer() {
 
               <p className="viewer__hint notice notice--inline">
                 <Move3d size={14} strokeWidth={1.5} aria-hidden="true" />
-                Arrastra para rotar
+                Desliza para girar
               </p>
 
               {modelState === 'placeholder' ? (

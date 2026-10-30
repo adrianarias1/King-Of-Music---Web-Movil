@@ -7,7 +7,7 @@ import './CharacterCollage.css'
 const copy = {
   eyebrow: 'Roster',
   title: 'Conoce a los artistas',
-  lead: 'Cada artista pelea con un estilo propio. Estas son las posiciones reservadas para las ilustraciones finales de cada personaje.',
+  lead: 'Conoce a los artistas del roster y explora sus modelos 3D en la sección de selección.',
 } as const
 
 export function CharacterCollage() {
@@ -21,11 +21,7 @@ export function CharacterCollage() {
           </p>
         </SectionHeading>
 
-        {/*
-          ASSETS PENDIENTES: public/images/characters/<id>.jpg
-          Layout editorial: cada personaje tiene una posicion distinta.
-          Para cambiar una ilustracion basta con reemplazar el archivo.
-        */}
+        {/* Retratos opcionales; cuando faltan, SmartImage muestra el nombre. */}
         <ul className="collage__grid">
           {characters.map((character, index) => (
             <Reveal
