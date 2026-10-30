@@ -8,6 +8,11 @@
  */
 export function assetUrl(path: string): string {
   if (/^(https?:)?\/\//.test(path) || path.startsWith('data:')) return path
+  if (path.startsWith('/models/characters/')) {
+    const r2Base = (import.meta.env.VITE_R2_PUBLIC_BASE_URL ||
+      'https://pub-635f10d16c96474cb14af54616e8ce39.r2.dev').replace(/\/+$/, '')
+    return `${r2Base}${path}`
+  }
   const base = import.meta.env.BASE_URL || '/'
   const normalized = path.startsWith('/') ? path.slice(1) : path
   return `${base}${normalized}`

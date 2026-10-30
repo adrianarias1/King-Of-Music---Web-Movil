@@ -3,8 +3,8 @@ import type { Character } from '../types'
 /* ==========================================================================
    PERSONAJES — DATOS DEL ROSTER
    --------------------------------------------------------------------------
-   Los modelos disponibles viven en public/models/characters. Los personajes
-   cuyo modelo aun no se ha agregado conservan el placeholder en el visor.
+   Los modelos GLB se sirven desde Cloudflare R2 conservando su ruta original.
+   Los personajes sin modelo conservan el placeholder en el visor.
    ========================================================================== */
 
 export const characters: Character[] = [

@@ -31,6 +31,7 @@ dist-ssr
 android/keystore.properties
 release/
 *.apk
+*.glb
 
 # NOT ignored on purpose (checked in once generated):
 # android/  -> Capacidad Android nativo generado por Capacitor

@@ -1,6 +1,6 @@
 import { Canvas } from '@react-three/fiber'
 import { ContactShadows } from '@react-three/drei'
-import { Suspense, useCallback, useEffect, useRef, useState } from 'react'
+import { Suspense, useCallback, useEffect, useRef } from 'react'
 import type { PointerEvent as ReactPointerEvent } from 'react'
 import type { Group as ThreeGroup } from 'three'
 import { ACESFilmicToneMapping } from 'three'
@@ -35,22 +35,22 @@ export function ViewerCanvas({
   active,
   onModelStateChange,
 }: Props) {
-  const [dragging, setDragging] = useState(false)
   const modelRef = useRef<ThreeGroup>(null)
   const dragRef = useRef<{ pointerId: number; lastX: number } | null>(null)
 
-  const setModelState = useCallback(
-    (state: ModelState) => onModelStateChange?.(state),
+  const handleModelLoaded = useCallback(
+    () => onModelStateChange?.('loaded'),
     [onModelStateChange],
   )
-  const handleModelLoaded = useCallback(() => setModelState('loaded'), [setModelState])
 
   const handlePointerDown = useCallback((event: ReactPointerEvent<HTMLDivElement>) => {
     if (event.button !== 0) return
     event.preventDefault()
     event.currentTarget.setPointerCapture(event.pointerId)
     dragRef.current = { pointerId: event.pointerId, lastX: event.clientX }
-    setDragging(true)
+    // Cambiar el cursor no necesita renderizar React ni volver a reconciliar
+    // el subárbol 3D mientras se mantiene el puntero presionado.
+    event.currentTarget.classList.add('is-dragging')
   }, [])
 
   const handlePointerMove = useCallback((event: ReactPointerEvent<HTMLDivElement>) => {
@@ -64,7 +64,7 @@ export function ViewerCanvas({
   const handlePointerUp = useCallback((event: ReactPointerEvent<HTMLDivElement>) => {
     if (dragRef.current?.pointerId !== event.pointerId) return
     dragRef.current = null
-    setDragging(false)
+    event.currentTarget.classList.remove('is-dragging')
     if (event.currentTarget.hasPointerCapture(event.pointerId)) {
       event.currentTarget.releasePointerCapture(event.pointerId)
     }
@@ -73,12 +73,11 @@ export function ViewerCanvas({
   useEffect(() => {
     if (modelRef.current) modelRef.current.rotation.y = 0
     dragRef.current = null
-    setDragging(false)
   }, [character.model])
 
   return (
     <div
-      className={`viewer-canvas${dragging ? ' is-dragging' : ''}`}
+      className="viewer-canvas"
       onPointerDown={handlePointerDown}
       onPointerMove={handlePointerMove}
       onPointerUp={handlePointerUp}

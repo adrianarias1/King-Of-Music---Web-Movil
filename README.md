@@ -67,13 +67,13 @@ docs/            # Documentacion del proyecto (ver mas abajo)
 ### Anadir un personaje
 
 1. Editar `src/data/characters.ts` y añadir una entrada `Character`.
-2. Colocar el modelo 3D en `public/models/<id>.glb`.
+2. Subir el modelo 3D a Cloudflare R2 bajo `models/characters/<archivo>.glb`.
 3. Colocar la ilustracion en `public/images/characters/<id>.jpg`.
 4. El visor detecta automaticamente si el `.glb` existe. Si no, usa un placeholder 3D propio.
 
 ### Anadir un modelo GLB
 
-Colocar el archivo en `public/models/nombre.glb`. Actualizar la ruta en `src/data/characters.ts` (`model: '/models/nombre.glb'`). El visor comprueba existencia (HEAD) antes de cargarlo para evitar 404.
+Subir el archivo a Cloudflare R2 bajo `models/characters/nombre.glb`. Actualizar la ruta conservando `/models/characters/nombre.glb` en `src/data/characters.ts`. `assetUrl()` resuelve estas rutas al bucket público de R2; la URL base se puede sustituir con `VITE_R2_PUBLIC_BASE_URL`. El visor carga los modelos de forma diferida y permite reintentar una descarga fallida.
 
 ### Anadir una habilidad
 

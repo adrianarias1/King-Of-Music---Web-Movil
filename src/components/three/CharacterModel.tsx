@@ -1,5 +1,5 @@
 import { useGLTF } from '@react-three/drei'
-import { useEffect, useMemo } from 'react'
+import { useEffect, useMemo, useRef } from 'react'
 import {
   Box3,
   Vector3,
@@ -26,6 +26,12 @@ interface Props {
  */
 export function CharacterModel({ url, scale = 1, onLoaded }: Props) {
   const { scene } = useGLTF(assetUrl(url))
+  // El callback puede cambiar durante un render del padre. Mantenerlo en un
+  // ref evita que una actualización de UI ejecute el cleanup del modelo.
+  const onLoadedRef = useRef(onLoaded)
+  useEffect(() => {
+    onLoadedRef.current = onLoaded
+  }, [onLoaded])
   const model = useMemo(() => scene.clone(true), [scene])
   const bounds = useMemo(() => {
     const box = new Box3().setFromObject(model)
@@ -61,7 +67,7 @@ export function CharacterModel({ url, scale = 1, onLoaded }: Props) {
       })
     })
 
-    onLoaded?.()
+    onLoadedRef.current?.()
 
     return () => {
       textures.forEach((texture) => texture.dispose())
@@ -69,7 +75,7 @@ export function CharacterModel({ url, scale = 1, onLoaded }: Props) {
       geometries.forEach((geometry) => geometry.dispose())
       useGLTF.clear(assetUrl(url))
     }
-  }, [model, onLoaded, url])
+  }, [model, url])
 
   return (
     <group

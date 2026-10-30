@@ -1,4 +1,5 @@
 import { Info, MousePointer2, Move3d } from 'lucide-react'
+import { useGLTF } from '@react-three/drei'
 import { useCallback, useEffect, useState } from 'react'
 import { characters, defaultCharacterId } from '../../data/characters'
 import { useInView } from '../../hooks/useInView'
@@ -8,6 +9,7 @@ import { Reveal } from '../ui/Reveal'
 import { SectionHeading } from '../ui/SectionHeading'
 import { AbilityModal } from './AbilityModal'
 import { ViewerCanvas, type ModelState } from './ViewerCanvas'
+import { assetUrl } from '../../utils/assets'
 import './CharacterViewer.css'
 
 const copy = {
@@ -16,15 +18,10 @@ const copy = {
   lead: 'Desliza horizontalmente para girar cada modelo sobre su eje vertical. La vista permanece centrada.',
 } as const
 
-const FALLBACK = (
-  <div className="viewer-fallback" role="status">
-    <span className="label">Visor 3D no disponible en este dispositivo</span>
-  </div>
-)
-
 export function CharacterViewer() {
   const [activeId, setActiveId] = useState(defaultCharacterId)
   const [ability, setAbility] = useState<Ability | null>(null)
+  const [loadAttempt, setLoadAttempt] = useState(0)
   const [modelState, setModelState] = useState<ModelState>(
     characters[0]?.model ? 'loading' : 'placeholder',
   )
@@ -58,7 +55,14 @@ export function CharacterViewer() {
     setActiveId(id)
     setModelState(characters.find((item) => item.id === id)?.model ? 'loading' : 'placeholder')
     setAbility(null)
+    setLoadAttempt(0)
   }, [])
+
+  const retryModel = useCallback(() => {
+    if (character?.model) useGLTF.clear(assetUrl(character.model))
+    setModelState('loading')
+    setLoadAttempt((attempt) => attempt + 1)
+  }, [character])
 
   if (!character) return null
 
@@ -106,7 +110,16 @@ export function CharacterViewer() {
               aria-labelledby={`tab-${character.id}`}
               tabIndex={-1}
             >
-              <ErrorBoundary label="Visor 3D no disponible" fallback={FALLBACK}>
+              <ErrorBoundary
+                key={`${character.id}-${loadAttempt}`}
+                label="Visor 3D no disponible"
+                fallback={
+                  <div className="viewer-fallback" role="status">
+                    <span className="label">No se pudo cargar el modelo.</span>
+                    <button type="button" onClick={retryModel}>Reintentar</button>
+                  </div>
+                }
+              >
                 {hasMounted ? (
                   <ViewerCanvas
                     character={character}
