@@ -31,6 +31,19 @@
   touch-action: pan-y;
 }
 
+.viewer-canvas__loading {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  display: flex;
+  align-items: flex-start;
+  justify-content: flex-end;
+  padding: 1rem 1.25rem;
+  color: var(--color-gray-light);
+  background: rgba(0, 0, 0, 0.18);
+  pointer-events: none;
+}
+
 /* Suelo sutil para dar sensacion de escenario */
 .viewer-canvas::after {
   content: '';

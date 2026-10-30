@@ -2,7 +2,6 @@ import { Info, MousePointer2, Move3d } from 'lucide-react'
 import { useCallback, useEffect, useState } from 'react'
 import { characters, defaultCharacterId } from '../../data/characters'
 import { useInView } from '../../hooks/useInView'
-import { useReducedMotion } from '../../hooks/useReducedMotion'
 import type { Ability } from '../../types'
 import { ErrorBoundary } from '../ui/ErrorBoundary'
 import { Reveal } from '../ui/Reveal'
@@ -29,7 +28,6 @@ export function CharacterViewer() {
   const [modelState, setModelState] = useState<ModelState>(
     characters[0]?.model ? 'loading' : 'placeholder',
   )
-  const reduced = useReducedMotion()
 
   // El Canvas se monta cerca del viewport, no al cargar la pagina.
   const { ref: mountRef, inView } = useInView<HTMLDivElement>({
@@ -112,8 +110,8 @@ export function CharacterViewer() {
                 {hasMounted ? (
                   <ViewerCanvas
                     character={character}
+                    modelState={modelState}
                     active={onScreen}
-                    reduced={reduced}
                     onModelStateChange={handleModelState}
                   />
                 ) : (

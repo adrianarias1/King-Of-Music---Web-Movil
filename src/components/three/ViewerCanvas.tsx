@@ -6,17 +6,15 @@ import type { Group as ThreeGroup } from 'three'
 import { ACESFilmicToneMapping } from 'three'
 import type { Character } from '../../types'
 import { CharacterModel } from './CharacterModel'
-import { PlaceholderFigure } from './PlaceholderFigure'
 import './ViewerCanvas.css'
 
 export type ModelState = 'placeholder' | 'loading' | 'loaded'
 
 interface Props {
   character: Character
+  modelState: ModelState
   /** Permite pausar el render cuando la seccion sale del viewport. */
   active: boolean
-  /** Desactiva rotacion y camara automatica. */
-  reduced?: boolean
   onModelStateChange?: (state: ModelState) => void
 }
 
@@ -33,8 +31,8 @@ const CAMERA_POSITION: [number, number, number] = [0, 0, 3.3]
  */
 export function ViewerCanvas({
   character,
+  modelState,
   active,
-  reduced = false,
   onModelStateChange,
 }: Props) {
   const [dragging, setDragging] = useState(false)
@@ -99,11 +97,7 @@ export function ViewerCanvas({
         }}
         style={{ touchAction: 'pan-y' }}
       >
-        <Suspense
-          fallback={
-            <PlaceholderFigure accent={character.accent} animate={false} scale={character.scale} />
-          }
-        >
+        <Suspense fallback={null}>
           {character.model ? (
             <group ref={modelRef}>
               <CharacterModel
@@ -112,13 +106,7 @@ export function ViewerCanvas({
                 onLoaded={handleModelLoaded}
               />
             </group>
-          ) : (
-            <PlaceholderFigure
-              accent={character.accent}
-              animate={!reduced && active}
-              scale={character.scale}
-            />
-          )}
+          ) : null}
         </Suspense>
 
         {/* Iluminacion de estudio: clave, relleno y contraluz */}
@@ -143,6 +131,11 @@ export function ViewerCanvas({
         </mesh>
 
       </Canvas>
+      {modelState === 'loading' ? (
+        <div className="viewer-canvas__loading label" role="status">
+          Cargando personaje
+        </div>
+      ) : null}
     </div>
   )
 }
