@@ -34,9 +34,7 @@ import { GameMap } from './components/sections/GameMap'
 import { BehindTheGame } from './components/sections/BehindTheGame'
 import { TeamSection } from './components/sections/Team'
 import { DownloadCTA } from './components/sections/DownloadCTA'
-import { Reviews } from './features/reviews/Reviews'
-import { characters } from './data/characters'
-import { locations } from './data/locations'
+import { ReviewsDock } from './features/reviews/Reviews'
 import { Login } from './features/auth/Login'
 
 // Manejo de errores
@@ -147,7 +145,6 @@ export default function App() {
             <CharacterViewer />
           </Suspense>
         </ErrorBoundary>
-        <Reviews section="personajes" title="Personajes" subjects={characters} />
 
         {/* =================================================
             05. HISTORIA Y STORYBOARD
@@ -162,11 +159,6 @@ export default function App() {
             ================================================= */}
 
         <GameMap mapImage={mapAsset} />
-        <Reviews
-          section="escenarios"
-          title="Mapa y escenarios"
-          subjects={[{ id: 'general', name: 'Mapa general', section: 'mapa' }, ...locations]}
-        />
 
         {/* =================================================
             07. DETRÁS DEL JUEGO
@@ -193,6 +185,10 @@ export default function App() {
       {/* Pie de página */}
 
       <Footer />
+
+      {/* Reseñas: botón flotante fijo fuera del recorrido principal */}
+      <ReviewsDock />
+
       <Login open={loginOpen} onClose={() => setLoginOpen(false)} />
     </>
   )

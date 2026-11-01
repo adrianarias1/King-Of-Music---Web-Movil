@@ -1,41 +1,631 @@
-.reviews { padding: clamp(2rem, 5vw, 4rem) 0; color: #eee; background: #090909; border-block: 1px solid #c5a45b25; }
-.reviews__heading { display: flex; justify-content: space-between; align-items: end; gap: 1.5rem; flex-wrap: wrap; }
-.reviews__heading .label { color: #c5a45b; margin-bottom: .75rem; }
-.reviews h2 { font-family: var(--font-display); font-size: clamp(1.6rem, 3.5vw, 2.5rem); font-weight: 400; }
-.reviews h3 { font-size: 1.15rem; }
-.reviews__notice { color: #aaa; font-size: .85rem; line-height: 1.6; margin: 1.25rem 0 2rem; }
-.reviews__grid { display: grid; grid-template-columns: minmax(0, .9fr) minmax(0, 1.1fr); gap: clamp(1.5rem, 4vw, 4rem); }
-.reviews__form { display: flex; flex-direction: column; gap: .65rem; padding: clamp(1rem, 3vw, 2rem); background: #121212; border: 1px solid #ffffff18; border-radius: 6px; }
-.reviews__form h3 { margin-bottom: .5rem; }
-.reviews label, .reviews legend { font-size: .85rem; }
-.reviews input:not([type=radio]), .reviews textarea, .reviews select { width: 100%; background: #080808; border: 1px solid #555; border-radius: 4px; color: #eee; padding: .75rem; font: inherit; min-height: 44px; }
-.reviews textarea { resize: vertical; }
-.reviews :focus-visible { outline: 2px solid #e3c57b; outline-offset: 4px; }
-.reviews__subject { display: grid; gap: .5rem; min-width: min(100%, 230px); }
-.reviews__rating { border: 0; padding: .5rem 0; margin: 0; }
-.reviews__rating > div { display: flex; gap: 4px; margin-top: .5rem; }
-.reviews__rating label { position: relative; width: 44px; height: 44px; display: grid; place-items: center; cursor: pointer; color: #888; border-radius: 4px; }
-.reviews__rating input { position: absolute; inset: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer; }
-.reviews__rating label:focus-within { outline: 2px solid #e3c57b; }
-.reviews__rating .is-selected, .reviews__stars, .reviews__summary strong span { color: #e3c57b; }
-.reviews .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; border: 0; }
-.reviews small { color: #aaa; font-size: .75rem; }
-.reviews__error { color: #ffaaa1; }
-.reviews__error:empty, .reviews [role=status]:empty { display: none; }
-.reviews__submit, .reviews__retry { padding: .8rem 1rem; background: #e3c57b; color: #14100a; font-weight: 700; border-radius: 4px; min-height: 44px; cursor: pointer; }
-.reviews button:disabled { opacity: .5; cursor: wait; }
-.reviews__summary { display: flex; align-items: center; justify-content: space-between; gap: 1rem; padding-bottom: 1.5rem; border-bottom: 1px solid #ffffff20; }
-.reviews__summary strong { font-size: 2.2rem; }
-.reviews__summary p { color: #aaa; font-size: .85rem; }
-.reviews__summary label { display: grid; gap: .5rem; }
-.reviews__empty { padding: 3rem 1rem; text-align: center; color: #aaa; line-height: 1.7; }
-.reviews__empty svg { margin: 0 auto 1rem; color: #c5a45b; }
-.reviews__empty h3 { color: #eee; }
-.reviews__list { list-style: none; padding: 0; max-height: 540px; overflow-y: auto; }
-.reviews__list li { padding: 1.5rem 0; border-bottom: 1px solid #ffffff20; }
-.reviews__byline { display: flex; justify-content: space-between; gap: 1rem; flex-wrap: wrap; }
-.reviews__byline strong, .reviews__comment { overflow-wrap: anywhere; }
-.reviews time { font-size: .75rem; color: #aaa; }
-.reviews__stars { letter-spacing: .15em; margin: .5rem 0; }
-.reviews__comment { white-space: pre-wrap; line-height: 1.7; color: #ccc; }
-@media (max-width: 700px) { .reviews__grid { grid-template-columns: minmax(0, 1fr); } .reviews__subject { width: 100%; } }
+/* =========================================================
+   KING OF MUSIC — RESEÑAS (BOTÓN FLOTANTE + PANEL)
+
+   Capas:
+   - Botón flotante: 900 (debajo del header, 1000, para no
+     tapar el menú móvil).
+   - Panel: 1100 (encima del header).
+   El botón se oculta mientras hay un menú / modal abierto
+   (body.is-locked), lo que también cubre el propio panel.
+
+   Sin backdrop-filter: se usa un fondo sólido translúcido
+   para evitar los parpadeos ya vistos en el header.
+   ========================================================= */
+
+.reviews-fab,
+.reviews-dock {
+  --rv-gold: #c5a45b;
+  --rv-gold-soft: #e3c57b;
+  --rv-gold-line: rgba(197, 164, 91, 0.35);
+  --rv-surface: #0c0c0c;
+  --rv-raised: #141414;
+  --rv-line: rgba(255, 255, 255, 0.12);
+  --rv-muted: #a9a9a9;
+}
+
+/* ---------------------------------------------------------
+   1. BOTÓN FLOTANTE
+   --------------------------------------------------------- */
+
+.reviews-fab {
+  position: fixed;
+  right: calc(16px + env(safe-area-inset-right, 0px));
+  bottom: calc(16px + env(safe-area-inset-bottom, 0px));
+  z-index: 900;
+
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+
+  height: 48px;
+  padding: 0 1.1rem 0 0.95rem;
+
+  color: var(--rv-gold);
+  background: rgba(10, 10, 10, 0.88);
+  border: 1px solid var(--rv-gold-line);
+  border-radius: 999px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.45);
+
+  font-family: var(--font-body);
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+
+  cursor: pointer;
+
+  opacity: 0;
+  transform: translateY(12px);
+  pointer-events: none;
+
+  transition:
+    opacity 320ms ease,
+    transform 320ms cubic-bezier(0.22, 1, 0.36, 1),
+    background-color 220ms ease,
+    color 220ms ease,
+    border-color 220ms ease,
+    box-shadow 220ms ease;
+}
+
+.reviews-fab.is-visible {
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: auto;
+}
+
+.reviews-fab:focus-visible {
+  outline: 2px solid var(--rv-gold-soft);
+  outline-offset: 4px;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .reviews-fab:hover {
+    color: #14100a;
+    background: var(--rv-gold);
+    border-color: var(--rv-gold);
+    box-shadow: 0 10px 34px rgba(197, 164, 91, 0.28);
+  }
+}
+
+.reviews-fab:active {
+  transform: scale(0.97);
+}
+
+body.is-locked .reviews-fab {
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* En móvil: solo el icono, círculo de 52px. */
+@media (max-width: 767px) {
+  .reviews-fab {
+    width: 52px;
+    height: 52px;
+    padding: 0;
+    justify-content: center;
+  }
+
+  .reviews-fab__label {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+}
+
+/* ---------------------------------------------------------
+   2. OVERLAY Y PANEL
+   --------------------------------------------------------- */
+
+.reviews-dock__overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1100;
+
+  display: flex;
+  justify-content: flex-end;
+
+  background: rgba(0, 0, 0, 0.62);
+}
+
+.reviews-dock {
+  position: relative;
+
+  display: flex;
+  flex-direction: column;
+
+  width: min(920px, 100vw);
+  height: 100%;
+  max-height: 100dvh;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+
+  padding:
+    calc(clamp(1.25rem, 3vw, 2.25rem) + env(safe-area-inset-top, 0px))
+    clamp(1.25rem, 3vw, 2.5rem)
+    calc(1.5rem + env(safe-area-inset-bottom, 0px));
+
+  color: #eee;
+  background:
+    radial-gradient(ellipse at top right, rgba(197, 164, 91, 0.08), transparent 55%),
+    var(--rv-surface);
+  border-left: 1px solid var(--rv-gold-line);
+  box-shadow: -24px 0 80px rgba(0, 0, 0, 0.6);
+}
+
+.reviews-dock:focus {
+  outline: none;
+}
+
+.reviews-dock [hidden] {
+  display: none !important;
+}
+
+.reviews-dock :focus-visible {
+  outline: 2px solid var(--rv-gold-soft);
+  outline-offset: 3px;
+}
+
+.reviews-dock .sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* ---------------------------------------------------------
+   3. ENCABEZADO
+   --------------------------------------------------------- */
+
+.reviews-dock__head {
+  position: relative;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  padding-bottom: 1.25rem;
+  border-bottom: 1px solid var(--rv-line);
+}
+
+.reviews-dock__eyebrow {
+  margin-bottom: 0.5rem;
+  color: var(--rv-gold);
+  font-size: 0.68rem;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+}
+
+.reviews-dock__title {
+  font-family: var(--font-display);
+  font-size: clamp(1.8rem, 4vw, 2.6rem);
+  font-weight: 400;
+  line-height: 1;
+}
+
+.reviews-dock__close {
+  display: grid;
+  place-items: center;
+  flex: 0 0 auto;
+  width: 44px;
+  height: 44px;
+  color: #ddd;
+  border: 1px solid var(--rv-line);
+  border-radius: 50%;
+  cursor: pointer;
+  transition: color 200ms ease, border-color 200ms ease;
+}
+
+.reviews-dock__close:hover {
+  color: var(--rv-gold);
+  border-color: var(--rv-gold-line);
+}
+
+.reviews-dock__grabber {
+  position: absolute;
+  top: -0.75rem;
+  left: 50%;
+  width: 42px;
+  height: 4px;
+  border-radius: 4px;
+  background: rgba(255, 255, 255, 0.22);
+  transform: translateX(-50%);
+}
+
+/* ---------------------------------------------------------
+   4. SELECTORES (DROPDOWNS)
+   --------------------------------------------------------- */
+
+.reviews-dock__pickers {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
+  padding: 1.25rem 0;
+}
+
+.reviews-dock__field {
+  display: grid;
+  gap: 0.45rem;
+}
+
+.reviews-dock__field > span,
+.reviews-dock__summary label > span {
+  color: var(--rv-muted);
+  font-size: 0.7rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+.reviews-dock select,
+.reviews-dock input:not([type='radio']),
+.reviews-dock textarea {
+  width: 100%;
+  min-height: 44px;
+  padding: 0.7rem 0.8rem;
+  color: #eee;
+  background: #080808;
+  border: 1px solid #4a4a4a;
+  border-radius: 4px;
+  font: inherit;
+  font-size: 16px; /* evita el zoom automático en iOS / Android */
+  transition: border-color 200ms ease;
+}
+
+.reviews-dock select:hover,
+.reviews-dock input:not([type='radio']):hover,
+.reviews-dock textarea:hover {
+  border-color: #6a6a6a;
+}
+
+.reviews-dock select {
+  appearance: none;
+  padding-right: 2.25rem;
+  background-image:
+    linear-gradient(45deg, transparent 50%, var(--rv-gold) 50%),
+    linear-gradient(135deg, var(--rv-gold) 50%, transparent 50%);
+  background-position:
+    calc(100% - 18px) 50%,
+    calc(100% - 13px) 50%;
+  background-size: 5px 5px;
+  background-repeat: no-repeat;
+  cursor: pointer;
+}
+
+.reviews-dock select option {
+  color: #eee;
+  background: #111;
+}
+
+.reviews-dock textarea {
+  resize: vertical;
+}
+
+/* ---------------------------------------------------------
+   5. PESTAÑAS (SOLO MÓVIL)
+   --------------------------------------------------------- */
+
+.reviews-dock__tabs {
+  display: none;
+}
+
+/* ---------------------------------------------------------
+   6. CUERPO: DOS ÁREAS
+   --------------------------------------------------------- */
+
+.reviews-dock__body {
+  display: grid;
+  grid-template-columns: minmax(0, 0.95fr) minmax(0, 1.05fr);
+  gap: clamp(1.25rem, 3vw, 2.25rem);
+  /* Altura natural: el scroll lo maneja .reviews-dock. */
+  flex: none;
+}
+
+.reviews-dock__area-title {
+  margin-bottom: 0.75rem;
+  font-size: 1.05rem;
+  font-weight: 500;
+}
+
+.reviews-dock__area-title span {
+  color: var(--rv-gold-soft);
+}
+
+/* Formulario */
+
+.reviews-dock__form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  align-self: start;
+  padding: clamp(1rem, 2.5vw, 1.5rem);
+  background: var(--rv-raised);
+  border: 1px solid var(--rv-line);
+  border-radius: 6px;
+}
+
+.reviews-dock__form > label,
+.reviews-dock__rating legend {
+  font-size: 0.82rem;
+}
+
+.reviews-dock small {
+  color: var(--rv-muted);
+  font-size: 0.72rem;
+}
+
+.reviews-dock__rating {
+  margin: 0;
+  padding: 0.25rem 0;
+  border: 0;
+}
+
+.reviews-dock__rating > div {
+  display: flex;
+  gap: 2px;
+  margin-top: 0.4rem;
+}
+
+.reviews-dock__rating label {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  color: #777;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: color 160ms ease;
+}
+
+.reviews-dock__rating label:hover,
+.reviews-dock__rating .is-selected {
+  color: var(--rv-gold-soft);
+}
+
+.reviews-dock__rating input {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  cursor: pointer;
+}
+
+.reviews-dock__rating label:focus-within {
+  outline: 2px solid var(--rv-gold-soft);
+}
+
+.reviews-dock__error {
+  color: #ffaaa1;
+  font-size: 0.85rem;
+}
+
+.reviews-dock__success {
+  color: var(--rv-gold-soft);
+  font-size: 0.85rem;
+}
+
+.reviews-dock__error:empty,
+.reviews-dock__success:empty {
+  display: none;
+}
+
+.reviews-dock__submit,
+.reviews-dock__retry {
+  min-height: 46px;
+  margin-top: 0.35rem;
+  padding: 0.8rem 1rem;
+  color: #14100a;
+  background: var(--rv-gold);
+  border-radius: 4px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: background-color 200ms ease;
+}
+
+.reviews-dock__submit:hover:not(:disabled),
+.reviews-dock__retry:hover {
+  background: var(--rv-gold-soft);
+}
+
+.reviews-dock button:disabled {
+  opacity: 0.5;
+  cursor: wait;
+}
+
+/* Comunidad */
+
+.reviews-dock__feed {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.reviews-dock__summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid var(--rv-line);
+}
+
+.reviews-dock__summary strong {
+  font-size: 2rem;
+  font-weight: 500;
+}
+
+.reviews-dock__summary strong span {
+  color: var(--rv-gold-soft);
+}
+
+.reviews-dock__summary p {
+  color: var(--rv-muted);
+  font-size: 0.82rem;
+}
+
+.reviews-dock__summary label {
+  display: grid;
+  gap: 0.4rem;
+  min-width: 170px;
+}
+
+.reviews-dock__empty {
+  padding: 2.5rem 1rem;
+  color: var(--rv-muted);
+  line-height: 1.7;
+  text-align: center;
+}
+
+.reviews-dock__empty svg {
+  margin: 0 auto 0.75rem;
+  color: var(--rv-gold);
+}
+
+.reviews-dock__empty h4 {
+  color: #eee;
+  font-size: 1rem;
+  font-weight: 500;
+}
+
+.reviews-dock__list {
+  max-height: min(56dvh, 560px);
+  margin: 0;
+  padding: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  list-style: none;
+}
+
+.reviews-dock__list li {
+  padding: 1.15rem 0;
+  border-bottom: 1px solid var(--rv-line);
+}
+
+.reviews-dock__byline {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.reviews-dock__byline strong,
+.reviews-dock__comment {
+  overflow-wrap: anywhere;
+}
+
+.reviews-dock time {
+  color: var(--rv-muted);
+  font-size: 0.72rem;
+}
+
+.reviews-dock__stars {
+  margin: 0.35rem 0;
+  color: var(--rv-gold-soft);
+  letter-spacing: 0.15em;
+}
+
+.reviews-dock__comment {
+  color: #ccc;
+  line-height: 1.65;
+  white-space: pre-wrap;
+}
+
+.reviews-dock__notice {
+  /* En escritorio queda anclado al fondo del panel. */
+  margin-top: auto;
+  padding-top: 1.5rem;
+  color: #8a8a8a;
+  font-size: 0.75rem;
+  line-height: 1.6;
+}
+
+/* ---------------------------------------------------------
+   7. MÓVIL: HOJA INFERIOR CON PESTAÑAS
+   --------------------------------------------------------- */
+
+@media (max-width: 767px) {
+  .reviews-dock__overlay {
+    align-items: flex-end;
+  }
+
+  .reviews-dock {
+    width: 100%;
+    height: auto;
+    max-height: calc(100dvh - 2.5rem - env(safe-area-inset-top, 0px));
+    padding-top: 1.75rem;
+    border-left: 0;
+    border-top: 1px solid var(--rv-gold-line);
+    border-radius: 16px 16px 0 0;
+    box-shadow: 0 -24px 80px rgba(0, 0, 0, 0.6);
+  }
+
+  .reviews-dock__head {
+    padding-bottom: 1rem;
+  }
+
+  .reviews-dock__pickers {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 0.75rem;
+    padding: 1rem 0;
+  }
+
+  .reviews-dock__tabs {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 4px;
+    margin-bottom: 1rem;
+    padding: 4px;
+    background: #080808;
+    border: 1px solid var(--rv-line);
+    border-radius: 999px;
+  }
+
+  .reviews-dock__tabs button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.45rem;
+    min-height: 42px;
+    color: var(--rv-muted);
+    border-radius: 999px;
+    font-size: 0.8rem;
+    cursor: pointer;
+    transition: color 200ms ease, background-color 200ms ease;
+  }
+
+  .reviews-dock__tabs button.is-active {
+    color: #14100a;
+    background: var(--rv-gold);
+    font-weight: 600;
+  }
+
+  .reviews-dock__body {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .reviews-dock__list {
+    max-height: none;
+    overflow: visible;
+  }
+
+  .reviews-dock__summary label {
+    min-width: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .reviews-fab {
+    transition: none;
+    transform: none;
+  }
+}

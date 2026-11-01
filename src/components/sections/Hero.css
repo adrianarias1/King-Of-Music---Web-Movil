@@ -1239,6 +1239,17 @@
   .hero__portal-scene::after {
     height: clamp(25px, 5vh, 45px);
   }
+
+  /*
+     El tramo del isotipo es más corto en móvil (ver
+     LOGO_MOBILE_PACE en Hero.tsx). Promover el logo a su
+     propia capa evita tirones al escalar y rotar más rápido
+     en GPUs de gama baja. Solo se aplica aquí porque el
+     PNG del logo es grande y la capa ocupa memoria.
+  */
+  .hero__reveal-logo {
+    will-change: transform, opacity;
+  }
 }
 
 
