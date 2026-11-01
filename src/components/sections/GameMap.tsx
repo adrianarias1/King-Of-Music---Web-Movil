@@ -353,7 +353,7 @@ export function GameMap({ mapImage }: Props) {
                   </span>
 
                   <span className="map__schematic-sub">
-                    Reemplazar con public/images/map.png
+                    Reemplazar con public/images/map.webp
                   </span>
                 </div>
               )}
@@ -511,29 +511,6 @@ export function GameMap({ mapImage }: Props) {
                 <p className="map__panel-desc">
                   {selected.description}
                 </p>
-
-                <dl className="map__panel-meta">
-                  <div>
-                    <dt className="label">
-                      ID
-                    </dt>
-
-                    <dd>
-                      {selected.id}
-                    </dd>
-                  </div>
-
-                  <div>
-                    <dt className="label">
-                      Coords
-                    </dt>
-
-                    <dd>
-                      {Math.round(selected.x)}% /{' '}
-                      {Math.round(selected.y)}%
-                    </dd>
-                  </div>
-                </dl>
               </>
             ) : (
               <p className="notice">

@@ -42,13 +42,19 @@ export const download = {
 
 // PORTADA PRINCIPAL
 
-export const heroAsset: string | undefined = '/images/poster-hero.png'
+export const heroAsset: string | undefined = '/images/poster-hero.webp'
+
+/** Versión ligera del póster para pantallas pequeñas (srcset). */
+export const heroMobileAsset = '/images/poster-hero-mobile.webp'
 
 export const heroVideoAsset: string | undefined = undefined
 
 // IDENTIDAD Y PORTAL
 
-export const gameLogoAsset = '/images/king-of-music-logo.png'
+export const gameLogoAsset = '/images/king-of-music-logo.webp'
+
+/** Logo pequeño para header y diálogos (40–72 px). */
+export const gameLogoSmallAsset = '/images/king-of-music-logo-sm.webp'
 
 export const portalImageAsset = '/images/imagen-hero.jpeg'
 
@@ -61,7 +67,7 @@ export const trailerPosterAsset = '/images/imagen-hero.jpeg'
 // MAPA
 
 export const mapAsset: string | undefined =
-  '/images/map.png'
+  '/images/map.webp'
 
 
 /** Puede sobrescribirse con window.KING_OF_MUSIC en builds nativos. */

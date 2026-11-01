@@ -53,14 +53,3 @@
   color: var(--color-gray-light);
 }
 
-.download__note {
-  margin-top: 0.75rem;
-  font-size: var(--fs-small);
-  color: var(--color-gray-dark);
-}
-
-.download__note code {
-  font-family: ui-monospace, 'SFMono-Regular', Menlo, monospace;
-  font-size: 0.9em;
-  color: var(--color-gray-light);
-}

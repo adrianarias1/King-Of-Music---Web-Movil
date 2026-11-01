@@ -129,9 +129,33 @@
   left: 1rem;
   bottom: 1rem;
   pointer-events: none;
+  flex-wrap: wrap;
+  column-gap: 0.35em;
+  max-width: calc(100% - 2rem);
   background: rgba(0, 0, 0, 0.6);
   backdrop-filter: blur(6px);
   -webkit-backdrop-filter: blur(6px);
+}
+
+/* Cada frase se mantiene completa; si no cabe, baja entera. */
+.viewer__hint > span {
+  white-space: nowrap;
+}
+
+/* La instrucción de zoom depende del dispositivo:
+   rueda con ratón, pellizco en pantallas táctiles. */
+.viewer__hint-pinch {
+  display: none;
+}
+
+@media (hover: none) and (pointer: coarse) {
+  .viewer__hint-zoom {
+    display: none;
+  }
+
+  .viewer__hint-pinch {
+    display: inline;
+  }
 }
 
 .viewer__model-notice {

@@ -1,6 +1,6 @@
 import { Info, MousePointer2, Move3d } from 'lucide-react'
 import { useGLTF } from '@react-three/drei'
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useState } from 'react'
 import { characters, defaultCharacterId } from '../../data/characters'
 import { useInView } from '../../hooks/useInView'
 import type { Ability } from '../../types'
@@ -15,7 +15,7 @@ import './CharacterViewer.css'
 const copy = {
   eyebrow: 'Seleccion',
   title: 'Elige a tu artista',
-  lead: 'Desliza horizontalmente para girar cada modelo sobre su eje vertical. La vista permanece centrada.',
+  lead: 'Arrastra para girar cada modelo en cualquier dirección y usa la rueda o pellizca para acercarte. Doble toque para restablecer la vista.',
 } as const
 
 export function CharacterViewer() {
@@ -31,11 +31,11 @@ export function CharacterViewer() {
     rootMargin: '300px 0px',
     threshold: 0.01,
   })
+  // Una vez montado, el Canvas se conserva aunque la sección salga de
+  // pantalla. Se actualiza durante el render (patrón recomendado por
+  // React para estado derivado) en lugar de un efecto adicional.
   const [hasMounted, setHasMounted] = useState(inView)
-
-  useEffect(() => {
-    if (inView) setHasMounted(true)
-  }, [inView])
+  if (inView && !hasMounted) setHasMounted(true)
 
   // Pausa el render 3D cuando la seccion sale de pantalla.
   const { ref: activeRef, inView: onScreen } = useInView<HTMLDivElement>({
@@ -134,7 +134,9 @@ export function CharacterViewer() {
 
               <p className="viewer__hint notice notice--inline">
                 <Move3d size={14} strokeWidth={1.5} aria-hidden="true" />
-                Desliza para girar
+                <span>Arrastra para girar</span>
+                <span className="viewer__hint-zoom">· Rueda para zoom</span>
+                <span className="viewer__hint-pinch">· Pellizca para zoom</span>
               </p>
 
               {modelState === 'placeholder' ? (

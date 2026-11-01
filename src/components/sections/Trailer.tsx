@@ -43,7 +43,10 @@ export function Trailer({ videoSrc, posterSrc }: Props) {
   // =====================================================
 
   const [playing, setPlaying] = useState(false)
-  const [videoReady, setVideoReady] = useState(false)
+  // Se guarda junto con la ruta comprobada: si cambia `videoSrc`,
+  // el resultado anterior deja de valer sin un setState extra.
+  const [videoCheck, setVideoCheck] = useState<{ src: string; ready: boolean } | null>(null)
+  const videoReady = Boolean(videoSrc) && videoCheck?.src === videoSrc && videoCheck?.ready === true
 
   const videoRef = useRef<HTMLVideoElement | null>(null)
 
@@ -59,18 +62,16 @@ export function Trailer({ videoSrc, posterSrc }: Props) {
   useEffect(() => {
     let active = true
 
-    setVideoReady(false)
-
     if (videoSrc) {
       assetExists(videoSrc)
         .then((exists) => {
           if (active) {
-            setVideoReady(exists)
+            setVideoCheck({ src: videoSrc, ready: exists })
           }
         })
         .catch(() => {
           if (active) {
-            setVideoReady(false)
+            setVideoCheck({ src: videoSrc, ready: false })
           }
         })
     }

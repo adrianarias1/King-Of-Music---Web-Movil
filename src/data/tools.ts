@@ -3,38 +3,67 @@ import type { DevShot, Tool } from '../types'
 /* ==========================================================================
    BEHIND THE GAME — HERRAMIENTAS
    --------------------------------------------------------------------------
-   IMPORTANTE: no se inventan versiones. `version` es opcional y se omite
-   hasta que el equipo confirme la version que utiliza.
+   Fuente: documento del proyecto (Requerimientos técnicos y Herramientas
+   de software). Los logos van en public/images/tools/<id>.png; mientras
+   no existan, la tarjeta muestra las iniciales de la herramienta.
    ========================================================================== */
 
 export const tools: Tool[] = [
   {
     id: 'unity',
-    name: 'UNITY 6.3',
+    name: 'Unity 6.3',
     description:
-      'Motor principal donde se integran combate, escenarios, animaciones, interfaces, audio y mecánicas.',
+      'Motor principal. Integra modelos, animaciones, escenarios, interfaz, audio y la programación de las mecánicas de combate.',
     logo: '/images/tools/unity.png',
   },
   {
-    id: 'blender',
-    name: 'BLENDER 5.2',
+    id: 'visual-studio',
+    name: 'Visual Studio 2026',
     description:
-      'Modelado, optimización, rigging y animación de personajes, objetos y escenarios.',
+      'Programación en C# de movimiento, colisiones, daño, barras de vida, selección de personajes y habilidades especiales.',
+    logo: '/images/tools/visual-studio.png',
+  },
+  {
+    id: 'blender',
+    name: 'Blender 5.2',
+    description:
+      'Modelado, rigging y animación de los seis personajes jugables, escenarios y objetos, y optimización de modelos antes de Unity.',
     logo: '/images/tools/blender.png',
   },
   {
-    id: 'flstudio',
-    name: 'FL STUDIO 2024',
+    id: 'krita',
+    name: 'Krita 5.3.4',
     description:
-      'Producción musical, efectos de sonido y diseño sonoro de King of Music.',
-    logo: '/images/tools/fl-studio.png',
+      'Concept art de personajes, escenarios y objetos, y dibujo de los storyboards de la historia y las mecánicas.',
+    logo: '/images/tools/krita.png',
   },
   {
     id: 'photoshop',
-    name: 'ADOBE PHOTOSHOP 2020',
+    name: 'Adobe Photoshop 2020',
     description:
-      'Diseño y edición de interfaces, texturas, imágenes promocionales y recursos gráficos 2D.',
+      'Logotipos, iconos, interfaz, barras de vida, imágenes promocionales y edición de texturas para los modelos 3D.',
     logo: '/images/tools/photoshop.png',
+  },
+  {
+    id: 'flstudio',
+    name: 'FL Studio 2024',
+    description:
+      'Composición de música original para menús, combates y escenarios, y edición y mezcla de efectos de sonido.',
+    logo: '/images/tools/fl-studio.png',
+  },
+  {
+    id: 'mixamo',
+    name: 'Adobe Mixamo',
+    description:
+      'Rigging automático y animaciones base (caminar, correr, saltar, guardia) que después se ajustan en Blender.',
+    logo: '/images/tools/mixamo.png',
+  },
+  {
+    id: 'hunyuan',
+    name: 'Tencent Hunyuan 3D',
+    description:
+      'Apoyo con IA para generar bases 3D de objetos y accesorios; el equipo las revisa y termina en Blender.',
+    logo: '/images/tools/hunyuan.png',
   },
 ]
 
@@ -44,10 +73,10 @@ export const tools: Tool[] = [
    ========================================================================== */
 
 export const devShots: DevShot[] = [
-  { id: 'shot-01', caption: 'Modelado de personaje en Blender', image: '/images/dev/shot-01.jpg' },
-  { id: 'shot-02', caption: 'Rig y esqueleto de combate', image: '/images/dev/shot-02.jpg' },
-  { id: 'shot-03', caption: 'Prueba de partidas en Unity', image: '/images/dev/shot-03.jpg' },
-  { id: 'shot-04', caption: 'Render de escenario con luz de escenario', image: '/images/dev/shot-04.jpg' },
+  { id: 'shot-01', caption: 'Concept art y storyboard en Krita', image: '/images/dev/shot-01.jpg' },
+  { id: 'shot-02', caption: 'Modelado de personaje en Blender', image: '/images/dev/shot-02.jpg' },
+  { id: 'shot-03', caption: 'Rigging y animación base con Mixamo', image: '/images/dev/shot-03.jpg' },
+  { id: 'shot-04', caption: 'Pruebas de combate en Unity', image: '/images/dev/shot-04.jpg' },
 ]
 
 /* ==========================================================================
@@ -56,23 +85,33 @@ export const devShots: DevShot[] = [
 
 export const processSteps: { id: string; title: string; description: string }[] = [
   {
-    id: 'concept',
+    id: 'requerimientos',
+    title: 'Requerimientos y herramientas',
+    description:
+      'Se investigaron los requisitos técnicos de cada programa y se eligió cada herramienta según su función y el dominio del equipo.',
+  },
+  {
+    id: 'concepto',
     title: 'Concepto',
-    description: 'Definicion del roster, escenarios y reglas base del combate musical.',
+    description:
+      'Juego de peleas 3D con artistas ficticios de la música mexicana, pensado para jugadores desde los 10 años y sin violencia gráfica.',
   },
   {
-    id: 'blockout',
-    title: 'Blockout',
-    description: 'Pruebas de ritmo de combate, alcance de ataques y control de camara.',
+    id: 'historia',
+    title: 'Historia y storyboard',
+    description:
+      'Un México alternativo y el Torneo del Bienestar: cada derrota veta un género musical. La historia se bocetó en Krita.',
   },
   {
-    id: 'art',
-    title: 'Arte',
-    description: 'Modelado, texturas, animaciones e iluminacion de cada escenario.',
+    id: 'arte',
+    title: 'Personajes, escenarios y poderes',
+    description:
+      'Seis artistas jugables, la villana Flavia Cheinbaum, tres escenarios, seis poderes especiales y seis items, del concept art al modelo 3D.',
   },
   {
-    id: 'polish',
-    title: 'Pulido',
-    description: 'Balance, efectos, audio, interfaz y optimizacion para Android.',
+    id: 'integracion',
+    title: 'Mecánicas e integración',
+    description:
+      'En Unity se programan movimiento, ataques, combos y poderes, y se integran animaciones, música y efectos de sonido.',
   },
 ]

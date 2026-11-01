@@ -58,7 +58,7 @@ export function Login({ open, onClose }: Props) {
       }}
     >
       <button className="login-dialog__close" type="button" onClick={close} aria-label="Cerrar inicio de sesión"><X size={21} aria-hidden="true" /></button>
-      <img className="login-dialog__logo" src={`${import.meta.env.BASE_URL}images/king-of-music-logo.png`} alt="" width={72} height={72} />
+      <img className="login-dialog__logo" src={`${import.meta.env.BASE_URL}images/king-of-music-logo-sm.webp`} alt="" width={72} height={72} />
       <p className="login-dialog__eyebrow">King of Music · Comunidad</p>
       <h2 id="login-title">Tu voz forma parte<br />del juego.</h2>
       <p id="login-description">Inicia sesión con Google para compartir tus reseñas sobre los personajes, el mapa y los escenarios.</p>

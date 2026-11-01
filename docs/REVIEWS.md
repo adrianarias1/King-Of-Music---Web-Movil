@@ -1,13 +1,18 @@
 # Reseñas
 
-La interfaz se monta después del visor de Personajes y del Mapa. Mapa y escenarios
-comparten un solo formulario con la opción «Mapa general» y las ubicaciones
-existentes. Personajes permite elegir un personaje. Cada destino tiene sus propias
-reseñas. No hay sección de reseñas de Nosotros.
+Las reseñas no forman parte del recorrido principal de la landing. Se abren desde
+un botón flotante dorado, fijo abajo a la derecha (`ReviewsDock`, montado en
+`App.tsx`). El botón aparece tras un pequeño scroll y se oculta mientras hay un
+menú o modal abierto (`body.is-locked`).
 
-«Mapa general» conserva el destino `mapa/general`, por lo que las reseñas locales
-anteriores del mapa siguen disponibles. Las reseñas antiguas de Nosotros no se
-muestran; no se borran los datos almacenados.
+El panel tiene dos selectores: **Categoría** (Personajes / Mapa y escenarios) y
+el elemento a evaluar. Debajo hay dos áreas: **Escribir reseña** y **Comunidad**.
+En escritorio se muestran lado a lado en un panel lateral; en móvil es una hoja
+inferior con pestañas y, al publicar, se cambia a la pestaña Comunidad.
+
+Los destinos no cambiaron: personajes usan `personajes/<id>`, «Mapa general»
+conserva `mapa/general` y cada ubicación usa `escenarios/<id>`, por lo que las
+reseñas locales anteriores siguen disponibles. No hay sección de reseñas de Nosotros.
 
 ## Estado actual
 

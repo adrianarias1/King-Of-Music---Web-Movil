@@ -20,11 +20,11 @@ public/videos/  public/models/  public/fonts/  public/downloads/
 | Trailer | `public/videos/trailer.mp4` | **Pendiente** | `src/config.ts` (`trailerAsset`) |
 | Poster del trailer | `public/images/trailer-poster.jpg` | **Pendiente** | `src/config.ts` (`trailerPosterAsset`) |
 | Storyboard | `public/images/storyboard/page-01..06.jpg` | **Pendiente** | `src/data/storyboard.ts` |
-| Mapa | `public/images/map.png` | **Pendiente** | `src/config.ts` (`mapAsset`) |
+| Mapa | `public/images/map.webp` | Listo | `src/config.ts` (`mapAsset`) |
 | Modelos 3D | `public/models/<id>.glb` | **Pendiente** | `src/data/characters.ts` |
 | Ilustraciones | `public/images/characters/<id>.jpg` | **Pendiente** | `src/data/characters.ts` |
 | Preview habilidad | `public/images/abilities/<personaje>/<habilidad>.jpg` | **Pendiente** | `src/data/characters.ts` |
-| Fotos de lugares | `public/images/locations/<id>.png` | **Pendiente** | `src/data/locations.ts` |
+| Fotos de lugares | `public/images/locations/<id>.webp` | Listo (3 de 5) | `src/data/locations.ts` |
 | Fotos del equipo | `public/images/team/<id>.jpg` | **Pendiente** | `src/data/team.ts` |
 | Logos de herramientas | `public/images/tools/*.png` | **Pendiente** | `src/data/tools.ts` |
 | Capturas de proceso | `public/images/dev/shot-01..04.jpg` | **Pendiente** | `src/data/tools.ts` |
@@ -55,7 +55,7 @@ public/videos/  public/models/  public/fonts/  public/downloads/
 3. Sin imagen, se dibuja un placeholder con el mismo pie de pagina.
 
 ## Mapa
-1. Colocar la imagen del mapa en `public/images/map.png` (recomendado 4:3).
+1. Colocar la imagen del mapa en `public/images/map.webp` (WebP, ~1600 px de ancho).
 2. Actualizar `mapAsset` en `src/config.ts`.
 3. En `src/data/locations.ts`, ajustar `x` y `y` (porcentajes 0-100) de cada `Location` hasta que el punto caiga sobre el lugar correcto.
 4. Nota: Palacio de Bellas Artes, Palacio Nacional, Forostage Arena y Estacion del Norte son placeholders de prueba; renombrar cuando se definan los escenarios reales.

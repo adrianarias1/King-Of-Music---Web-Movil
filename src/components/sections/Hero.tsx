@@ -10,10 +10,12 @@ import { useGSAP } from '@gsap/react'
 import {
   siteConfig,
   gameLogoAsset,
+  heroMobileAsset,
   portalImageAsset,
 } from '../../config'
 
 import { useAssetExists } from '../../hooks/useAssetExists'
+import { useMediaQuery } from '../../hooks/useMediaQuery'
 
 import './Hero.css'
 
@@ -37,6 +39,46 @@ gsap.registerPlugin(ScrollTrigger, useGSAP)
 const DEBUG_SCROLL = false
 
 // =========================================================
+// RITMO DEL RECORRIDO EN MÓVIL
+//
+// En pantallas pequeñas el tramo de la Piedra del Sol
+// (aparición + zoom del isotipo) se sentía lento.
+// Ese tramo se comprime con LOGO_MOBILE_PACE y todo lo
+// posterior se adelanta la misma cantidad, por lo que
+// el resto del recorrido conserva su ritmo original.
+//
+// El breakpoint coincide con Hero.css (max-width: 767px).
+// =========================================================
+
+const MOBILE_QUERY = '(max-width: 767px)'
+
+/** Inicio y fin (en tiempo de timeline) del tramo del isotipo. */
+const LOGO_PHASE_START = 0.6
+const LOGO_PHASE_END = 2.15
+
+/** 1 = ritmo original. Menor = más rápido. */
+const LOGO_MOBILE_PACE = 0.65
+
+/** Duración total de la timeline original (5.82 + 0.08). */
+const TIMELINE_TOTAL = 5.9
+
+/**
+ * Convierte un tiempo de la timeline original al tiempo
+ * real según el ritmo indicado para el tramo del isotipo.
+ */
+function remapTime(time: number, pace: number): number {
+  if (time <= LOGO_PHASE_START) return time
+
+  const phaseLength = LOGO_PHASE_END - LOGO_PHASE_START
+
+  if (time <= LOGO_PHASE_END) {
+    return LOGO_PHASE_START + (time - LOGO_PHASE_START) * pace
+  }
+
+  return time - phaseLength * (1 - pace)
+}
+
+// =========================================================
 // CONTENIDO NARRATIVO DEL PORTAL
 //
 // La cifra de descargas es demostrativa.
@@ -46,7 +88,7 @@ const DEBUG_SCROLL = false
 const PORTAL_CONTENT = {
   eyebrow: 'KING OF MUSIC',
   title: 'ELIGE A TU ARTISTA FAVORITO',
-  subtitle: 'Y SALTA A A LA ARENA DE COMBATE.',
+  subtitle: 'Y SALTA A LA ARENA DE COMBATE.',
   downloads: 5000,
   downloadsLabel: 'Descargas en Steam',
 } as const
@@ -67,6 +109,8 @@ export function Hero({
   heroVideo,
 }: Props) {
   const reduced = useReducedMotion()
+
+  const isMobile = useMediaQuery(MOBILE_QUERY)
 
   const heroRef = useRef<HTMLElement>(null)
 
@@ -279,6 +323,21 @@ export function Hero({
       // 4. TIMELINE PRINCIPAL
       // ===================================================
 
+      // Posiciones y duraciones se escriben con los tiempos
+      // originales; at() y span() aplican el ritmo móvil.
+      const pace = isMobile ? LOGO_MOBILE_PACE : 1
+
+      const at = (time: number) => remapTime(time, pace)
+
+      const span = (time: number, duration: number) =>
+        remapTime(time + duration, pace) - remapTime(time, pace)
+
+      // Como la timeline es más corta, la distancia de scroll
+      // se reduce en la misma proporción. Así el tramo del
+      // isotipo realmente avanza más rápido y el resto no
+      // se estira para ocupar el espacio liberado.
+      const scrollFactor = at(TIMELINE_TOTAL) / TIMELINE_TOTAL
+
       const timeline = gsap.timeline({
         defaults: {
           ease: 'none',
@@ -294,7 +353,8 @@ export function Hero({
           // V8:
           // Reducimos la distancia fijada respecto
           // a la versión anterior (3.2 pantallas).
-          end: () => `+=${window.innerHeight * 2.65}`,
+          end: () =>
+            `+=${window.innerHeight * 2.65 * scrollFactor}`,
 
           // Seguimiento más cercano al movimiento
           // real del usuario.
@@ -318,9 +378,9 @@ export function Hero({
         background,
         {
           scale: 1.08,
-          duration: 1.1,
+          duration: span(0, 1.1),
         },
-        0,
+        at(0),
       )
 
       timeline.to(
@@ -329,9 +389,9 @@ export function Hero({
           y: -45,
           scale: 1.04,
           autoAlpha: 0,
-          duration: 0.5,
+          duration: span(0.12, 0.5),
         },
-        0.12,
+        at(0.12),
       )
 
       if (scrollIndicator) {
@@ -339,9 +399,9 @@ export function Hero({
           scrollIndicator,
           {
             autoAlpha: 0,
-            duration: 0.2,
+            duration: span(0, 0.2),
           },
-          0,
+          at(0),
         )
       }
 
@@ -353,9 +413,9 @@ export function Hero({
         reveal,
         {
           autoAlpha: 1,
-          duration: 0.25,
+          duration: span(0.6, 0.25),
         },
-        0.6,
+        at(0.6),
       )
 
       timeline.to(
@@ -364,10 +424,10 @@ export function Hero({
           autoAlpha: 1,
           scale: 1,
           rotation: 0,
-          duration: 0.55,
+          duration: span(0.7, 0.55),
           ease: 'power2.out',
         },
-        0.7,
+        at(0.7),
       )
 
       // ===================================================
@@ -379,10 +439,10 @@ export function Hero({
         {
           scale: 2.15,
           rotation: 5,
-          duration: 1.3,
+          duration: span(1.25, 1.3),
           ease: 'sine.inOut',
         },
-        1.25,
+        at(1.25),
       )
 
       // ===================================================
@@ -393,10 +453,10 @@ export function Hero({
         portal,
         {
           clipPath: 'circle(150% at 50% 50%)',
-          duration: 1.5,
+          duration: span(2.15, 1.5),
           ease: 'sine.inOut',
         },
-        2.15,
+        at(2.15),
       )
 
       timeline.to(
@@ -405,10 +465,10 @@ export function Hero({
           scale: 2.45,
           rotation: 7,
           autoAlpha: 0,
-          duration: 0.8,
+          duration: span(2.35, 0.8),
           ease: 'sine.inOut',
         },
-        2.35,
+        at(2.35),
       )
 
       // ===================================================
@@ -421,19 +481,19 @@ export function Hero({
         {
           scale: 1.07,
           opacity: 1,
-          duration: 1.4,
+          duration: span(2.3, 1.4),
           ease: 'sine.inOut',
         },
-        2.3,
+        at(2.3),
       )
 
       timeline.to(
         portalOverlay,
         {
           opacity: 0.72,
-          duration: 1.1,
+          duration: span(2.55, 1.1),
         },
-        2.55,
+        at(2.55),
       )
 
       // ===================================================
@@ -445,7 +505,7 @@ export function Hero({
         {
           autoAlpha: 1,
         },
-        3.55,
+        at(3.55),
       )
 
       timeline.to(
@@ -453,10 +513,10 @@ export function Hero({
         {
           opacity: 1,
           y: 0,
-          duration: 0.3,
+          duration: span(3.6, 0.3),
           ease: 'power2.out',
         },
-        3.6,
+        at(3.6),
       )
 
       timeline.to(
@@ -464,10 +524,10 @@ export function Hero({
         {
           opacity: 1,
           y: 0,
-          duration: 0.5,
+          duration: span(3.7, 0.5),
           ease: 'power2.out',
         },
-        3.7,
+        at(3.7),
       )
 
       timeline.to(
@@ -475,10 +535,10 @@ export function Hero({
         {
           opacity: 1,
           y: 0,
-          duration: 0.4,
+          duration: span(3.95, 0.4),
           ease: 'power2.out',
         },
-        3.95,
+        at(3.95),
       )
 
       // ===================================================
@@ -498,10 +558,10 @@ export function Hero({
         {
           scale: 1.12,
           yPercent: -2,
-          duration: 1.65,
+          duration: span(3.7, 1.65),
           ease: 'sine.inOut',
         },
-        3.7,
+        at(3.7),
       )
 
       // Movimiento adicional muy ligero de la fotografía.
@@ -512,10 +572,10 @@ export function Hero({
           {
             scale: 1.025,
             yPercent: -1.5,
-            duration: 1.5,
+            duration: span(3.85, 1.5),
             ease: 'sine.inOut',
           },
-          3.85,
+          at(3.85),
         )
       }
 
@@ -528,17 +588,17 @@ export function Hero({
         {
           opacity: 1,
           y: 0,
-          duration: 0.4,
+          duration: span(4.1, 0.4),
           ease: 'power2.out',
         },
-        4.1,
+        at(4.1),
       )
 
       timeline.to(
         counter,
         {
           value: PORTAL_CONTENT.downloads,
-          duration: 0.9,
+          duration: span(4.2, 0.9),
           ease: 'power2.out',
 
           onUpdate: () => {
@@ -546,7 +606,7 @@ export function Hero({
               Math.round(counter.value).toLocaleString('es-MX')
           },
         },
-        4.2,
+        at(4.2),
       )
 
       // ===================================================
@@ -569,10 +629,10 @@ export function Hero({
         {
           y: -42,
           autoAlpha: 0,
-          duration: 0.55,
+          duration: span(5.12, 0.55),
           ease: 'sine.inOut',
         },
-        5.12,
+        at(5.12),
       )
 
       // Último desplazamiento de cámara.
@@ -581,10 +641,10 @@ export function Hero({
         {
           yPercent: -3,
           scale: 1.15,
-          duration: 0.45,
+          duration: span(5.35, 0.45),
           ease: 'sine.inOut',
         },
-        5.35,
+        at(5.35),
       )
 
       // El fondo desaparece sobre el negro del Hero.
@@ -594,19 +654,19 @@ export function Hero({
         portalScene,
         {
           opacity: 0,
-          duration: 0.5,
+          duration: span(5.32, 0.5),
           ease: 'sine.inOut',
         },
-        5.32,
+        at(5.32),
       )
 
       // Final breve: no dejamos una pausa prolongada.
       timeline.to(
         {},
         {
-          duration: 0.08,
+          duration: span(5.82, 0.08),
         },
-        5.82,
+        at(5.82),
       )
 
       if (DEBUG_SCROLL) {
@@ -617,7 +677,7 @@ export function Hero({
     },
     {
       scope: heroRef,
-      dependencies: [reduced],
+      dependencies: [reduced, isMobile],
       revertOnUpdate: true,
     },
   )
@@ -642,8 +702,13 @@ export function Hero({
           <img
             className="hero__bg-img"
             src={heroImage}
+            // En móvil el navegador elige la versión de 1280 px
+            // (~85 KB) en lugar de la de 2560 px.
+            srcSet={`${heroMobileAsset} 1280w, ${heroImage} 2560w`}
+            sizes="100vw"
             alt=""
             loading="eager"
+            fetchPriority="high"
             decoding="async"
           />
         ) : (

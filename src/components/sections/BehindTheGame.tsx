@@ -6,9 +6,9 @@ import { ToolCard } from '../ui/ToolCard'
 import './BehindTheGame.css'
 
 const copy = {
-  eyebrow: 'Detras del juego',
-  title: 'Como se construye',
-  lead: 'Herramientas, proceso y material de trabajo del equipo. Esta seccion documenta el desarrollo de King of Music.',
+  eyebrow: 'Detrás del juego',
+  title: 'Cómo se construye',
+  lead: 'King of Music se desarrolla en Unity con modelos de Blender, arte en Krita y Photoshop y música original producida en FL Studio. Estas son las herramientas y las etapas del proyecto.',
 } as const
 
 export function BehindTheGame() {
@@ -52,7 +52,7 @@ export function BehindTheGame() {
           Galeria de material de proceso: renders, capturas y documentacion visual.
         */}
         <div className="behind__gallery">
-          <h3 className="label behind__subtitle">Galeria de desarrollo</h3>
+          <h3 className="label behind__subtitle">Galería de desarrollo</h3>
           <ul className="behind__shots">
             {devShots.map((shot, index) => (
               <Reveal as="li" key={shot.id} delay={0.05 * index} distance={18}>
@@ -60,7 +60,7 @@ export function BehindTheGame() {
                   <SmartImage
                     src={shot.image}
                     alt={shot.caption}
-                    placeholderLabel="Screenshot"
+                    placeholderLabel="Captura pendiente"
                     ratio="16 / 10"
                   />
                   <figcaption className="behind__shot-cap">
