@@ -10,6 +10,7 @@ import { useGSAP } from '@gsap/react'
 import {
   siteConfig,
   gameLogoAsset,
+  heroMobileAsset,
   portalImageAsset,
 } from '../../config'
 
@@ -87,7 +88,7 @@ function remapTime(time: number, pace: number): number {
 const PORTAL_CONTENT = {
   eyebrow: 'KING OF MUSIC',
   title: 'ELIGE A TU ARTISTA FAVORITO',
-  subtitle: 'Y SALTA A A LA ARENA DE COMBATE.',
+  subtitle: 'Y SALTA A LA ARENA DE COMBATE.',
   downloads: 5000,
   downloadsLabel: 'Descargas en Steam',
 } as const
@@ -701,8 +702,13 @@ export function Hero({
           <img
             className="hero__bg-img"
             src={heroImage}
+            // En móvil el navegador elige la versión de 1280 px
+            // (~85 KB) en lugar de la de 2560 px.
+            srcSet={`${heroMobileAsset} 1280w, ${heroImage} 2560w`}
+            sizes="100vw"
             alt=""
             loading="eager"
+            fetchPriority="high"
             decoding="async"
           />
         ) : (

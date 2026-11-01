@@ -1,4 +1,4 @@
-import { Apple, Clock } from 'lucide-react'
+import { Clock, Download } from 'lucide-react'
 import { resolvedDownload, siteConfig } from '../../config'
 import { Reveal } from '../ui/Reveal'
 import './DownloadCTA.css'
@@ -33,7 +33,7 @@ export function DownloadCTA() {
             download
           >
             <span className="btn__label">
-              <Apple size={20} strokeWidth={1.5} aria-hidden="true" />
+              <Download size={20} strokeWidth={1.5} aria-hidden="true" />
               Descargar
             </span>
           </a>
@@ -51,11 +51,6 @@ export function DownloadCTA() {
             </p>
           </>
         )}
-
-        <p className="download__note">
-          Configura <code>src/config.ts</code> para habilitar el enlace de descarga cuando exista
-          el APK.
-        </p>
       </Reveal>
     </section>
   )

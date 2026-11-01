@@ -592,36 +592,6 @@
    16. INFORMACIÓN TÉCNICA
    ========================================================= */
 
-.map__panel-meta {
-  display: flex;
-  flex-wrap: wrap;
-
-  gap: 1.5rem;
-
-  margin-top: 0.25rem;
-  padding-top: 0.9rem;
-
-  border-top: 1px solid rgba(197, 164, 91, 0.25);
-}
-
-.map__panel-meta div {
-  display: flex;
-  flex-direction: column;
-
-  gap: 0.2rem;
-}
-
-.map__panel-meta dt {
-  color: var(--color-gray-light);
-}
-
-.map__panel-meta dd {
-  margin: 0;
-
-  font-size: var(--fs-small);
-  font-variant-numeric: tabular-nums;
-}
-
 /* =========================================================
    17. IMAGEN DEL ESCENARIO
    ========================================================= */

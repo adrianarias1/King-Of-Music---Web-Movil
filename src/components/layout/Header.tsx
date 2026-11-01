@@ -230,7 +230,7 @@ const overlayTransition = {
           aria-label={`${siteConfig.name} — inicio`}
           tabIndex={menuOpen ? -1 : undefined}
         >
-          <img className="brand__logo" src={`${import.meta.env.BASE_URL}images/king-of-music-logo.png`} alt="" width={40} height={40} />
+          <img className="brand__logo" src={`${import.meta.env.BASE_URL}images/king-of-music-logo-sm.webp`} alt="" width={40} height={40} />
 
           <span className="brand__text">
             King <em>of</em> Music
