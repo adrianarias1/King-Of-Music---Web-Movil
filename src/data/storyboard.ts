@@ -12,25 +12,25 @@ export const storyboardPages: StoryboardPage[] = [
   {
     id: 'page-01',
     caption: 'Anuncio del torneo',
-    image: '/images/storyboard/page-01.jpg',
+    image: '/images/storyboard/page-01.png',
     text: 'El gobierno presenta el Torneo del Bienestar como una celebración nacional de la música mexicana.',
   },
   {
     id: 'page-02',
     caption: 'Revelación de las reglas',
-    image: '/images/storyboard/page-02.jpg',
+    image: '/images/storyboard/page-02.png',
     text: 'Los participantes descubren que cada uno representa la existencia de su género y que perder significa su eliminación.',
   },
   {
     id: 'page-03',
     caption: 'Veto musical',
-    image: '/images/storyboard/page-03.jpg',
+    image: '/images/storyboard/page-03.png',
     text: 'Después de cada derrota, canciones, instrumentos y elementos culturales del género vencido comienzan a desaparecer.',
   },
   {
     id: 'page-04',
     caption: 'Batalla final',
-    image: '/images/storyboard/page-04.jpg',
+    image: '/images/storyboard/page-04.png',
     text: 'El último representante debe descubrir el verdadero propósito del torneo y enfrentarse al jefe final.',
   },
 ]

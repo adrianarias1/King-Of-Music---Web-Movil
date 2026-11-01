@@ -98,6 +98,99 @@
   outline-offset: 5px;
 }
 
+.story__expand {
+  position: absolute;
+  z-index: 8;
+  top: 1rem;
+  right: 1rem;
+  display: grid;
+  place-items: center;
+  width: 42px;
+  height: 42px;
+  color: #fff;
+  background: rgba(0, 0, 0, 0.68);
+  border: 1px solid rgba(255, 255, 255, 0.45);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+}
+
+.story__lightbox {
+  position: fixed;
+  z-index: 1000;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  padding: clamp(3.5rem, 8vh, 6rem) clamp(3.5rem, 9vw, 8rem);
+}
+
+.story__lightbox-backdrop {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(5, 5, 5, 0.76);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 0;
+}
+
+.story__lightbox-content {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  width: min(100%, 1500px);
+  max-height: 100%;
+  margin: 0;
+}
+
+.story__lightbox-content .smart-img {
+  display: grid;
+  place-items: center;
+  width: 100%;
+  height: min(76vh, 900px);
+  background: transparent;
+}
+
+.story__lightbox-content .smart-img__el {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.story__lightbox-content figcaption {
+  color: #fff;
+  text-align: center;
+}
+
+.story__lightbox-close,
+.story__lightbox-nav {
+  position: absolute;
+  z-index: 2;
+  display: grid;
+  place-items: center;
+  color: #fff;
+  background: rgba(0, 0, 0, 0.68);
+  border: 1px solid rgba(255, 255, 255, 0.45);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+}
+
+.story__lightbox-close { top: 1.25rem; right: 1.25rem; width: 44px; height: 44px; }
+.story__lightbox-nav { top: 50%; width: 48px; height: 56px; transform: translateY(-50%); }
+.story__lightbox-nav--prev { left: 1rem; }
+.story__lightbox-nav--next { right: 1rem; }
+.story__lightbox-nav:disabled { opacity: 0.35; cursor: default; }
+
+@media (max-width: 600px) {
+  .story__lightbox { padding: 4rem 3rem; }
+  .story__lightbox-content .smart-img { height: 70vh; }
+  .story__lightbox-nav--prev { left: 0.35rem; }
+  .story__lightbox-nav--next { right: 0.35rem; }
+}
+
 
 /* =========================================================
    5. LIBRO DIGITAL

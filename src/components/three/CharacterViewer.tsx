@@ -1,6 +1,5 @@
 import { Info, MousePointer2, Move3d } from 'lucide-react'
-import { useGLTF } from '@react-three/drei'
-import { useCallback, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { characters, defaultCharacterId } from '../../data/characters'
 import { useInView } from '../../hooks/useInView'
 import type { Ability } from '../../types'
@@ -9,7 +8,7 @@ import { Reveal } from '../ui/Reveal'
 import { SectionHeading } from '../ui/SectionHeading'
 import { AbilityModal } from './AbilityModal'
 import { ViewerCanvas, type ModelState } from './ViewerCanvas'
-import { assetUrl } from '../../utils/assets'
+import { clearModel, isModelPrepared, preloadModel } from './gltfModelCache'
 import './CharacterViewer.css'
 
 const copy = {
@@ -22,9 +21,7 @@ export function CharacterViewer() {
   const [activeId, setActiveId] = useState(defaultCharacterId)
   const [ability, setAbility] = useState<Ability | null>(null)
   const [loadAttempt, setLoadAttempt] = useState(0)
-  const [modelState, setModelState] = useState<ModelState>(
-    characters[0]?.model ? 'loading' : 'placeholder',
-  )
+  const [modelStates, setModelStates] = useState<Partial<Record<string, ModelState>>>({})
 
   // El Canvas se monta cerca del viewport, no al cargar la pagina.
   const { ref: mountRef, inView } = useInView<HTMLDivElement>({
@@ -46,23 +43,45 @@ export function CharacterViewer() {
 
   const character =
     characters.find((item) => item.id === activeId) ?? characters[0]
+  const prepared = character?.model ? isModelPrepared(character.model) : false
+  const modelState: ModelState = !character?.model
+    ? 'placeholder'
+    : prepared
+      ? 'loaded'
+      : modelStates[character.id] === 'loaded'
+        ? 'loading'
+        : modelStates[character.id] ?? 'loading'
 
   const handleModelState = useCallback((state: ModelState) => {
-    setModelState(state)
-  }, [])
+    setModelStates((previous) => ({ ...previous, [activeId]: state }))
+  }, [activeId])
 
   const handleSelect = useCallback((id: string) => {
     setActiveId(id)
-    setModelState(characters.find((item) => item.id === id)?.model ? 'loading' : 'placeholder')
+    const next = characters.find((item) => item.id === id)
+    setModelStates((previous) => ({ ...previous, [id]: !next?.model ? 'placeholder' : isModelPrepared(next.model) ? 'loaded' : 'loading' }))
     setAbility(null)
     setLoadAttempt(0)
   }, [])
 
   const retryModel = useCallback(() => {
-    if (character?.model) useGLTF.clear(assetUrl(character.model))
-    setModelState('loading')
+    if (character?.model) clearModel(character.model)
+    if (character) setModelStates((previous) => ({ ...previous, [character.id]: 'loading' }))
     setLoadAttempt((attempt) => attempt + 1)
   }, [character])
+
+  useEffect(() => {
+    if (!character?.model || !onScreen || modelState !== 'loaded' || !navigator.onLine) return
+    const connection = (navigator as Navigator & { connection?: { effectiveType?: string; saveData?: boolean } }).connection
+    if (connection?.saveData || ['slow-2g', '2g', '3g'].includes(connection?.effectiveType ?? '')) return
+    const mobile = /android|iphone|ipad|ipod/i.test(navigator.userAgent)
+    const count = mobile ? (connection?.effectiveType === '4g' ? 1 : 0) : 1
+    const current = characters.findIndex((item) => item.id === character.id)
+    for (let offset = 1, loaded = 0; offset < characters.length && loaded < count; offset += 1) {
+      const next = characters[(current + offset) % characters.length]
+      if (next?.model && !isModelPrepared(next.model)) { preloadModel(next.model); loaded += 1 }
+    }
+  }, [character, modelState, onScreen])
 
   if (!character) return null
 

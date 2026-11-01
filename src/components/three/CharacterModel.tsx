@@ -1,15 +1,8 @@
 import { useGLTF } from '@react-three/drei'
 import { useEffect, useMemo, useRef } from 'react'
-import {
-  Box3,
-  Vector3,
-  type BufferGeometry,
-  type Group as ThreeGroup,
-  type Material,
-  type Mesh,
-  type Texture,
-} from 'three'
+import { Box3, Vector3, type Group as ThreeGroup, type Mesh } from 'three'
 import { assetUrl } from '../../utils/assets'
+import { retainModel } from './gltfModelCache'
 
 interface Props {
   /** Ruta del .glb / .gltf. */
@@ -21,8 +14,8 @@ interface Props {
 /**
  * Carga un modelo GLB/GLTF.
  *
- * Solo se monta cuando `assetExists()` confirma que el archivo existe,
- * por lo que nunca se generan errores 404.
+ * La escena GLTF queda en caché después del desmontaje y solo se libera cuando
+ * el LRU la expulsa por límite de memoria.
  */
 export function CharacterModel({ url, scale = 1, onLoaded }: Props) {
   const { scene } = useGLTF(assetUrl(url))
@@ -44,9 +37,6 @@ export function CharacterModel({ url, scale = 1, onLoaded }: Props) {
 
   useEffect(() => {
     const root = model as ThreeGroup
-    const geometries = new Set<BufferGeometry>()
-    const materials = new Set<Material>()
-    const textures = new Set<Texture>()
 
     root.traverse((child) => {
       const mesh = child as Mesh
@@ -54,28 +44,13 @@ export function CharacterModel({ url, scale = 1, onLoaded }: Props) {
 
       mesh.castShadow = true
       mesh.receiveShadow = true
-      geometries.add(mesh.geometry)
-
-      const meshMaterials = Array.isArray(mesh.material) ? mesh.material : [mesh.material]
-      meshMaterials.forEach((material) => {
-        materials.add(material)
-        Object.values(material).forEach((value) => {
-          if (value && typeof value === 'object' && 'isTexture' in value && value.isTexture) {
-            textures.add(value as Texture)
-          }
-        })
-      })
     })
 
+    const releaseModel = retainModel(url, scene)
     onLoadedRef.current?.()
 
-    return () => {
-      textures.forEach((texture) => texture.dispose())
-      materials.forEach((material) => material.dispose())
-      geometries.forEach((geometry) => geometry.dispose())
-      useGLTF.clear(assetUrl(url))
-    }
-  }, [model, url])
+    return releaseModel
+  }, [model, scene, url])
 
   return (
     <group

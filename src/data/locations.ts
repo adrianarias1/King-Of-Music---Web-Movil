@@ -24,8 +24,8 @@ export const locations: Location[] = [
     name: 'La Madrugadora',
     description:
       'Escenario inicial y tutorial del Torneo del Bienestar. Un espacio de transmisión gubernamental donde el jugador aprende las mecánicas fundamentales antes de regresar para la batalla final.',
-    x: 22,
-    y: 63,
+    x: 26.4,
+    y: 69.5,
     image: '/images/locations/la-madrugadora.webp',
   },
   {
@@ -33,8 +33,8 @@ export const locations: Location[] = [
     name: 'Bellas Artes',
     description:
       'Primera arena completa del torneo. Su plataforma circular, obstáculos e ítems obligan al jugador a controlar con precisión la distancia frente al rival.',
-    x: 56,
-    y: 27,
+    x: 35.3,
+    y: 36.5,
     image: '/images/locations/bellas-artes.webp',
   },
   {
@@ -42,8 +42,8 @@ export const locations: Location[] = [
     name: 'Zócalo de la Ciudad de México',
     description:
       'Un escenario exterior amplio que favorece el desplazamiento, las persecuciones y los ataques de larga distancia.',
-    x: 78,
-    y: 68,
+    x: 74.68,
+    y: 69.5,
     image: '/images/locations/zocalo.webp',
   },
 ]

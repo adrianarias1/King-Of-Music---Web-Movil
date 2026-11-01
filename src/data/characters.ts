@@ -15,7 +15,7 @@ export const characters: Character[] = [
     description:
       'Combatiente de largo alcance que transforma la fuerza de su interpretación en ondas sonoras para controlar el espacio.',
     model: '/models/characters/juangrabriel.glb',
-    preview: '/images/characters/juan-grabriel.jpg',
+    preview: '/images/characters/juan-grabriel.png',
     scale: 0.95,
     cameraPosition: [0, 1.25, 3.8],
     accent: '#002F61',
@@ -36,7 +36,7 @@ export const characters: Character[] = [
     description:
       'Utiliza la intensidad emocional de sus interpretaciones para generar ataques de energía y efectos musicales.',
     model: '/models/characters/JoseJose.glb',
-    preview: '/images/characters/jose-jose-jose.jpg',
+    preview: '/images/characters/jose-jose-jose.png',
     scale: 0.98,
     cameraPosition: [0, 1.1, 3.2],
     accent: '#BABABA',
@@ -57,7 +57,7 @@ export const characters: Character[] = [
     description:
       'Combatiente ofensivo de corta distancia basado en potencia, guitarras, amplificadores y ataques de alto impacto.',
     model: '/models/characters/AlexLLora.glb',
-    preview: '/images/characters/alex-llora.jpg',
+    preview: '/images/characters/alex-llora.png',
     scale: 0.95,
     cameraPosition: [0, 1.05, 3.1],
     accent: '#002F61',
@@ -78,7 +78,7 @@ export const characters: Character[] = [
     description:
       'Especialista en alcance medio que utiliza su acordeón para generar ráfagas de energía y ataques musicales.',
     model: '/models/characters/Roman.glb',
-    preview: '/images/characters/roman-ayala.jpg',
+    preview: '/images/characters/roman-ayala.png',
     scale: 0.98,
     cameraPosition: [0, 1.1, 3.2],
     accent: '#333333',
@@ -98,7 +98,7 @@ export const characters: Character[] = [
     tagline: 'Corridos tumbados',
     description:
       'Combatiente rápido y ágil especializado en ataques consecutivos y movimientos capaces de sorprender al rival.',
-    preview: '/images/characters/natanael-chano.jpg',
+    preview: '/images/characters/natanael-chano.png',
     scale: 0.95,
     cameraPosition: [0, 1.05, 3.1],
     accent: '#002F61',
@@ -119,7 +119,7 @@ export const characters: Character[] = [
     description:
       'Combatiente de ofensiva constante basado en velocidad, requintos y combinaciones rápidas de ataques.',
     model: '/models/characters/PesoPumba.glb',
-    preview: '/images/characters/peso-plomo.jpg',
+    preview: '/images/characters/peso-plomo.png',
     scale: 1,
     cameraPosition: [0, 1.15, 3.4],
     accent: '#002F61',
@@ -139,7 +139,7 @@ export const characters: Character[] = [
     tagline: 'Artista',
     description: 'Personaje del roster de King of Music.',
     model: '/models/characters/Flavia.glb',
-    preview: '/images/characters/flavia.jpg',
+    preview: '/images/characters/flavia.png',
     scale: 1,
     cameraPosition: [0, 1.1, 3.2],
     accent: '#BABABA',

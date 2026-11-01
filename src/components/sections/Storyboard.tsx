@@ -7,10 +7,13 @@ import {
 import {
   ChevronLeft,
   ChevronRight,
+  Maximize2,
+  X,
 } from 'lucide-react'
 
 import {
   useCallback,
+  useEffect,
   useRef,
   useState,
 } from 'react'
@@ -72,11 +75,21 @@ export function Storyboard() {
 
   const [pageTurn, setPageTurn] =
     useState<PageTurn | null>(null)
+  const [imageExpanded, setImageExpanded] = useState(false)
 
   const touchStart = useRef<{
     x: number
     y: number
   } | null>(null)
+
+  useEffect(() => {
+    if (!imageExpanded) return undefined
+    const onKeyDown = (event: globalThis.KeyboardEvent) => {
+      if (event.key === 'Escape') setImageExpanded(false)
+    }
+    window.addEventListener('keydown', onKeyDown)
+    return () => window.removeEventListener('keydown', onKeyDown)
+  }, [imageExpanded])
 
   // =====================================================
   // 2. DATOS Y PÁGINAS
@@ -118,6 +131,11 @@ export function Storyboard() {
 
       if (target < 0 || target >= total) return
 
+      if (imageExpanded) {
+        setCurrentPage(target)
+        return
+      }
+
       // Cambio directo para usuarios que prefieren
       // reducir las animaciones.
       if (reduced) {
@@ -131,7 +149,7 @@ export function Storyboard() {
         direction,
       })
     },
-    [pageTurn, total, safePage, reduced],
+    [pageTurn, total, safePage, reduced, imageExpanded],
   )
 
   const goNext = useCallback(() => {
@@ -313,6 +331,15 @@ const flipTransition = {
               role="group"
               aria-label="Storyboard interactivo. Usa las flechas izquierda y derecha para cambiar de página."
             >
+              <button
+                type="button"
+                className="story__expand"
+                onClick={() => setImageExpanded(true)}
+                aria-label="Ver imagen completa"
+                title="Ver imagen completa"
+              >
+                <Maximize2 size={18} aria-hidden="true" />
+              </button>
 
               {/* =========================================
                   LIBRO DIGITAL EN PERSPECTIVA
@@ -473,6 +500,25 @@ const flipTransition = {
               </button>
 
             </div>
+
+            {imageExpanded && current ? (
+              <div className="story__lightbox" role="dialog" aria-modal="true" aria-label={`${current.caption || 'Imagen'} — vista completa`}>
+                <button className="story__lightbox-backdrop" onClick={() => setImageExpanded(false)} aria-label="Cerrar imagen completa" />
+                <button type="button" className="story__lightbox-close" onClick={() => setImageExpanded(false)} aria-label="Cerrar">
+                  <X size={22} aria-hidden="true" />
+                </button>
+                <button type="button" className="story__lightbox-nav story__lightbox-nav--prev" onClick={goPrev} disabled={!canGoPrev} aria-label="Página anterior">
+                  <ChevronLeft size={28} aria-hidden="true" />
+                </button>
+                <figure className="story__lightbox-content">
+                  <SmartImage src={current.image} alt={current.caption || 'Imagen narrativa'} fit="contain" />
+                  <figcaption>{current.caption} · {safePage + 1} / {total}</figcaption>
+                </figure>
+                <button type="button" className="story__lightbox-nav story__lightbox-nav--next" onClick={goNext} disabled={!canGoNext} aria-label="Página siguiente">
+                  <ChevronRight size={28} aria-hidden="true" />
+                </button>
+              </div>
+            ) : null}
 
             {/* ===========================================
                 INFORMACIÓN DE LA PÁGINA

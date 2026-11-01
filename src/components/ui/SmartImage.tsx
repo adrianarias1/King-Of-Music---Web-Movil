@@ -87,6 +87,7 @@ function ImageBlock({
           alt={alt}
           loading={loading}
           decoding="async"
+          draggable={false}
           onError={() => setStatus('missing')}
         />
       ) : null}
