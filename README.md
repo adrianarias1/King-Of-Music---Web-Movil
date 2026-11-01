@@ -192,7 +192,7 @@ cd android
 
 ## Licencia
 
-Proyecto universitario. Todos los derechos reservados a su equipo desarrollador.
+Proyecto Integrador - Videojuegos 2026. Todos los derechos reservados a su equipo desarrollador.
 
 ## Estado del proyecto
 

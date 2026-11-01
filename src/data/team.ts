@@ -55,7 +55,7 @@ export const team: TeamMember[] = [
    ========================================================================== */
 
 export const projectMeta = {
-  type: 'Proyecto universitario',
+  type: 'Proyecto Integrador - Videojuegos 2026',
   subject: 'Creación de Videojuegos',
   group: 'IDGS-101',
   teacher: 'Ing. Juan Manuel Tovar Sánchez',

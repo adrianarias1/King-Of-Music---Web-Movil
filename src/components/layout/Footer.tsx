@@ -46,7 +46,7 @@ export function Footer() {
       </div>
 
       <div className="site-footer__legal container">
-        <p>{siteConfig.universityProject ? 'Proyecto universitario' : null}</p>
+        <p>{siteConfig.universityProject ? 'Proyecto Integrador - Videojuegos 2026' : null}</p>
         <p>
           &copy; {YEAR} {siteConfig.name}
         </p>
