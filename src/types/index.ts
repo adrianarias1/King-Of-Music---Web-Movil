@@ -73,6 +73,8 @@ export interface TeamMember {
   id: string
   name: string
   role: string
+  /** Breve descripción de su aportación. */
+  description?: string
   /** Ruta a foto. Placeholder si no existe. */
   image?: string
   links?: SocialLink[]

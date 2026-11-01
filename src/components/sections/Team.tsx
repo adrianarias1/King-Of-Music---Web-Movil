@@ -9,8 +9,8 @@ import './Team.css'
 
 const copy = {
   eyebrow: 'Equipo',
-  title: 'Detras del proyecto',
-  lead: 'Equipo desarrollador de King of Music. Proyecto universitario.',
+  title: 'Detrás del proyecto',
+  lead: 'Cinco estudiantes desarrollan King of Music como proyecto de la materia Creación de Videojuegos: del videojuego en Unity a esta plataforma web y móvil.',
 } as const
 
 const ICONS: Record<string, LucideIcon> = {
@@ -49,13 +49,16 @@ export function TeamSection() {
               <article className="team__card">
                 <SmartImage
                   src={member.image}
-                  alt={`Fotografia de ${member.name}`}
+                  alt={`Fotografía de ${member.name}`}
                   placeholderLabel="Integrante"
                   ratio="1 / 1"
                 />
                 <div className="team__info">
                   <h3 className="team__name">{member.name}</h3>
                   <p className="team__role">{member.role}</p>
+                  {member.description ? (
+                    <p className="team__desc">{member.description}</p>
+                  ) : null}
                 </div>
                 {member.links && member.links.length > 0 ? (
                   <div className="team__links">
@@ -70,7 +73,9 @@ export function TeamSection() {
         </ul>
 
         <p className="team__meta notice">
-          <span>{projectMeta.type}</span>
+          <span>
+            {projectMeta.subject} · Grupo {projectMeta.group} · Docente: {projectMeta.teacher}
+          </span>
           <a
             className="team__repo"
             href={projectMeta.repository}
