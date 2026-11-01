@@ -15,7 +15,7 @@ import './CharacterViewer.css'
 const copy = {
   eyebrow: 'Seleccion',
   title: 'Elige a tu artista',
-  lead: 'Desliza horizontalmente para girar cada modelo sobre su eje vertical. La vista permanece centrada.',
+  lead: 'Arrastra para girar cada modelo en cualquier dirección y usa la rueda o pellizca para acercarte. Doble toque para restablecer la vista.',
 } as const
 
 export function CharacterViewer() {
@@ -134,7 +134,7 @@ export function CharacterViewer() {
 
               <p className="viewer__hint notice notice--inline">
                 <Move3d size={14} strokeWidth={1.5} aria-hidden="true" />
-                Desliza para girar
+                Arrastra para girar · pellizca o usa la rueda para zoom
               </p>
 
               {modelState === 'placeholder' ? (

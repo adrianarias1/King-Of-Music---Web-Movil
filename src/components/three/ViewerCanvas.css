@@ -10,7 +10,8 @@
     linear-gradient(180deg, #0b0b0b 0%, #050505 100%);
   border: 1px solid var(--color-line);
   cursor: grab;
-  touch-action: pan-y;
+  /* Giro libre y pellizco: el visor captura todos los gestos táctiles. */
+  touch-action: none;
 }
 
 .viewer-canvas.is-dragging {
@@ -28,7 +29,7 @@
   display: block;
   width: 100% !important;
   height: 100% !important;
-  touch-action: pan-y;
+  touch-action: none;
 }
 
 .viewer-canvas__loading {
@@ -42,6 +43,30 @@
   color: var(--color-gray-light);
   background: rgba(0, 0, 0, 0.18);
   pointer-events: none;
+}
+
+/* Botón para restablecer giro y zoom */
+.viewer-canvas__reset {
+  position: absolute;
+  top: 0.75rem;
+  left: 0.75rem;
+  z-index: 2;
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  color: var(--color-gray-light);
+  background: rgba(0, 0, 0, 0.45);
+  border: 1px solid var(--color-line);
+  border-radius: 50%;
+  cursor: pointer;
+  transition: color 200ms ease, border-color 200ms ease;
+}
+
+.viewer-canvas__reset:hover,
+.viewer-canvas__reset:focus-visible {
+  color: #c5a45b;
+  border-color: rgba(197, 164, 91, 0.5);
 }
 
 /* Suelo sutil para dar sensacion de escenario */
