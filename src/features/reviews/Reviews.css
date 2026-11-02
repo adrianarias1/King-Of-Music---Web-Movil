@@ -540,13 +540,200 @@ body.is-locked .reviews-fab {
   white-space: pre-wrap;
 }
 
-.reviews-dock__notice {
-  /* En escritorio queda anclado al fondo del panel. */
-  margin-top: auto;
-  padding-top: 1.5rem;
-  color: #8a8a8a;
+/* ---------------------------------------------------------
+   6b. SESIÓN, AUTOR Y ACCIONES (Supabase)
+   --------------------------------------------------------- */
+
+.reviews-dock__form-wrap {
+  align-self: start;
+  min-width: 0;
+}
+
+.reviews-dock__gate {
+  gap: 0.9rem;
+  color: var(--rv-muted);
+  line-height: 1.65;
+}
+
+.reviews-dock__gate .reviews-dock__submit {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.55rem;
+}
+
+.reviews-dock__author {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  margin-bottom: 0.25rem;
+  color: var(--rv-muted);
+  font-size: 0.82rem;
+  overflow-wrap: anywhere;
+}
+
+.reviews-dock__author strong {
+  color: #eee;
+  font-weight: 500;
+}
+
+.reviews-dock__avatar {
+  display: inline-grid;
+  place-items: center;
+  flex: none;
+  width: 28px;
+  height: 28px;
+  overflow: hidden;
+  color: var(--rv-gold-soft);
+  background: rgba(197, 164, 91, 0.12);
+  border: 1px solid var(--rv-gold-line);
+  border-radius: 50%;
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+.reviews-dock__avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.reviews-dock legend span,
+.reviews-dock__form > label span {
+  color: var(--rv-gold);
+}
+
+.reviews-dock textarea.is-invalid,
+.reviews-dock__rating.is-invalid > div {
+  border-color: #ff8a7d;
+}
+
+.reviews-dock__rating.is-invalid > div {
+  border: 1px solid #ff8a7d55;
+  border-radius: 6px;
+  width: fit-content;
+}
+
+.reviews-dock small.is-over {
+  color: #ffaaa1;
+}
+
+.reviews-dock__field-error {
+  color: #ffaaa1;
+  font-size: 0.78rem;
+  line-height: 1.5;
+}
+
+.reviews-dock__actions {
+  display: flex;
+  gap: 0.6rem;
+  margin-top: 0.35rem;
+}
+
+.reviews-dock__actions .reviews-dock__submit {
+  flex: 1;
+  margin-top: 0;
+}
+
+.reviews-dock__secondary {
+  min-height: 46px;
+  padding: 0.8rem 1rem;
+  color: #ddd;
+  border: 1px solid var(--rv-line);
+  border-radius: 4px;
   font-size: 0.75rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+
+.reviews-dock__secondary:hover {
+  border-color: #ffffff40;
+}
+
+.reviews-dock__muted {
+  padding: 1.5rem 0;
+  color: var(--rv-muted);
   line-height: 1.6;
+}
+
+.reviews-dock__muted .reviews-dock__retry {
+  margin-top: 0.75rem;
+}
+
+.reviews-dock__who {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+  min-width: 0;
+}
+
+.reviews-dock__badge {
+  padding: 0.1rem 0.45rem;
+  color: #14100a;
+  background: var(--rv-gold);
+  border-radius: 999px;
+  font-size: 0.62rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.reviews-dock__list li.is-mine {
+  padding-left: 0.85rem;
+  border-left: 2px solid var(--rv-gold-line);
+}
+
+.reviews-dock__hidden-note {
+  margin-top: 0.5rem;
+  color: #ffcf8a;
+  font-size: 0.75rem;
+}
+
+.reviews-dock__own-actions,
+.reviews-dock__confirm {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.4rem 1rem;
+  margin-top: 0.75rem;
+  font-size: 0.78rem;
+}
+
+.reviews-dock__confirm span {
+  color: #eee;
+}
+
+.reviews-dock__link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  min-height: 32px;
+  color: var(--rv-muted);
+  cursor: pointer;
+  transition: color 180ms ease;
+}
+
+.reviews-dock__link:hover {
+  color: var(--rv-gold-soft);
+}
+
+.reviews-dock__link--danger:hover {
+  color: #ffaaa1;
+}
+
+.reviews-dock__danger {
+  min-height: 32px;
+  padding: 0.3rem 0.8rem;
+  color: #fff;
+  background: #a33a2f;
+  border-radius: 4px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.reviews-dock__danger:hover:not(:disabled) {
+  background: #c04537;
 }
 
 /* ---------------------------------------------------------

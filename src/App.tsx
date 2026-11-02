@@ -90,6 +90,7 @@ export default function App() {
     else setLoginOpen(true)
   }, [status])
   const closeLogin = useCallback(() => setLoginOpen(false), [])
+  const openLogin = useCallback(() => setLoginOpen(true), [])
   const closeAccount = useCallback(() => setAccountOpen(false), [])
 
   // Si el regreso de Google trae un error (p. ej. credenciales inválidas o
@@ -208,7 +209,7 @@ export default function App() {
       <Footer />
 
       {/* Reseñas: botón flotante fijo fuera del recorrido principal */}
-      <ReviewsDock />
+      <ReviewsDock onRequestLogin={openLogin} />
 
       <Login open={loginOpen} onClose={closeLogin} />
       <Account open={accountOpen && status === 'signed_in'} onClose={closeAccount} />

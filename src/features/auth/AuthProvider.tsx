@@ -41,12 +41,38 @@ function sessionIdFromToken(token: string): string | null {
   }
 }
 
+const titleCase = (value: string) =>
+  value.toLocaleLowerCase('es-MX').replace(/(^|\s)(\p{L})/gu, (_m, space: string, letter: string) => space + letter.toLocaleUpperCase('es-MX'))
+
+/**
+ * Nombre visible a partir de los metadatos de Google.
+ * Misma regla que private.display_name_parts() en la base de datos:
+ * las cuentas institucionales (claim "hd") entregan
+ * "APELLIDO APELLIDO NOMBRE(S)" en mayúsculas y se reordenan.
+ */
+function displayNames(meta: Record<string, unknown>): { fullName: string; firstName: string } {
+  const text = (value: unknown) => (typeof value === 'string' ? value.trim().replace(/\s+/g, ' ') : '')
+  const raw = text(meta.full_name) || text(meta.name)
+  const given = text(meta.given_name)
+  const claims = (meta.custom_claims ?? {}) as Record<string, unknown>
+  const hd = text(claims.hd) || text(meta.hd)
+  if (!raw) return { fullName: given, firstName: given }
+
+  const words = raw.split(' ')
+  const allCaps = raw === raw.toLocaleUpperCase('es-MX')
+  if (!given && hd && allCaps && words.length >= 3) {
+    const reordered = [...words.slice(2), ...words.slice(0, 2)].join(' ')
+    return { fullName: titleCase(reordered), firstName: titleCase(words[2] ?? '') }
+  }
+  const fullName = allCaps ? titleCase(raw) : raw
+  return { fullName, firstName: given || fullName.split(' ')[0] || '' }
+}
+
 /** Perfil a partir de los metadatos de Google, mientras llega el de la BD. */
 function profileFromUser(user: User): Profile {
   const meta = (user.user_metadata ?? {}) as Record<string, unknown>
   const text = (value: unknown) => (typeof value === 'string' ? value.trim() : '')
-  const fullName = text(meta.full_name) || text(meta.name) || ''
-  const firstName = text(meta.given_name) || fullName.split(/\s+/)[0] || ''
+  const { fullName, firstName } = displayNames(meta)
   return {
     firstName: firstName || (user.email ?? '').split('@')[0] || 'Cuenta',
     fullName: fullName || firstName,

@@ -1,8 +1,8 @@
-import { useCallback, useEffect, useId, useMemo, useState } from 'react'
+import { useCallback, useEffect, useId, useMemo, useRef, useState } from 'react'
 import type { FormEvent } from 'react'
 import { createPortal } from 'react-dom'
 import { AnimatePresence, motion, useReducedMotion } from 'motion/react'
-import { MessageSquareText, PenLine, Star, Users, X } from 'lucide-react'
+import { LogIn, MessageSquareText, PenLine, Pencil, Star, Trash2, Users, X } from 'lucide-react'
 
 import { characters } from '../../data/characters'
 import { locations } from '../../data/locations'
@@ -10,25 +10,25 @@ import { useBodyScrollLock } from '../../hooks/useBodyScrollLock'
 import { useDialog } from '../../hooks/useDialog'
 import { useMediaQuery } from '../../hooks/useMediaQuery'
 import { useScrolledPast } from '../../hooks/useScrolledPast'
-import { localReviewRepository, validateReview } from './repository'
-import type { Review, ReviewRepository, ReviewSection } from './repository'
+import { useAuth } from '../auth/authContext'
+import { ReviewError, supabaseReviewRepository } from './repository'
+import type { Review, ReviewRepository } from './repository'
+import { COMMENT_MAX, COMMENT_MIN, hasErrors, normalizeComment, validateReviewDraft } from './validation'
+import type { ReviewErrors, ReviewSection } from './validation'
 import './Reviews.css'
 
 // =========================================================
 // KING OF MUSIC — RESEÑAS (BOTÓN FLOTANTE)
 //
-// Las reseñas ya no se montan como secciones dentro del
-// recorrido principal. Un botón dorado fijo abre un panel
-// con dos áreas:
-//   1. Escribir reseña (formulario).
-//   2. Comunidad (reseñas de otros usuarios).
+// Botón dorado fijo que abre un panel con dos áreas:
+//   1. Escribir (o editar) una reseña — requiere sesión de Google.
+//   2. Comunidad — reseñas de todos los usuarios (Supabase).
 //
-// Escritorio: panel lateral derecho, ambas áreas lado a lado.
-// Móvil: hoja inferior con pestañas para alternar áreas.
+// Escritorio: panel lateral con ambas áreas lado a lado.
+// Móvil: hoja inferior con pestañas.
 //
-// Los destinos (section + subjectId) se conservan iguales a
-// la versión anterior, así las reseñas guardadas siguen
-// apareciendo en el mismo personaje / escenario.
+// Validación en dos capas: este formulario (validation.ts) y la base de
+// datos (public.reviews: checks, triggers y RLS).
 // =========================================================
 
 type CategoryId = 'personajes' | 'escenarios'
@@ -45,6 +45,7 @@ interface Category {
   subjects: Subject[]
 }
 
+// Los IDs coinciden con el catálogo public.review_subjects.
 const CATEGORIES: Category[] = [
   {
     id: 'personajes',
@@ -55,7 +56,6 @@ const CATEGORIES: Category[] = [
     id: 'escenarios',
     label: 'Mapa y escenarios',
     subjects: [
-      // `mapa/general` conserva las reseñas antiguas del mapa.
       { id: 'general', name: 'Mapa general', section: 'mapa' },
       ...locations.map((l) => ({ id: l.id, name: l.name, section: 'escenarios' as const })),
     ],
@@ -68,13 +68,20 @@ const MOBILE_QUERY = '(max-width: 767px)'
 type View = 'write' | 'feed'
 
 interface Props {
+  /** Abre el diálogo de inicio de sesión (el panel se cierra antes). */
+  onRequestLogin: () => void
   repository?: ReviewRepository
 }
 
-export function ReviewsDock({ repository = localReviewRepository }: Props) {
+export function ReviewsDock({ onRequestLogin, repository = supabaseReviewRepository }: Props) {
   const [open, setOpen] = useState(false)
   const visible = useScrolledPast(120)
   const close = useCallback(() => setOpen(false), [])
+
+  const requestLogin = useCallback(() => {
+    setOpen(false)
+    onRequestLogin()
+  }, [onRequestLogin])
 
   return (
     <>
@@ -92,7 +99,7 @@ export function ReviewsDock({ repository = localReviewRepository }: Props) {
       </button>
 
       {createPortal(
-        <ReviewsDialog open={open} onClose={close} repository={repository} />,
+        <ReviewsDialog open={open} onClose={close} onRequestLogin={requestLogin} repository={repository} />,
         document.body,
       )}
     </>
@@ -106,10 +113,12 @@ export function ReviewsDock({ repository = localReviewRepository }: Props) {
 function ReviewsDialog({
   open,
   onClose,
+  onRequestLogin,
   repository,
 }: {
   open: boolean
   onClose: () => void
+  onRequestLogin: () => void
   repository: ReviewRepository
 }) {
   const reduced = useReducedMotion()
@@ -122,8 +131,6 @@ function ReviewsDialog({
   const [subjectId, setSubjectId] = useState(category.subjects[0]?.id ?? '')
   const subject = category.subjects.find((s) => s.id === subjectId) ?? category.subjects[0]
   const [view, setView] = useState<View>('write')
-  // El nombre se conserva al cambiar de personaje o escenario.
-  const [authorName, setAuthorName] = useState('')
 
   function changeCategory(next: CategoryId) {
     setCategoryId(next)
@@ -157,31 +164,21 @@ function ReviewsDialog({
             exit={reduced ? { opacity: 0 } : offscreen}
             transition={{ duration: reduced ? 0 : 0.42, ease: [0.22, 1, 0.36, 1] }}
           >
-            {/* Encabezado */}
             <header className="reviews-dock__head">
               {isMobile ? <span className="reviews-dock__grabber" aria-hidden="true" /> : null}
               <div>
                 <p className="reviews-dock__eyebrow">La voz de la comunidad</p>
                 <h2 id="reviews-dock-title" className="reviews-dock__title">Reseñas</h2>
               </div>
-              <button
-                type="button"
-                className="reviews-dock__close"
-                onClick={onClose}
-                aria-label="Cerrar reseñas"
-              >
+              <button type="button" className="reviews-dock__close" onClick={onClose} aria-label="Cerrar reseñas">
                 <X size={20} strokeWidth={1.5} aria-hidden="true" />
               </button>
             </header>
 
-            {/* Selección del destino */}
             <div className="reviews-dock__pickers">
               <label className="reviews-dock__field">
                 <span>Categoría</span>
-                <select
-                  value={categoryId}
-                  onChange={(e) => changeCategory(e.target.value as CategoryId)}
-                >
+                <select value={categoryId} onChange={(e) => changeCategory(e.target.value as CategoryId)}>
                   {CATEGORIES.map((c) => (
                     <option key={c.id} value={c.id}>{c.label}</option>
                   ))}
@@ -197,7 +194,6 @@ function ReviewsDialog({
               </label>
             </div>
 
-            {/* Pestañas (solo móvil, ver CSS) */}
             <div className="reviews-dock__tabs" role="tablist" aria-label="Áreas de reseñas">
               <button
                 type="button"
@@ -232,15 +228,10 @@ function ReviewsDialog({
                 repository={repository}
                 view={view}
                 isMobile={isMobile}
-                authorName={authorName}
-                onAuthorNameChange={setAuthorName}
-                onSubmitted={() => { if (isMobile) setView('feed') }}
+                onViewChange={setView}
+                onRequestLogin={onRequestLogin}
               />
             ) : null}
-
-            <p className="reviews-dock__notice">
-              Vista previa local: tus reseñas se guardan en este dispositivo y no se comparten con otros usuarios.
-            </p>
           </motion.div>
         </motion.div>
       ) : null}
@@ -259,10 +250,11 @@ interface PanelProps {
   repository: ReviewRepository
   view: View
   isMobile: boolean
-  authorName: string
-  onAuthorNameChange: (value: string) => void
-  onSubmitted: () => void
+  onViewChange: (view: View) => void
+  onRequestLogin: () => void
 }
+
+const dateFormat = new Intl.DateTimeFormat('es-MX', { day: 'numeric', month: 'short', year: 'numeric' })
 
 function ReviewPanel({
   section,
@@ -271,139 +263,270 @@ function ReviewPanel({
   repository,
   view,
   isMobile,
-  authorName,
-  onAuthorNameChange,
-  onSubmitted,
+  onViewChange,
+  onRequestLogin,
 }: PanelProps) {
   const id = useId()
+  const { status, user, profile } = useAuth()
+  const signedIn = status === 'signed_in' && Boolean(user)
+
+  // Listado
   const [reviews, setReviews] = useState<Review[]>([])
   const [loading, setLoading] = useState(true)
-  const [loadError, setLoadError] = useState(false)
+  const [loadError, setLoadError] = useState('')
   const [retry, setRetry] = useState(0)
+  const [sort, setSort] = useState<'recent' | 'best'>('recent')
+
+  // Formulario
   const [rating, setRating] = useState(0)
   const [comment, setComment] = useState('')
-  const [sort, setSort] = useState('recent')
+  const [editing, setEditing] = useState<Review | null>(null)
+  const [touched, setTouched] = useState<{ rating?: boolean; comment?: boolean }>({})
+  const [submitted, setSubmitted] = useState(false)
   const [saving, setSaving] = useState(false)
-  const [error, setError] = useState('')
+  const [formError, setFormError] = useState('')
   const [success, setSuccess] = useState('')
+
+  // Borrado con confirmación
+  const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null)
+  const [deletingId, setDeletingId] = useState<string | null>(null)
+  const [feedError, setFeedError] = useState('')
+
+  const textareaRef = useRef<HTMLTextAreaElement>(null)
 
   useEffect(() => {
     let active = true
-    repository.list({ section, subjectId })
-      .then((data) => { if (active) setReviews(data) })
-      .catch(() => { if (active) setLoadError(true) })
-      .finally(() => { if (active) setLoading(false) })
-    return () => { active = false }
+    repository
+      .list({ section, subjectId })
+      .then((data) => {
+        if (active) {
+          setReviews(data)
+          setLoadError('')
+        }
+      })
+      .catch((error: unknown) => {
+        if (active) setLoadError(error instanceof ReviewError ? error.message : 'No pudimos cargar las reseñas.')
+      })
+      .finally(() => {
+        if (active) setLoading(false)
+      })
+    return () => {
+      active = false
+    }
   }, [repository, section, subjectId, retry])
+
+  // ---------------------------------------------------------
+  // Validación en vivo (se muestra al tocar el campo o al enviar)
+  // ---------------------------------------------------------
+  const errors: ReviewErrors = useMemo(
+    () => validateReviewDraft({ section, subjectId, rating, comment }),
+    [section, subjectId, rating, comment],
+  )
+  const showError = (field: 'rating' | 'comment') => (submitted || touched[field]) && errors[field]
+  const normalizedLength = normalizeComment(comment).length
+
+  function resetForm() {
+    setRating(0)
+    setComment('')
+    setEditing(null)
+    setTouched({})
+    setSubmitted(false)
+    setFormError('')
+  }
+
+  function startEdit(review: Review) {
+    setEditing(review)
+    setRating(review.rating)
+    setComment(review.comment)
+    setTouched({})
+    setSubmitted(false)
+    setFormError('')
+    setSuccess('')
+    setConfirmDeleteId(null)
+    onViewChange('write')
+    requestAnimationFrame(() => textareaRef.current?.focus())
+  }
 
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
     if (saving) return
-    setError('')
+    setSubmitted(true)
+    setFormError('')
     setSuccess('')
-    const input = { section, subjectId, authorName, rating, comment }
-    const validation = validateReview(input)
-    if (validation) { setError(validation); return }
+    if (!signedIn) {
+      onRequestLogin()
+      return
+    }
+    if (hasErrors(errors)) return
+
     setSaving(true)
     try {
-      const review = await repository.create(input)
-      setReviews((current) => [...current, review])
-      setComment('')
-      setRating(0)
-      setSuccess('Tu reseña se guardó en este dispositivo.')
-      onSubmitted()
-    } catch {
-      setError('No pudimos guardar tu reseña. Comprueba que el almacenamiento esté disponible e inténtalo de nuevo. Tu texto se conserva.')
+      if (editing) {
+        const updated = await repository.update(editing.id, { rating, comment })
+        setReviews((current) => current.map((r) => (r.id === updated.id ? updated : r)))
+        setSuccess('Tu reseña se actualizó.')
+      } else {
+        const created = await repository.create({ section, subjectId, rating, comment })
+        setReviews((current) => [created, ...current])
+        setSuccess('¡Gracias! Tu reseña ya está publicada.')
+      }
+      resetForm()
+      if (isMobile) onViewChange('feed')
+    } catch (error) {
+      setFormError(error instanceof ReviewError ? error.message : 'No pudimos guardar tu reseña. Tu texto se conserva.')
     } finally {
       setSaving(false)
     }
   }
 
-  const average = reviews.length
-    ? (reviews.reduce((sum, r) => sum + r.rating, 0) / reviews.length).toFixed(1)
+  async function confirmDelete(review: Review) {
+    setDeletingId(review.id)
+    setFeedError('')
+    try {
+      await repository.remove(review.id)
+      setReviews((current) => current.filter((r) => r.id !== review.id))
+      if (editing?.id === review.id) resetForm()
+      setConfirmDeleteId(null)
+    } catch (error) {
+      setFeedError(error instanceof ReviewError ? error.message : 'No pudimos eliminar la reseña.')
+    } finally {
+      setDeletingId(null)
+    }
+  }
+
+  // ---------------------------------------------------------
+  // Datos derivados del listado
+  // ---------------------------------------------------------
+  const published = reviews.filter((r) => r.status === 'published')
+  const average = published.length
+    ? (published.reduce((sum, r) => sum + r.rating, 0) / published.length).toFixed(1)
     : '—'
 
-  const sorted = useMemo(() => [...reviews].sort((a, b) => sort === 'best'
-    ? b.rating - a.rating || Date.parse(b.createdAt) - Date.parse(a.createdAt)
-    : Date.parse(b.createdAt) - Date.parse(a.createdAt)), [reviews, sort])
+  const sorted = useMemo(
+    () =>
+      [...reviews].sort((a, b) =>
+        sort === 'best'
+          ? b.rating - a.rating || Date.parse(b.createdAt) - Date.parse(a.createdAt)
+          : Date.parse(b.createdAt) - Date.parse(a.createdAt),
+      ),
+    [reviews, sort],
+  )
 
-  // En móvil solo se muestra el área activa; en escritorio ambas.
   const showWrite = !isMobile || view === 'write'
   const showFeed = !isMobile || view === 'feed'
+  const commentInvalid = Boolean(showError('comment'))
+  const ratingInvalid = Boolean(showError('rating'))
 
   return (
     <div className="reviews-dock__body">
-      <form
+      {/* ======================== ESCRIBIR ======================== */}
+      <div
         id="reviews-area-write"
         role={isMobile ? 'tabpanel' : undefined}
         aria-labelledby={isMobile ? 'reviews-tab-write' : undefined}
-        className="reviews-dock__form"
+        className="reviews-dock__form-wrap"
         hidden={!showWrite}
-        onSubmit={submit}
-        aria-describedby={`${id}-error`}
       >
-        <h3 className="reviews-dock__area-title">
-          Evalúa a <span>{subjectName}</span>
-        </h3>
-
-        <label htmlFor={`${id}-name`}>Nombre para mostrar</label>
-        <input
-          id={`${id}-name`}
-          value={authorName}
-          onChange={(e) => onAuthorNameChange(e.target.value)}
-          autoComplete="nickname"
-          required
-          minLength={2}
-          maxLength={50}
-          placeholder="Cómo quieres aparecer"
-        />
-
-        <fieldset className="reviews-dock__rating" disabled={saving}>
-          <legend>Tu calificación</legend>
-          <div>
-            {[1, 2, 3, 4, 5].map((value) => (
-              <label key={value} className={value <= rating ? 'is-selected' : ''}>
-                <input
-                  type="radio"
-                  name={`${id}-rating`}
-                  value={value}
-                  checked={rating === value}
-                  onChange={() => setRating(value)}
-                  required
-                />
-                <Star size={24} fill={value <= rating ? 'currentColor' : 'none'} aria-hidden="true" />
-                <span className="sr-only">{value} {value === 1 ? 'estrella' : 'estrellas'}</span>
-              </label>
-            ))}
+        {status === 'loading' ? (
+          <div className="reviews-dock__form reviews-dock__gate" aria-busy="true">
+            <p>Comprobando tu sesión…</p>
           </div>
-        </fieldset>
+        ) : !signedIn ? (
+          <div className="reviews-dock__form reviews-dock__gate">
+            <h3 className="reviews-dock__area-title">
+              Evalúa a <span>{subjectName}</span>
+            </h3>
+            <p>Inicia sesión con tu cuenta de Google para publicar tu reseña. Puedes leer las de la comunidad sin iniciar sesión.</p>
+            <button type="button" className="reviews-dock__submit" onClick={onRequestLogin}>
+              <LogIn size={17} aria-hidden="true" /> Iniciar sesión para escribir
+            </button>
+          </div>
+        ) : (
+          <form className="reviews-dock__form" onSubmit={submit} noValidate aria-describedby={`${id}-form-error`}>
+            <h3 className="reviews-dock__area-title">
+              {editing ? 'Editar tu reseña de ' : 'Evalúa a '}
+              <span>{subjectName}</span>
+            </h3>
 
-        <label htmlFor={`${id}-comment`}>Tu reseña</label>
-        <textarea
-          id={`${id}-comment`}
-          value={comment}
-          onChange={(e) => setComment(e.target.value)}
-          required
-          minLength={10}
-          maxLength={1000}
-          rows={4}
-          placeholder="¿Qué te gustó? ¿Qué mejorarías?"
-          aria-describedby={`${id}-count`}
-        />
-        <small id={`${id}-count`}>{comment.length}/1000 caracteres · mínimo 10</small>
+            <p className="reviews-dock__author">
+              <Avatar name={profile?.fullName || profile?.firstName || ''} url={profile?.avatarUrl ?? null} />
+              Publicarás como <strong>{profile?.fullName || profile?.firstName}</strong>
+            </p>
 
-        <p id={`${id}-error`} role="alert" className="reviews-dock__error">{error}</p>
-        <p role="status" className="reviews-dock__success">{success}</p>
+            <fieldset
+              className={`reviews-dock__rating${ratingInvalid ? ' is-invalid' : ''}`}
+              disabled={saving}
+              aria-describedby={ratingInvalid ? `${id}-rating-error` : undefined}
+              aria-invalid={ratingInvalid || undefined}
+            >
+              <legend>Tu calificación <span aria-hidden="true">*</span></legend>
+              <div>
+                {[1, 2, 3, 4, 5].map((value) => (
+                  <label key={value} className={value <= rating ? 'is-selected' : ''}>
+                    <input
+                      type="radio"
+                      name={`${id}-rating`}
+                      value={value}
+                      checked={rating === value}
+                      onChange={() => {
+                        setRating(value)
+                        setTouched((t) => ({ ...t, rating: true }))
+                      }}
+                    />
+                    <Star size={24} fill={value <= rating ? 'currentColor' : 'none'} aria-hidden="true" />
+                    <span className="sr-only">{value} {value === 1 ? 'estrella' : 'estrellas'}</span>
+                  </label>
+                ))}
+              </div>
+              {ratingInvalid ? <p id={`${id}-rating-error`} className="reviews-dock__field-error">{errors.rating}</p> : null}
+            </fieldset>
 
-        <button
-          className="reviews-dock__submit"
-          type="submit"
-          disabled={saving || loading || loadError}
-        >
-          {saving ? 'Guardando…' : 'Publicar reseña'}
-        </button>
-      </form>
+            <label htmlFor={`${id}-comment`}>Tu reseña <span aria-hidden="true">*</span></label>
+            <textarea
+              ref={textareaRef}
+              id={`${id}-comment`}
+              value={comment}
+              onChange={(e) => setComment(e.target.value.slice(0, COMMENT_MAX + 200))}
+              onBlur={() => setTouched((t) => ({ ...t, comment: true }))}
+              rows={5}
+              disabled={saving}
+              placeholder="¿Qué te gustó? ¿Qué mejorarías?"
+              aria-required="true"
+              aria-invalid={commentInvalid || undefined}
+              aria-describedby={`${id}-count${commentInvalid ? ` ${id}-comment-error` : ''}`}
+              className={commentInvalid ? 'is-invalid' : undefined}
+            />
+            <small
+              id={`${id}-count`}
+              className={normalizedLength > COMMENT_MAX ? 'is-over' : undefined}
+            >
+              {normalizedLength}/{COMMENT_MAX} caracteres · mínimo {COMMENT_MIN}
+            </small>
+            {commentInvalid ? <p id={`${id}-comment-error`} className="reviews-dock__field-error">{errors.comment}</p> : null}
 
+            <p id={`${id}-form-error`} role="alert" className="reviews-dock__error">{formError}</p>
+            <p role="status" className="reviews-dock__success">{isMobile ? '' : success}</p>
+
+            <div className="reviews-dock__actions">
+              <button
+                className="reviews-dock__submit"
+                type="submit"
+                disabled={saving || (submitted && hasErrors(errors))}
+                aria-busy={saving}
+              >
+                {saving ? 'Guardando…' : editing ? 'Guardar cambios' : 'Publicar reseña'}
+              </button>
+              {editing ? (
+                <button type="button" className="reviews-dock__secondary" onClick={resetForm} disabled={saving}>
+                  Cancelar
+                </button>
+              ) : null}
+            </div>
+          </form>
+        )}
+      </div>
+
+      {/* ======================== COMUNIDAD ======================== */}
       <section
         id="reviews-area-feed"
         role={isMobile ? 'tabpanel' : undefined}
@@ -412,19 +535,21 @@ function ReviewPanel({
         hidden={!showFeed}
         aria-busy={loading}
       >
-        <h3 id={`${id}-feed-title`} className="reviews-dock__area-title">
-          Opiniones de la comunidad
-        </h3>
+        <h3 id={`${id}-feed-title`} className="reviews-dock__area-title">Opiniones de la comunidad</h3>
 
         {loading ? (
-          <p role="status">Cargando reseñas…</p>
+          <p role="status" className="reviews-dock__muted">Cargando reseñas…</p>
         ) : loadError ? (
-          <div role="alert">
-            <p>No pudimos leer las reseñas guardadas. No se modificó su contenido.</p>
+          <div role="alert" className="reviews-dock__muted">
+            <p>{loadError}</p>
             <button
               type="button"
               className="reviews-dock__retry"
-              onClick={() => { setLoading(true); setLoadError(false); setRetry((v) => v + 1) }}
+              onClick={() => {
+                setLoading(true)
+                setLoadError('')
+                setRetry((v) => v + 1)
+              }}
             >
               Reintentar
             </button>
@@ -434,18 +559,19 @@ function ReviewPanel({
             <div className="reviews-dock__summary">
               <div>
                 <strong>{average} <span aria-hidden="true">★</span></strong>
-                <p>{reviews.length} {reviews.length === 1 ? 'reseña' : 'reseñas'}</p>
+                <p>{published.length} {published.length === 1 ? 'reseña' : 'reseñas'}</p>
               </div>
               <label>
                 <span>Ordenar por</span>
-                <select value={sort} onChange={(e) => setSort(e.target.value)}>
+                <select value={sort} onChange={(e) => setSort(e.target.value as 'recent' | 'best')}>
                   <option value="recent">Más recientes</option>
                   <option value="best">Mejor calificación</option>
                 </select>
               </label>
             </div>
 
-            {isMobile && success ? <p className="reviews-dock__success">{success}</p> : null}
+            {isMobile && success ? <p className="reviews-dock__success" role="status">{success}</p> : null}
+            {feedError ? <p className="reviews-dock__error" role="alert">{feedError}</p> : null}
 
             {!reviews.length ? (
               <div className="reviews-dock__empty">
@@ -455,28 +581,93 @@ function ReviewPanel({
               </div>
             ) : (
               <ul className="reviews-dock__list">
-                {sorted.map((review) => (
-                  <li key={review.id}>
-                    <article>
-                      <div className="reviews-dock__byline">
-                        <strong>{review.authorName}</strong>
-                        <time dateTime={review.createdAt}>
-                          {new Date(review.createdAt).toLocaleDateString('es-MX', { day: 'numeric', month: 'short', year: 'numeric' })}
-                        </time>
-                      </div>
-                      <p className="reviews-dock__stars" aria-label={`${review.rating} de 5 estrellas`}>
-                        {'★'.repeat(review.rating)}
-                        <span aria-hidden="true">{'☆'.repeat(5 - review.rating)}</span>
-                      </p>
-                      <p className="reviews-dock__comment">{review.comment}</p>
-                    </article>
-                  </li>
-                ))}
+                {sorted.map((review) => {
+                  const mine = user?.id === review.userId
+                  const confirming = confirmDeleteId === review.id
+                  return (
+                    <li key={review.id} className={mine ? 'is-mine' : undefined}>
+                      <article>
+                        <div className="reviews-dock__byline">
+                          <span className="reviews-dock__who">
+                            <Avatar name={review.authorName} url={review.authorAvatarUrl} />
+                            <strong>{review.authorName}</strong>
+                            {mine ? <span className="reviews-dock__badge">Tú</span> : null}
+                          </span>
+                          <time dateTime={review.createdAt}>
+                            {dateFormat.format(Date.parse(review.createdAt))}
+                            {review.edited ? ' · editada' : ''}
+                          </time>
+                        </div>
+                        <p className="reviews-dock__stars" aria-label={`${review.rating} de 5 estrellas`}>
+                          {'★'.repeat(review.rating)}
+                          <span aria-hidden="true">{'☆'.repeat(5 - review.rating)}</span>
+                        </p>
+                        <p className="reviews-dock__comment">{review.comment}</p>
+
+                        {review.status === 'hidden' && mine ? (
+                          <p className="reviews-dock__hidden-note">
+                            Ocultada por moderación: solo tú puedes verla.
+                          </p>
+                        ) : null}
+
+                        {mine ? (
+                          confirming ? (
+                            <div className="reviews-dock__confirm" role="group" aria-label="Confirmar eliminación">
+                              <span>¿Eliminar esta reseña?</span>
+                              <button
+                                type="button"
+                                className="reviews-dock__danger"
+                                onClick={() => void confirmDelete(review)}
+                                disabled={deletingId === review.id}
+                              >
+                                {deletingId === review.id ? 'Eliminando…' : 'Sí, eliminar'}
+                              </button>
+                              <button type="button" className="reviews-dock__link" onClick={() => setConfirmDeleteId(null)}>
+                                Cancelar
+                              </button>
+                            </div>
+                          ) : (
+                            <div className="reviews-dock__own-actions">
+                              <button type="button" className="reviews-dock__link" onClick={() => startEdit(review)}>
+                                <Pencil size={14} aria-hidden="true" /> Editar
+                              </button>
+                              <button
+                                type="button"
+                                className="reviews-dock__link reviews-dock__link--danger"
+                                onClick={() => {
+                                  setConfirmDeleteId(review.id)
+                                  setFeedError('')
+                                }}
+                              >
+                                <Trash2 size={14} aria-hidden="true" /> Eliminar
+                              </button>
+                            </div>
+                          )
+                        ) : null}
+                      </article>
+                    </li>
+                  )
+                })}
               </ul>
             )}
           </>
         )}
       </section>
     </div>
+  )
+}
+
+/** Foto del autor; si no hay o falla, inicial en dorado. */
+function Avatar({ name, url }: { name: string; url: string | null }) {
+  const [failed, setFailed] = useState(false)
+  const initial = (name.trim().charAt(0) || '?').toUpperCase()
+  return (
+    <span className="reviews-dock__avatar" aria-hidden="true">
+      {url && !failed ? (
+        <img src={url} alt="" width={28} height={28} loading="lazy" referrerPolicy="no-referrer" onError={() => setFailed(true)} />
+      ) : (
+        initial
+      )}
+    </span>
   )
 }

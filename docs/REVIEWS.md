@@ -1,47 +1,62 @@
 # Reseñas
 
-Las reseñas no forman parte del recorrido principal de la landing. Se abren desde
-un botón flotante dorado, fijo abajo a la derecha (`ReviewsDock`, montado en
-`App.tsx`). El botón aparece tras un pequeño scroll y se oculta mientras hay un
-menú o modal abierto (`body.is-locked`).
+Las reseñas se abren desde el botón flotante dorado (abajo a la derecha,
+`ReviewsDock` en `App.tsx`). El panel tiene dos selectores (Categoría y
+personaje/escenario) y dos áreas: **Escribir reseña** y **Comunidad**.
+Escritorio: panel lateral con ambas áreas; móvil: hoja inferior con pestañas.
 
-El panel tiene dos selectores: **Categoría** (Personajes / Mapa y escenarios) y
-el elemento a evaluar. Debajo hay dos áreas: **Escribir reseña** y **Comunidad**.
-En escritorio se muestran lado a lado en un panel lateral; en móvil es una hoja
-inferior con pestañas y, al publicar, se cambia a la pestaña Comunidad.
+Los datos viven en Supabase (proyecto KING OF MUSIC). Las reseñas de la
+versión anterior (solo en el navegador) eran de prueba y se descartan.
 
-Los destinos no cambiaron: personajes usan `personajes/<id>`, «Mapa general»
-conserva `mapa/general` y cada ubicación usa `escenarios/<id>`, por lo que las
-reseñas locales anteriores siguen disponibles. No hay sección de reseñas de Nosotros.
+## Reglas
 
-## Estado actual
+- Cualquiera puede **leer** las reseñas publicadas, sin iniciar sesión.
+- Para **escribir** hay que iniciar sesión con Google. El nombre y la foto del
+  autor salen de su cuenta; no se escriben a mano.
+- Un usuario puede escribir **muchas reseñas**; cada reseña tiene un solo autor.
+- El autor puede **editar** (calificación y comentario) y **eliminar** sus
+  reseñas. Las editadas muestran "editada".
+- **Anti-spam:** máximo 5 reseñas por minuto por usuario.
+- **Moderación básica:** un administrador puede cambiar `status` a `hidden`
+  desde el panel de Supabase (Table Editor → `reviews`). La reseña deja de
+  verse para todos; su autor la ve con el aviso "Ocultada por moderación".
 
-Sin Supabase, autenticación ni solicitudes de red. `localReviewRepository`
-guarda en `localStorage` bajo `king-of-music:reviews:v1`. Las reseñas sobreviven
-a una recarga, pero solo existen en ese navegador / instalación de la app.
-Borrar los datos del navegador o desinstalar la app puede eliminarlas.
-El nombre es libre, no una identidad verificada. No se incluyen reseñas ficticias.
+## Validación (formulario + base de datos)
 
-## Conexión futura
+| Regla | Formulario | Base de datos |
+|---|---|---|
+| Categoría y elemento existentes | ✅ | ✅ catálogo `review_subjects` |
+| Calificación entera 1–5 | ✅ | ✅ |
+| Comentario obligatorio, no solo espacios ni solo símbolos | ✅ | ✅ |
+| Espacios y saltos de línea normalizados | ✅ | ✅ |
+| 10–1000 caracteres (contador en vivo) | ✅ | ✅ |
+| Sesión iniciada; autor = usuario de la sesión | ✅ | ✅ RLS + trigger |
+| Límite de 5 por minuto | — | ✅ trigger |
 
-`ReviewRepository` define operaciones asíncronas `list(target)` y `create(input)`.
-El componente `Reviews` acepta un repositorio por propiedad; sustituir el adaptador
-local permite conservar los formularios y las vistas. Mantener `section` y
-`subjectId` como identificadores estables del destino.
+Código: `src/features/reviews/validation.ts` (reglas compartidas),
+`repository.ts` (Supabase), `Reviews.tsx` (interfaz).
+SQL: `supabase/migrations/20261102221718_reviews.sql`.
 
-Al conectar Supabase, resolver el usuario desde una sesión real de Google;
-asociar la autoría a su ID, ignorando la identidad libre del prototipo.
-Implementar permisos/RLS y validación del lado del servidor antes de permitir
-escrituras. Decidir entonces las políticas de moderación, duplicados y paginación.
-No migrar automáticamente las reseñas locales como si fueran identidades verificadas.
+## Tabla `public.reviews`
 
-## Comprobación
+| Columna | Tipo | Notas |
+|---|---|---|
+| `id` | uuid | Llave primaria |
+| `user_id` | uuid | Autor (`auth.users`), lo asigna el servidor |
+| `section` | text | `personajes` · `escenarios` · `mapa` |
+| `subject_id` | text | ID del catálogo (`juan-grabriel`, `general`…) |
+| `rating` | smallint | 1–5 |
+| `comment` | text | 10–1000 caracteres |
+| `author_name` | text | Nombre visible, desde el perfil |
+| `author_avatar_url` | text | Foto de Google (opcional) |
+| `status` | text | `published` · `hidden` |
+| `created_at` / `updated_at` | timestamptz | Publicación / última edición |
 
-`npm run build`
+Para agregar un personaje o escenario reseñable: añadirlo en `src/data` y
+crear la fila correspondiente en `public.review_subjects` con el mismo ID.
 
-`node --test src/features/reviews/repository.test.mjs`
+## Pruebas
 
-Prueba manual: elegir un personaje o escenario, guardar nombre, estrellas y
-comentario; recargar y comprobar persistencia; cambiar de destino y comprobar
-que las reseñas se mantienen separadas. Revisar teclado, móvil y almacenamiento
-bloqueado (se muestra error sin perder el texto).
+```bash
+node --test src/features/reviews/validation.test.mjs
+```
