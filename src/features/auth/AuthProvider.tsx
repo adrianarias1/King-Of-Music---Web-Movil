@@ -82,6 +82,9 @@ function friendlyError(raw: string): string {
   if (/access_denied|denied/i.test(raw)) {
     return 'Cancelaste el inicio de sesión con Google.'
   }
+  if (/Unable to exchange external code|invalid_client|server_error/i.test(raw)) {
+    return 'Google rechazó la conexión con el servidor. Revisa el Client ID y el Client Secret configurados en Supabase.'
+  }
   return 'No se pudo iniciar sesión con Google. Inténtalo de nuevo.'
 }
 

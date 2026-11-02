@@ -82,7 +82,7 @@ function SectionFallback() {
 export default function App() {
   // Un solo botón de cuenta: sin sesión abre "Iniciar sesión";
   // con sesión abre el panel de la cuenta.
-  const { status } = useAuth()
+  const { status, error: authError } = useAuth()
   const [loginOpen, setLoginOpen] = useState(false)
   const [accountOpen, setAccountOpen] = useState(false)
   const openAccount = useCallback(() => {
@@ -91,6 +91,15 @@ export default function App() {
   }, [status])
   const closeLogin = useCallback(() => setLoginOpen(false), [])
   const closeAccount = useCallback(() => setAccountOpen(false), [])
+
+  // Si el regreso de Google trae un error (p. ej. credenciales inválidas o
+  // acceso cancelado), se abre el diálogo para mostrar el mensaje.
+  // Se hace durante el render, una sola vez por mensaje.
+  const [shownAuthError, setShownAuthError] = useState<string | null>(null)
+  if (authError && authError !== shownAuthError && status === 'signed_out') {
+    setShownAuthError(authError)
+    setLoginOpen(true)
+  }
   return (
     <>
       {/* Accesibilidad: salto al contenido principal */}
