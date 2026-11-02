@@ -80,6 +80,14 @@ function categoryOf(section: ReviewSection): CategoryId {
   return 'escenarios'
 }
 
+/** Categorías que abarca "Ver todas" según el elemento elegido. */
+const CATEGORY_SECTIONS: Record<ReviewSection, readonly ReviewSection[]> = {
+  juego: ['juego'],
+  personajes: ['personajes'],
+  escenarios: ['escenarios', 'mapa'],
+  mapa: ['escenarios', 'mapa'],
+}
+
 /** Reseñas por página en la vista general. */
 const RECENT_PAGE_SIZE = 15
 
@@ -318,10 +326,18 @@ function ReviewPanel({
   const [loading, setLoading] = useState(true)
   const [loadError, setLoadError] = useState('')
   const [retry, setRetry] = useState(0)
-  const [sort, setSort] = useState<'recent' | 'best'>('recent')
+  const [sort, setSort] = useState<'recent' | 'best' | 'all'>('recent')
   const [hasMore, setHasMore] = useState(false)
   const [loadingMore, setLoadingMore] = useState(false)
   const [stats, setStats] = useState<ReviewStats | null>(null)
+
+  // "Ver todas": todas las reseñas de la categoría del elemento elegido
+  // (p. ej. todos los escenarios y el mapa), no solo las de Bellas Artes.
+  const showAll = !general && sort === 'all'
+  const categoryLabel = section === 'personajes' ? 'Personajes' : 'Mapa y escenarios'
+  // Vista paginada con etiqueta "Sobre: …": la general o "Ver todas".
+  const paged = general || showAll
+  const pageSections = general ? undefined : CATEGORY_SECTIONS[section]
 
   // Formulario
   const [rating, setRating] = useState(0)
@@ -341,13 +357,16 @@ function ReviewPanel({
   const textareaRef = useRef<HTMLTextAreaElement>(null)
 
   const refreshStats = useCallback(() => {
-    repository.stats().then(setStats).catch(() => undefined)
-  }, [repository])
+    repository.stats(pageSections).then(setStats).catch(() => undefined)
+  }, [repository, pageSections])
 
   useEffect(() => {
     let active = true
-    const load = general
-      ? Promise.all([repository.listRecent({ limit: RECENT_PAGE_SIZE }), repository.stats()]).then(
+    const load = paged
+      ? Promise.all([
+          repository.listRecent({ limit: RECENT_PAGE_SIZE, sections: pageSections }),
+          repository.stats(pageSections),
+        ]).then(
           ([page, globalStats]) => {
             if (!active) return page.reviews
             setHasMore(page.hasMore)
@@ -372,7 +391,7 @@ function ReviewPanel({
     return () => {
       active = false
     }
-  }, [repository, section, subjectId, retry, general])
+  }, [repository, section, subjectId, retry, paged, pageSections])
 
   async function loadMore() {
     const last = reviews[reviews.length - 1]
@@ -380,7 +399,7 @@ function ReviewPanel({
     setLoadingMore(true)
     setFeedError('')
     try {
-      const page = await repository.listRecent({ limit: RECENT_PAGE_SIZE, after: last })
+      const page = await repository.listRecent({ limit: RECENT_PAGE_SIZE, after: last, sections: pageSections })
       setReviews((current) => {
         const seen = new Set(current.map((r) => r.id))
         return [...current, ...page.reviews.filter((r) => !seen.has(r.id))]
@@ -443,12 +462,12 @@ function ReviewPanel({
         const updated = await repository.update(editing.id, { rating, comment })
         setReviews((current) => current.map((r) => (r.id === updated.id ? updated : r)))
         setSuccess('Tu reseña se actualizó.')
-        if (general) refreshStats()
+        if (paged) refreshStats()
       } else {
         const created = await repository.create({ section, subjectId, rating, comment })
         setReviews((current) => [created, ...current])
         setSuccess('¡Gracias! Tu reseña ya está publicada.')
-        if (general) refreshStats()
+        if (paged) refreshStats()
       }
       resetForm()
       if (isMobile) onViewChange('feed')
@@ -465,7 +484,7 @@ function ReviewPanel({
     try {
       await repository.remove(review.id)
       setReviews((current) => current.filter((r) => r.id !== review.id))
-      if (general) refreshStats()
+      if (paged) refreshStats()
       if (editing?.id === review.id) resetForm()
       setConfirmDeleteId(null)
     } catch (error) {
@@ -483,8 +502,8 @@ function ReviewPanel({
     ? (published.reduce((sum, r) => sum + r.rating, 0) / published.length).toFixed(1)
     : '—'
   // Vista general: promedio y total de TODA la comunidad (servidor).
-  const average = general ? (stats?.average != null ? stats.average.toFixed(1) : '—') : localAverage
-  const totalCount = general ? stats?.total ?? published.length : published.length
+  const average = paged ? (stats?.average != null ? stats.average.toFixed(1) : '—') : localAverage
+  const totalCount = paged ? stats?.total ?? published.length : published.length
 
   const sorted = useMemo(
     () =>
@@ -620,7 +639,11 @@ function ReviewPanel({
         aria-busy={loading}
       >
         <h3 id={`${id}-feed-title`} className="reviews-dock__area-title">
-          {general ? 'Últimas reseñas de la comunidad' : `Opiniones sobre ${subjectName}`}
+          {general
+            ? 'Últimas reseñas de la comunidad'
+            : showAll
+              ? `Todas las reseñas de ${categoryLabel}`
+              : `Opiniones sobre ${subjectName}`}
         </h3>
 
         {loading ? (
@@ -647,15 +670,27 @@ function ReviewPanel({
                 <strong>{average} <span aria-hidden="true">★</span></strong>
                 <p>
                   {totalCount} {totalCount === 1 ? 'reseña' : 'reseñas'}
-                  {general ? ' en toda la comunidad' : ''}
+                  {general ? ' en toda la comunidad' : showAll ? ` en ${categoryLabel}` : ''}
                 </p>
               </div>
               {!general ? (
                 <label>
-                  <span>Ordenar por</span>
-                  <select value={sort} onChange={(e) => setSort(e.target.value as 'recent' | 'best')}>
+                  <span>Mostrar</span>
+                  <select
+                    value={sort}
+                    onChange={(e) => {
+                      const next = e.target.value as 'recent' | 'best' | 'all'
+                      // Entrar o salir de "Ver todas" cambia la consulta.
+                      if ((next === 'all') !== (sort === 'all')) {
+                        setLoading(true)
+                        setFeedError('')
+                      }
+                      setSort(next)
+                    }}
+                  >
                     <option value="recent">Más recientes</option>
                     <option value="best">Mejor calificación</option>
+                    <option value="all">Ver todas</option>
                   </select>
                 </label>
               ) : null}
@@ -671,7 +706,9 @@ function ReviewPanel({
                 <p>
                   {general
                     ? 'Aún no hay reseñas. Sé el primero en opinar sobre King of Music.'
-                    : `Aún no hay reseñas para ${subjectName}. Comparte la primera.`}
+                    : showAll
+                      ? `Aún no hay reseñas en ${categoryLabel}.`
+                      : `Aún no hay reseñas para ${subjectName}. Comparte la primera.`}
                 </p>
               </div>
             ) : (
@@ -693,7 +730,7 @@ function ReviewPanel({
                             {review.edited ? ' · editada' : ''}
                           </time>
                         </div>
-                        {general ? (
+                        {paged ? (
                           review.section === 'juego' ? (
                             <span className="reviews-dock__about">Sobre: el juego</span>
                           ) : (
@@ -760,7 +797,7 @@ function ReviewPanel({
               </ul>
             )}
 
-            {general && hasMore ? (
+            {paged && hasMore ? (
               <button
                 type="button"
                 className="reviews-dock__more"

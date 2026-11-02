@@ -70,10 +70,13 @@ export interface ReviewStats {
 
 export interface ReviewRepository {
   list(target: ReviewTarget): Promise<Review[]>
-  /** Últimas reseñas publicadas de todo; `after` = última reseña cargada. */
-  listRecent(options: { limit: number; after?: Review }): Promise<ReviewPage>
-  /** Total y promedio de todas las reseñas publicadas. */
-  stats(): Promise<ReviewStats>
+  /**
+   * Últimas reseñas publicadas (de todo, o solo de `sections`);
+   * `after` = última reseña cargada, para paginar.
+   */
+  listRecent(options: { limit: number; after?: Review; sections?: readonly ReviewSection[] }): Promise<ReviewPage>
+  /** Total y promedio de las reseñas publicadas (de todo o de `sections`). */
+  stats(sections?: readonly ReviewSection[]): Promise<ReviewStats>
   create(input: ReviewInput): Promise<Review>
   update(id: string, content: ReviewContent): Promise<Review>
   remove(id: string): Promise<void>
@@ -158,7 +161,7 @@ export const supabaseReviewRepository: ReviewRepository = {
     return (data as ReviewRow[]).map(toReview)
   },
 
-  async listRecent({ limit, after }) {
+  async listRecent({ limit, after, sections }) {
     let query = supabase
       .from('reviews')
       .select(COLUMNS)
@@ -166,6 +169,8 @@ export const supabaseReviewRepository: ReviewRepository = {
       .order('created_at', { ascending: false })
       .order('id', { ascending: false })
       .limit(limit + 1)
+
+    if (sections?.length) query = query.in('section', [...sections])
 
     // Paginación por cursor (fecha + id): estable aunque lleguen reseñas nuevas.
     if (after) {
@@ -181,8 +186,10 @@ export const supabaseReviewRepository: ReviewRepository = {
     return { reviews: rows.slice(0, limit), hasMore: rows.length > limit }
   },
 
-  async stats() {
-    const { data, error } = await supabase.rpc('review_stats').single()
+  async stats(sections) {
+    const { data, error } = await supabase
+      .rpc('review_stats', sections?.length ? { sections: [...sections] } : {})
+      .single()
     if (error) throw toReviewError(error)
     const row = data as { total: number; average: number | string | null }
     const average = row.average === null ? null : Number(row.average)

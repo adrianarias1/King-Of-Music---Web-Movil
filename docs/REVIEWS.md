@@ -20,6 +20,16 @@ Al abrir el panel, la categoría es **"El juego en general"**:
   botón **Volver a la vista general**. La etiqueta "Sobre: …" de una reseña
   lleva directo a las reseñas de ese elemento.
 
+## Vista de un personaje o escenario
+
+El selector **Mostrar** ofrece:
+
+- **Más recientes** / **Mejor calificación**: reseñas del elemento elegido.
+- **Ver todas**: todas las reseñas de la categoría (p. ej. en Mapa y escenarios
+  aparecen las de todos los escenarios y del mapa), de 15 en 15 con
+  **Ver más**, etiqueta "Sobre: …" y promedio de esa categoría
+  (`review_stats(array['escenarios','mapa'])`).
+
 Los datos viven en Supabase (proyecto KING OF MUSIC). Las reseñas de la
 versión anterior (solo en el navegador) eran de prueba y se descartan.
 
@@ -50,7 +60,7 @@ versión anterior (solo en el navegador) eran de prueba y se descartan.
 
 Código: `src/features/reviews/validation.ts` (reglas compartidas),
 `repository.ts` (Supabase), `Reviews.tsx` (interfaz).
-SQL: `supabase/migrations/20261102221718_reviews.sql` y `20261102223909_reviews_game_general.sql`.
+SQL: `supabase/migrations/20261102221718_reviews.sql` `20261102223909_reviews_game_general.sql` y `20261102224709_review_stats_by_sections.sql`.
 
 ## Tabla `public.reviews`
 
