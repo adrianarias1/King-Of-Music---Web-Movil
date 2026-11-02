@@ -56,8 +56,24 @@ export class ReviewError extends Error {
   }
 }
 
+/** Página de la vista general (últimas reseñas de toda la comunidad). */
+export interface ReviewPage {
+  reviews: Review[]
+  hasMore: boolean
+}
+
+export interface ReviewStats {
+  total: number
+  /** null si aún no hay reseñas. */
+  average: number | null
+}
+
 export interface ReviewRepository {
   list(target: ReviewTarget): Promise<Review[]>
+  /** Últimas reseñas publicadas de todo; `after` = última reseña cargada. */
+  listRecent(options: { limit: number; after?: Review }): Promise<ReviewPage>
+  /** Total y promedio de todas las reseñas publicadas. */
+  stats(): Promise<ReviewStats>
   create(input: ReviewInput): Promise<Review>
   update(id: string, content: ReviewContent): Promise<Review>
   remove(id: string): Promise<void>
@@ -140,6 +156,37 @@ export const supabaseReviewRepository: ReviewRepository = {
       .limit(200)
     if (error) throw toReviewError(error)
     return (data as ReviewRow[]).map(toReview)
+  },
+
+  async listRecent({ limit, after }) {
+    let query = supabase
+      .from('reviews')
+      .select(COLUMNS)
+      .eq('status', 'published')
+      .order('created_at', { ascending: false })
+      .order('id', { ascending: false })
+      .limit(limit + 1)
+
+    // Paginación por cursor (fecha + id): estable aunque lleguen reseñas nuevas.
+    if (after) {
+      query = query.or(
+        // Fechas entre comillas: contienen ".", ":" y "+".
+        `created_at.lt."${after.createdAt}",and(created_at.eq."${after.createdAt}",id.lt.${after.id})`,
+      )
+    }
+
+    const { data, error } = await query
+    if (error) throw toReviewError(error)
+    const rows = (data as ReviewRow[]).map(toReview)
+    return { reviews: rows.slice(0, limit), hasMore: rows.length > limit }
+  },
+
+  async stats() {
+    const { data, error } = await supabase.rpc('review_stats').single()
+    if (error) throw toReviewError(error)
+    const row = data as { total: number; average: number | string | null }
+    const average = row.average === null ? null : Number(row.average)
+    return { total: row.total ?? 0, average: Number.isFinite(average) ? average : null }
   },
 
   async create({ section, subjectId, rating, comment }) {

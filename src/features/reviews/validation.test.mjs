@@ -26,6 +26,10 @@ test('rechaza comentarios vacíos, solo espacios, solo símbolos, cortos o largo
   }
 })
 
+test('acepta reseñas sobre el juego en general', () => {
+  assert.equal(hasErrors(validateReviewDraft({ ...valid, section: 'juego', subjectId: 'general' })), false)
+})
+
 test('exige categoría y elemento válidos', () => {
   assert.ok(validateReviewDraft({ ...valid, section: 'nosotros' }).subject)
   assert.ok(validateReviewDraft({ ...valid, subjectId: '   ' }).subject)

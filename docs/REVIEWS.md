@@ -1,9 +1,24 @@
 # Reseñas
 
 Las reseñas se abren desde el botón flotante dorado (abajo a la derecha,
-`ReviewsDock` en `App.tsx`). El panel tiene dos selectores (Categoría y
-personaje/escenario) y dos áreas: **Escribir reseña** y **Comunidad**.
-Escritorio: panel lateral con ambas áreas; móvil: hoja inferior con pestañas.
+`ReviewsDock` en `App.tsx`). El panel tiene dos áreas: **Escribir reseña** y
+**Comunidad**. Escritorio: panel lateral con ambas áreas; móvil: hoja inferior
+con pestañas.
+
+## Vista general (por defecto)
+
+Al abrir el panel, la categoría es **"El juego en general"**:
+
+- El formulario sirve para opinar sobre el juego, sin elegir personaje ni
+  escenario (se guarda como `section = 'juego'`, `subject_id = 'general'`).
+- La lista muestra las **últimas 15 reseñas de toda la comunidad** (juego,
+  personajes, escenarios y mapa), cada una con su etiqueta "Sobre: …".
+  **Ver más reseñas** carga las siguientes 15 (paginación por cursor).
+- El promedio y el total son de **todas** las reseñas publicadas
+  (`public.review_stats()`).
+- Al elegir Personajes o Mapa y escenarios aparece un segundo selector y el
+  botón **Volver a la vista general**. La etiqueta "Sobre: …" de una reseña
+  lleva directo a las reseñas de ese elemento.
 
 Los datos viven en Supabase (proyecto KING OF MUSIC). Las reseñas de la
 versión anterior (solo en el navegador) eran de prueba y se descartan.
@@ -35,7 +50,7 @@ versión anterior (solo en el navegador) eran de prueba y se descartan.
 
 Código: `src/features/reviews/validation.ts` (reglas compartidas),
 `repository.ts` (Supabase), `Reviews.tsx` (interfaz).
-SQL: `supabase/migrations/20261102221718_reviews.sql`.
+SQL: `supabase/migrations/20261102221718_reviews.sql` y `20261102223909_reviews_game_general.sql`.
 
 ## Tabla `public.reviews`
 
@@ -43,7 +58,7 @@ SQL: `supabase/migrations/20261102221718_reviews.sql`.
 |---|---|---|
 | `id` | uuid | Llave primaria |
 | `user_id` | uuid | Autor (`auth.users`), lo asigna el servidor |
-| `section` | text | `personajes` · `escenarios` · `mapa` |
+| `section` | text | `juego` · `personajes` · `escenarios` · `mapa` |
 | `subject_id` | text | ID del catálogo (`juan-grabriel`, `general`…) |
 | `rating` | smallint | 1–5 |
 | `comment` | text | 10–1000 caracteres |

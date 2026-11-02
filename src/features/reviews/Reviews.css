@@ -541,6 +541,78 @@ body.is-locked .reviews-fab {
 }
 
 /* ---------------------------------------------------------
+   6a. VISTA GENERAL
+   --------------------------------------------------------- */
+
+/* Con "El juego en general" solo queda el selector de categoría. */
+.reviews-dock__pickers.is-single {
+  grid-template-columns: minmax(0, 1fr);
+  max-width: 420px;
+}
+
+.reviews-dock__back {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  align-self: flex-start;
+  min-height: 38px;
+  margin-top: 1rem;
+  padding: 0.4rem 0.85rem 0.4rem 0.65rem;
+  color: var(--rv-gold-soft);
+  border: 1px solid var(--rv-gold-line);
+  border-radius: 999px;
+  font-size: 0.78rem;
+  cursor: pointer;
+  transition: background-color 200ms ease, color 200ms ease;
+}
+
+.reviews-dock__back:hover {
+  color: #14100a;
+  background: var(--rv-gold);
+}
+
+.reviews-dock__about {
+  display: inline-block;
+  margin-top: 0.45rem;
+  padding: 0.12rem 0.55rem;
+  color: var(--rv-gold-soft);
+  background: rgba(197, 164, 91, 0.1);
+  border: 1px solid rgba(197, 164, 91, 0.25);
+  border-radius: 999px;
+  font-size: 0.7rem;
+  letter-spacing: 0.04em;
+}
+
+.reviews-dock__about--link {
+  cursor: pointer;
+  transition: background-color 180ms ease, border-color 180ms ease;
+}
+
+.reviews-dock__about--link:hover {
+  background: rgba(197, 164, 91, 0.2);
+  border-color: var(--rv-gold-line);
+}
+
+.reviews-dock__more {
+  width: 100%;
+  min-height: 44px;
+  margin-top: 1rem;
+  color: var(--rv-gold-soft);
+  border: 1px solid var(--rv-gold-line);
+  border-radius: 4px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: background-color 200ms ease;
+}
+
+.reviews-dock__more:hover:not(:disabled) {
+  background: rgba(197, 164, 91, 0.1);
+}
+
+/* ---------------------------------------------------------
    6b. SESIÓN, AUTOR Y ACCIONES (Supabase)
    --------------------------------------------------------- */
 

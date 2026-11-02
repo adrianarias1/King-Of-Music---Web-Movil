@@ -6,9 +6,9 @@
    la base de datos es la última palabra.
    ========================================================================== */
 
-export type ReviewSection = 'personajes' | 'escenarios' | 'mapa'
+export type ReviewSection = 'juego' | 'personajes' | 'escenarios' | 'mapa'
 
-export const REVIEW_SECTIONS: readonly ReviewSection[] = ['personajes', 'escenarios', 'mapa']
+export const REVIEW_SECTIONS: readonly ReviewSection[] = ['juego', 'personajes', 'escenarios', 'mapa']
 
 export const COMMENT_MIN = 10
 export const COMMENT_MAX = 1000
@@ -47,7 +47,7 @@ export function validateReviewDraft(draft: ReviewDraft): ReviewErrors {
   const errors: ReviewErrors = {}
 
   if (!REVIEW_SECTIONS.includes(draft.section as ReviewSection) || !draft.subjectId.trim()) {
-    errors.subject = 'Elige qué personaje o escenario quieres evaluar.'
+    errors.subject = 'Elige qué quieres evaluar.'
   }
 
   if (!Number.isInteger(draft.rating) || draft.rating < RATING_MIN || draft.rating > RATING_MAX) {
