@@ -6,6 +6,7 @@ import { Capacitor } from '@capacitor/core'
 import { registerSW } from 'virtual:pwa-register'
 import App from './App'
 import { AuthProvider } from './features/auth/AuthProvider'
+import { installExternalLinkHandler } from './lib/native'
 import './styles/index.css'
 
 document.documentElement.classList.toggle('android-app', Capacitor.getPlatform() === 'android')
@@ -13,6 +14,9 @@ document.documentElement.classList.toggle('android-app', Capacitor.getPlatform()
 if (import.meta.env.PROD && !Capacitor.isNativePlatform() && 'serviceWorker' in navigator) {
   registerSW({ immediate: true })
 }
+
+// App Android: los enlaces externos se abren en el navegador del sistema.
+installExternalLinkHandler()
 
 const container = document.getElementById('root')
 

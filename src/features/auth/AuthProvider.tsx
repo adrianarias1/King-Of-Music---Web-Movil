@@ -1,9 +1,11 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import type { ReactNode } from 'react'
 import type { Session, User } from '@supabase/supabase-js'
-import { Capacitor } from '@capacitor/core'
+import { App as CapacitorApp } from '@capacitor/app'
+import { Browser } from '@capacitor/browser'
 
 import { supabase } from '../../lib/supabase'
+import { isNativeApp, NATIVE_AUTH_REDIRECT } from '../../lib/native'
 import { AuthContext } from './authContext'
 import type { AuthContextValue, AuthStatus, Profile, SessionInfo } from './authContext'
 import { SESSION_MAX_AGE_DAYS } from './sessionPolicy'
@@ -27,6 +29,9 @@ import { SESSION_MAX_AGE_DAYS } from './sessionPolicy'
    ========================================================================== */
 
 const DAY_MS = 24 * 60 * 60 * 1000
+
+/** Deep links ya procesados: un código OAuth solo se puede canjear una vez. */
+const handledAuthUrls = new Set<string>()
 
 /** Lee el session_id del access token (JWT) sin validarlo: solo para UI. */
 function sessionIdFromToken(token: string): string | null {
@@ -121,7 +126,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [sessionInfo, setSessionInfo] = useState<SessionInfo | null>(null)
   const [error, setError] = useState<string | null>(null)
 
-  const isNative = Capacitor.isNativePlatform()
+  const isNative = isNativeApp
   const user = session?.user ?? null
 
   // ---------------------------------------------------------------------
@@ -153,6 +158,69 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return () => {
       alive = false
       listener.subscription.unsubscribe()
+    }
+  }, [])
+
+  // ---------------------------------------------------------------------
+  // 1b. App Android: regreso de Google por deep link + ciclo de vida
+  //
+  //   Google no permite iniciar sesión dentro del WebView de la app. Por
+  //   eso el login se abre en el navegador del sistema (Custom Tab) y
+  //   Supabase regresa a la app con:
+  //     com.kingofmusic.app://login-callback?code=…
+  //   Aquí se canjea ese código por la sesión (PKCE: el code_verifier quedó
+  //   guardado en el almacenamiento de la app antes de abrir el navegador).
+  // ---------------------------------------------------------------------
+  useEffect(() => {
+    if (!isNativeApp) return undefined
+    let alive = true
+
+    const handleUrl = async (url: string | undefined) => {
+      if (!url || !url.startsWith(NATIVE_AUTH_REDIRECT) || handledAuthUrls.has(url)) return
+      handledAuthUrls.add(url)
+      await Browser.close().catch(() => undefined)
+
+      const parsed = new URL(url)
+      const hash = new URLSearchParams(parsed.hash.replace(/^#/, ''))
+      const oauthError =
+        parsed.searchParams.get('error_description') ??
+        hash.get('error_description') ??
+        parsed.searchParams.get('error')
+      if (oauthError) {
+        if (alive) setError(friendlyError(oauthError))
+        return
+      }
+
+      const code = parsed.searchParams.get('code')
+      if (!code) return
+      const { error: exchangeError } = await supabase.auth.exchangeCodeForSession(code)
+      if (exchangeError && alive) setError(friendlyError(exchangeError.message))
+      // Si funcionó, onAuthStateChange actualiza la sesión.
+    }
+
+    const warn = (reason: unknown) => console.warn('[KingOfMusic] Plugin nativo no disponible:', reason)
+
+    // App abierta (o en segundo plano) al llegar el deep link.
+    const urlListener = CapacitorApp.addListener('appUrlOpen', ({ url }) => {
+      void handleUrl(url)
+    }).catch(warn)
+
+    // App cerrada: Android la abre directamente con el deep link.
+    CapacitorApp.getLaunchUrl()
+      .then((launch) => handleUrl(launch?.url))
+      .catch(warn)
+
+    // Renovación del token solo con la app en primer plano: en segundo
+    // plano Android congela los temporizadores del WebView.
+    const stateListener = CapacitorApp.addListener('appStateChange', ({ isActive }) => {
+      if (isActive) void supabase.auth.startAutoRefresh()
+      else void supabase.auth.stopAutoRefresh()
+    }).catch(warn)
+
+    return () => {
+      alive = false
+      void urlListener.then((handle) => handle?.remove())
+      void stateListener.then((handle) => handle?.remove())
     }
   }, [])
 
@@ -231,7 +299,30 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   // ---------------------------------------------------------------------
   const signInWithGoogle = useCallback(async () => {
     setError(null)
-    // Regresa a la misma página (respeta base './' y subcarpetas).
+
+    // App Android: login en el navegador del sistema y regreso por deep link.
+    if (isNativeApp) {
+      const { data, error: oauthError } = await supabase.auth.signInWithOAuth({
+        provider: 'google',
+        options: {
+          redirectTo: NATIVE_AUTH_REDIRECT,
+          skipBrowserRedirect: true,
+          queryParams: { prompt: 'select_account' },
+        },
+      })
+      if (oauthError || !data?.url) {
+        setError(friendlyError(oauthError?.message ?? 'No se pudo iniciar sesión'))
+        return
+      }
+      try {
+        await Browser.open({ url: data.url, windowName: '_self' })
+      } catch {
+        setError('No se pudo abrir el navegador para iniciar sesión. Inténtalo de nuevo.')
+      }
+      return
+    }
+
+    // Web: regresa a la misma página (respeta base './' y subcarpetas).
     const redirectTo = `${window.location.origin}${window.location.pathname}`
     const { error: oauthError } = await supabase.auth.signInWithOAuth({
       provider: 'google',

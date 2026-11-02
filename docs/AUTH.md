@@ -70,7 +70,50 @@ Google todavía no está activado en el servidor."
 
 ## App Android (Capacitor)
 
-Google no permite iniciar sesión dentro de un WebView embebido. En la app
-Android el botón indica que el acceso está disponible en la versión web.
-Para habilitarlo en la app hace falta abrir el login en el navegador del
-sistema y volver con un deep link (`@capacitor/browser` + `@capacitor/app`).
+Google no permite iniciar sesión dentro del WebView de una app, así que en el
+APK el flujo es distinto al de la web:
+
+1. `signInWithGoogle()` pide a Supabase la URL de Google con
+   `redirectTo = com.kingofmusic.app://login-callback` y
+   `skipBrowserRedirect: true`, y la abre con **`@capacitor/browser`**
+   (Custom Tab del navegador del sistema).
+2. Al terminar, Supabase redirige a `com.kingofmusic.app://login-callback?code=…`.
+   Android entrega ese deep link a la app gracias al `intent-filter` de
+   `android/app/src/main/AndroidManifest.xml`.
+3. **`@capacitor/app`** recibe el enlace (`appUrlOpen`, o `getLaunchUrl` si la
+   app estaba cerrada), se cierra el navegador y se canjea el código con
+   `exchangeCodeForSession` (PKCE). Cada código se procesa una sola vez.
+4. La sesión se guarda en el almacenamiento de la app. La renovación del token
+   se pausa en segundo plano y se reanuda al volver (`appStateChange`).
+
+Además, en la app cualquier enlace externo (ajustes de Google, GitHub…) se abre
+en el navegador del sistema (`installExternalLinkHandler`, `src/lib/native.ts`).
+
+| Pieza | Valor |
+|---|---|
+| Deep link | `com.kingofmusic.app://login-callback` (`NATIVE_AUTH_REDIRECT`) |
+| Esquema en Android | `@string/custom_url_scheme` = `com.kingofmusic.app` |
+| Plugins | `@capacitor/app` 8.1.2 · `@capacitor/browser` 8.0.5 |
+
+### Configuración en Supabase (una sola vez)
+
+**Authentication → URL Configuration → Redirect URLs** → agregar:
+
+```
+com.kingofmusic.app://login-callback
+```
+
+No hace falta cambiar nada en Google Cloud: Google sigue regresando a
+`https://bwpxwmfhkdxiyprrjxjc.supabase.co/auth/v1/callback`.
+
+### Generar el APK
+
+```bash
+npm install
+npm run build
+npx cap sync android
+```
+
+Luego abrir `android/` en Android Studio (o `cd android && ./gradlew assembleDebug`).
+`cap sync` copia la web a la app y registra los plugins; repetirlo después de
+cada cambio en la web o en las dependencias de Capacitor.

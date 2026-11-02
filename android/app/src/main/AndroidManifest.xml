@@ -15,6 +15,7 @@
             android:label="@string/title_activity_main"
             android:theme="@style/AppTheme.NoActionBarLaunch"
             android:launchMode="singleTask"
+            android:windowSoftInputMode="adjustPan|stateHidden"
             android:exported="true">
 
             <intent-filter>
@@ -22,9 +23,21 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
 
-                android:windowSoftInputMode="adjustPan|stateHidden"
-        android:fitsSystemWindows="true"
-    </activity>
+            <!--
+              Regreso del inicio de sesión con Google (Supabase Auth):
+              com.kingofmusic.app://login-callback?code=…
+              Debe coincidir con NATIVE_AUTH_REDIRECT (src/lib/native.ts) y
+              con las Redirect URLs del proyecto en Supabase.
+            -->
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data
+                    android:scheme="@string/custom_url_scheme"
+                    android:host="login-callback" />
+            </intent-filter>
+        </activity>
 
         <provider
             android:name="androidx.core.content.FileProvider"
