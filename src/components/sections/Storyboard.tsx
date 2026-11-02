@@ -331,6 +331,16 @@ const flipTransition = {
         />
 
         {/* ===============================================
+            SINOPSIS
+            =============================================== */}
+
+        <div className="story__synopsis">
+          {storyIntro.synopsis.map((paragraph) => (
+            <p key={paragraph.slice(0, 24)}>{paragraph}</p>
+          ))}
+        </div>
+
+        {/* ===============================================
             VISOR DE PÁGINAS
             =============================================== */}
 

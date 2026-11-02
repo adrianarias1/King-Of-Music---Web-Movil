@@ -44,6 +44,31 @@
   z-index: 2;
 }
 
+/* Sinopsis: dos párrafos justificados bajo el encabezado.
+   La separación silábica (hyphens) evita huecos grandes entre
+   palabras al justificar en pantallas estrechas. */
+.story__synopsis {
+  display: grid;
+  gap: 1rem;
+  max-width: 68ch;
+  margin-top: calc(clamp(2rem, 5vw, 3.5rem) * -0.4);
+  color: #3a3a3a;
+  font-size: var(--fs-body);
+  line-height: var(--lh-body);
+  text-align: justify;
+  text-justify: inter-word;
+  hyphens: auto;
+  -webkit-hyphens: auto;
+}
+
+@media (min-width: 900px) {
+  .story__synopsis {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: clamp(1.5rem, 3vw, 3rem);
+    max-width: none;
+  }
+}
+
 
 /* =========================================================
    2. DEGRADADO INFERIOR — BLANCO A NEGRO

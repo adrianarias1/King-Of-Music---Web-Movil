@@ -122,4 +122,9 @@ export const storyboardPages: StoryboardPage[] = [
 export const storyIntro = {
   title: 'Historia',
   lead: 'En un México alternativo, el Torneo del Bienestar convierte cada derrota en la pérdida de un género musical.',
+  /** Sinopsis tomada del apartado "Historia del videojuego" del documento. */
+  synopsis: [
+    'En este universo alternativo, el gobierno considera que la existencia de una gran cantidad de géneros musicales ha provocado una división entre generaciones y regiones del país. Como solución a esta situación se anuncia un evento nacional denominado “Torneo del Bienestar”, presentado inicialmente como un espectáculo destinado a celebrar la cultura mexicana.',
+    'La competencia parece inicialmente un espectáculo musical convencional. Sin embargo, los participantes descubren que las reglas son mucho más macabras de lo que imaginaban: cada artista representa la existencia de su género musical y, cuando un participante es derrotado, el género al que representa es vetado de este México alternativo.',
+  ],
 } as const
