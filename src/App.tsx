@@ -1,5 +1,5 @@
 
-import { lazy, Suspense, useState } from 'react'
+import { lazy, Suspense, useCallback, useState } from 'react'
 
 import {
   heroAsset,
@@ -36,6 +36,8 @@ import { TeamSection } from './components/sections/Team'
 import { DownloadCTA } from './components/sections/DownloadCTA'
 import { ReviewsDock } from './features/reviews/Reviews'
 import { Login } from './features/auth/Login'
+import { Account } from './features/auth/Account'
+import { useAuth } from './features/auth/authContext'
 
 // Manejo de errores
 import { ErrorBoundary } from './components/ui/ErrorBoundary'
@@ -78,7 +80,17 @@ function SectionFallback() {
 // =========================================================
 
 export default function App() {
+  // Un solo botón de cuenta: sin sesión abre "Iniciar sesión";
+  // con sesión abre el panel de la cuenta.
+  const { status } = useAuth()
   const [loginOpen, setLoginOpen] = useState(false)
+  const [accountOpen, setAccountOpen] = useState(false)
+  const openAccount = useCallback(() => {
+    if (status === 'signed_in') setAccountOpen(true)
+    else setLoginOpen(true)
+  }, [status])
+  const closeLogin = useCallback(() => setLoginOpen(false), [])
+  const closeAccount = useCallback(() => setAccountOpen(false), [])
   return (
     <>
       {/* Accesibilidad: salto al contenido principal */}
@@ -89,7 +101,7 @@ export default function App() {
 
       {/* Navegación superior */}
 
-      <Header onLogin={() => setLoginOpen(true)} />
+      <Header onLogin={openAccount} />
 
       <main id="contenido">
 
@@ -189,7 +201,8 @@ export default function App() {
       {/* Reseñas: botón flotante fijo fuera del recorrido principal */}
       <ReviewsDock />
 
-      <Login open={loginOpen} onClose={() => setLoginOpen(false)} />
+      <Login open={loginOpen} onClose={closeLogin} />
+      <Account open={accountOpen && status === 'signed_in'} onClose={closeAccount} />
     </>
   )
 }

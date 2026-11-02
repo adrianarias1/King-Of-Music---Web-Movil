@@ -5,6 +5,7 @@ import { createRoot } from 'react-dom/client'
 import { Capacitor } from '@capacitor/core'
 import { registerSW } from 'virtual:pwa-register'
 import App from './App'
+import { AuthProvider } from './features/auth/AuthProvider'
 import './styles/index.css'
 
 document.documentElement.classList.toggle('android-app', Capacitor.getPlatform() === 'android')
@@ -21,6 +22,8 @@ if (!container) {
 
 createRoot(container).render(
   <StrictMode>
-    <App />
+    <AuthProvider>
+      <App />
+    </AuthProvider>
   </StrictMode>,
 )

@@ -31,6 +31,8 @@ import { useBodyScrollLock } from '../../hooks/useBodyScrollLock'
 import { useDialog } from '../../hooks/useDialog'
 import { useScrolledPast } from '../../hooks/useScrolledPast'
 
+import { useAuth } from '../../features/auth/authContext'
+
 import './Header.css'
 
 // =========================================================
@@ -61,6 +63,13 @@ import './Header.css'
 
 export function Header({ onLogin }: { onLogin: () => void }) {
   const loginAfterMenu = useRef(false)
+
+  // Con sesión iniciada el botón muestra el primer nombre y abre el
+  // panel de la cuenta; sin sesión abre el diálogo de inicio de sesión.
+  const { status, profile } = useAuth()
+  const signedIn = status === 'signed_in' && Boolean(profile)
+  const accountLabel = signedIn ? profile?.firstName ?? 'Mi cuenta' : 'Iniciar sesión'
+  const accountDialogId = signedIn ? 'account-dialog' : 'login-dialog'
   // =====================================================
   // 1. ESTADOS
   // =====================================================
@@ -270,11 +279,12 @@ const overlayTransition = {
             type="button"
             onClick={onLogin}
             aria-haspopup="dialog"
-            aria-controls="login-dialog"
+            aria-controls={accountDialogId}
+            aria-label={signedIn ? `Cuenta de ${accountLabel}` : undefined}
             tabIndex={menuOpen ? -1 : undefined}
           >
             <UserRound size={18} aria-hidden="true" />
-            Iniciar sesión
+            <span className="site-header__login-name">{accountLabel}</span>
           </button>
 
           {/* Descargar */}
@@ -519,11 +529,11 @@ const overlayTransition = {
                       className="mobile-menu__link mobile-menu__login"
                       type="button"
                       aria-haspopup="dialog"
-                      aria-controls="login-dialog"
+                      aria-controls={accountDialogId}
                       onClick={() => { loginAfterMenu.current = true; closeMenu() }}
                     >
                       <UserRound size={18} aria-hidden="true" />
-                      <span className="mobile-menu__link-label">Iniciar sesión</span>
+                      <span className="mobile-menu__link-label">{signedIn ? `Cuenta · ${accountLabel}` : 'Iniciar sesión'}</span>
                       <ArrowUpRight className="mobile-menu__arrow" size={18} aria-hidden="true" />
                     </button>
                   </li>

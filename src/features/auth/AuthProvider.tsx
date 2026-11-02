@@ -1,0 +1,247 @@
+import { useCallback, useEffect, useMemo, useState } from 'react'
+import type { ReactNode } from 'react'
+import type { Session, User } from '@supabase/supabase-js'
+import { Capacitor } from '@capacitor/core'
+
+import { supabase } from '../../lib/supabase'
+import { AuthContext } from './authContext'
+import type { AuthContextValue, AuthStatus, Profile, SessionInfo } from './authContext'
+import { SESSION_MAX_AGE_DAYS } from './sessionPolicy'
+
+/* ==========================================================================
+   KING OF MUSIC — Proveedor de sesión (Supabase Auth + Google)
+   --------------------------------------------------------------------------
+   Flujo:
+     1. signInWithGoogle() redirige a Google (OAuth, PKCE).
+     2. Google regresa a esta misma página con ?code=…
+     3. supabase-js canjea el código por la sesión (detectSessionInUrl).
+        - Si es la primera vez, Supabase crea el usuario en auth.users y el
+          trigger on_auth_user_created crea su fila en public.profiles.
+        - El trigger on_auth_session_change registra la sesión en
+          public.user_sessions.
+     4. onAuthStateChange actualiza la interfaz (nombre en el header).
+
+   La sesión vive en localStorage ("kom-auth"); el access token dura 1 h y
+   se renueva solo. El servidor cierra sesiones vencidas (ver
+   sessionPolicy.ts).
+   ========================================================================== */
+
+const DAY_MS = 24 * 60 * 60 * 1000
+
+/** Lee el session_id del access token (JWT) sin validarlo: solo para UI. */
+function sessionIdFromToken(token: string): string | null {
+  try {
+    const payload = token.split('.')[1]
+    if (!payload) return null
+    const json = atob(payload.replace(/-/g, '+').replace(/_/g, '/'))
+    const data = JSON.parse(json) as { session_id?: unknown }
+    return typeof data.session_id === 'string' ? data.session_id : null
+  } catch {
+    return null
+  }
+}
+
+/** Perfil a partir de los metadatos de Google, mientras llega el de la BD. */
+function profileFromUser(user: User): Profile {
+  const meta = (user.user_metadata ?? {}) as Record<string, unknown>
+  const text = (value: unknown) => (typeof value === 'string' ? value.trim() : '')
+  const fullName = text(meta.full_name) || text(meta.name) || ''
+  const firstName = text(meta.given_name) || fullName.split(/\s+/)[0] || ''
+  return {
+    firstName: firstName || (user.email ?? '').split('@')[0] || 'Cuenta',
+    fullName: fullName || firstName,
+    email: user.email ?? '',
+    avatarUrl: text(meta.avatar_url) || text(meta.picture) || null,
+  }
+}
+
+/** Lee y limpia de la URL los parámetros que deja el regreso de OAuth. */
+function consumeOAuthParams(): string | null {
+  const url = new URL(window.location.href)
+  const hash = new URLSearchParams(url.hash.replace(/^#/, ''))
+  const error =
+    url.searchParams.get('error_description') ??
+    hash.get('error_description') ??
+    url.searchParams.get('error') ??
+    null
+
+  const keys = ['code', 'error', 'error_code', 'error_description', 'state']
+  const hadParams = keys.some((key) => url.searchParams.has(key)) || hash.has('error')
+  if (hadParams) {
+    keys.forEach((key) => url.searchParams.delete(key))
+    if (hash.has('error')) url.hash = ''
+    window.history.replaceState(window.history.state, '', url.toString())
+  }
+  return error
+}
+
+function friendlyError(raw: string): string {
+  if (/provider is not enabled|Unsupported provider/i.test(raw)) {
+    return 'El inicio de sesión con Google todavía no está activado en el servidor.'
+  }
+  if (/access_denied|denied/i.test(raw)) {
+    return 'Cancelaste el inicio de sesión con Google.'
+  }
+  return 'No se pudo iniciar sesión con Google. Inténtalo de nuevo.'
+}
+
+export function AuthProvider({ children }: { children: ReactNode }) {
+  const [status, setStatus] = useState<AuthStatus>('loading')
+  const [session, setSession] = useState<Session | null>(null)
+  const [dbProfile, setDbProfile] = useState<{ userId: string; profile: Profile } | null>(null)
+  const [sessionInfo, setSessionInfo] = useState<SessionInfo | null>(null)
+  const [error, setError] = useState<string | null>(null)
+
+  const isNative = Capacitor.isNativePlatform()
+  const user = session?.user ?? null
+
+  // ---------------------------------------------------------------------
+  // 1. Sesión inicial + suscripción a cambios
+  // ---------------------------------------------------------------------
+  useEffect(() => {
+    let alive = true
+
+    // getSession espera a que supabase-js termine de canjear ?code=.
+    supabase.auth.getSession().then(({ data, error: sessionError }) => {
+      if (!alive) return
+      const urlError = consumeOAuthParams()
+      const message = urlError ?? sessionError?.message
+      if (message) setError(friendlyError(message))
+      setSession(data.session)
+      setStatus(data.session ? 'signed_in' : 'signed_out')
+    })
+
+    const { data: listener } = supabase.auth.onAuthStateChange((_event, next) => {
+      if (!alive) return
+      setSession(next)
+      setStatus(next ? 'signed_in' : 'signed_out')
+      if (!next) {
+        setDbProfile(null)
+        setSessionInfo(null)
+      }
+    })
+
+    return () => {
+      alive = false
+      listener.subscription.unsubscribe()
+    }
+  }, [])
+
+  // ---------------------------------------------------------------------
+  // 2. Perfil y datos de la sesión desde la base de datos (RLS: solo propios)
+  // ---------------------------------------------------------------------
+  const userId = user?.id
+  const accessToken = session?.access_token
+
+  useEffect(() => {
+    if (!userId || !accessToken) return undefined
+    let alive = true
+
+    // Supabase recomienda no llamar a la API dentro de onAuthStateChange;
+    // por eso se hace en un efecto aparte.
+    const load = async () => {
+      const { data: row } = await supabase
+        .from('profiles')
+        .select('first_name, full_name, email, avatar_url')
+        .eq('id', userId)
+        .maybeSingle()
+
+      if (alive && row) {
+        setDbProfile({
+          userId,
+          profile: {
+            firstName: row.first_name ?? '',
+            fullName: row.full_name ?? '',
+            email: row.email ?? '',
+            avatarUrl: row.avatar_url ?? null,
+          },
+        })
+      }
+
+      const sessionId = sessionIdFromToken(accessToken)
+      if (!sessionId) return
+      const { data: info } = await supabase
+        .from('user_sessions')
+        .select('created_at, last_active_at')
+        .eq('id', sessionId)
+        .maybeSingle()
+
+      if (alive && info) {
+        setSessionInfo({
+          startedAt: info.created_at,
+          lastActiveAt: info.last_active_at,
+          maxAgeAt: new Date(
+            Date.parse(info.created_at) + SESSION_MAX_AGE_DAYS * DAY_MS,
+          ).toISOString(),
+        })
+      }
+    }
+
+    void load()
+    return () => {
+      alive = false
+    }
+  }, [userId, accessToken])
+
+  // El perfil de la BD manda; si aún no llega, se usan los metadatos.
+  const profile = useMemo<Profile | null>(() => {
+    if (!user) return null
+    const fallback = profileFromUser(user)
+    const fromDb = dbProfile?.userId === user.id ? dbProfile.profile : null
+    if (!fromDb) return fallback
+    return {
+      firstName: fromDb.firstName || fallback.firstName,
+      fullName: fromDb.fullName || fallback.fullName,
+      email: fromDb.email || fallback.email,
+      avatarUrl: fromDb.avatarUrl ?? fallback.avatarUrl,
+    }
+  }, [user, dbProfile])
+
+  // ---------------------------------------------------------------------
+  // 3. Acciones
+  // ---------------------------------------------------------------------
+  const signInWithGoogle = useCallback(async () => {
+    setError(null)
+    // Regresa a la misma página (respeta base './' y subcarpetas).
+    const redirectTo = `${window.location.origin}${window.location.pathname}`
+    const { error: oauthError } = await supabase.auth.signInWithOAuth({
+      provider: 'google',
+      options: {
+        redirectTo,
+        // Permite elegir cuenta aunque haya una sesión de Google abierta.
+        queryParams: { prompt: 'select_account' },
+      },
+    })
+    if (oauthError) setError(friendlyError(oauthError.message))
+  }, [])
+
+  const signOut = useCallback(async () => {
+    // scope 'local': cierra solo este dispositivo. El trigger marca la
+    // sesión como terminada en public.user_sessions.
+    const { error: signOutError } = await supabase.auth.signOut({ scope: 'local' })
+    if (signOutError) {
+      // Aunque falle la red, se limpia la sesión local.
+      await supabase.auth.signOut({ scope: 'local' }).catch(() => undefined)
+    }
+  }, [])
+
+  const clearError = useCallback(() => setError(null), [])
+
+  const value = useMemo<AuthContextValue>(
+    () => ({
+      status,
+      session,
+      user,
+      profile,
+      sessionInfo: user ? sessionInfo : null,
+      error,
+      isNative,
+      signInWithGoogle,
+      signOut,
+      clearError,
+    }),
+    [status, session, user, profile, sessionInfo, error, isNative, signInWithGoogle, signOut, clearError],
+  )
+
+  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>
+}

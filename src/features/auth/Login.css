@@ -19,3 +19,30 @@
 @media (min-width: 1024px) { .site-header__login { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 44px; padding: 8px 12px; color: #e3c57b; border: 1px solid #c5a45b66; border-radius: 4px; font-size: .8rem; white-space: nowrap; cursor: pointer; } .site-header__login:hover { background: #c5a45b15; } }
 
 .mobile-menu__login { cursor: pointer; text-align: left; font: inherit; }
+
+/* ---------------------------------------------------------
+   Botón del header con sesión iniciada (nombre del usuario)
+   --------------------------------------------------------- */
+.site-header__login-name { max-width: 12ch; overflow: hidden; text-overflow: ellipsis; }
+.login-dialog__google:disabled { opacity: .65; cursor: wait; }
+
+/* ---------------------------------------------------------
+   Panel de la cuenta
+   --------------------------------------------------------- */
+.account__avatar { display: grid; place-items: center; width: 72px; height: 72px; margin: 4px auto 18px; overflow: hidden; border: 1px solid #c5a45b80; border-radius: 50%; background: #c5a45b18; color: #e3c57b; font-family: var(--font-display); font-size: 1.9rem; }
+.account__avatar img { width: 100%; height: 100%; object-fit: cover; }
+.account__identity { display: grid; gap: 4px; color: #b5b5b5; font-size: .85rem; line-height: 1.5; overflow-wrap: anywhere; }
+.account__identity strong { color: #eee; font-weight: 500; }
+.account__session { display: grid; gap: 10px; margin: 22px 0 0; padding: 16px; text-align: left; background: #ffffff06; border: 1px solid #ffffff14; border-radius: 6px; }
+.account__session div { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+.account__session dt { color: #999; font-size: .7rem; letter-spacing: .12em; text-transform: uppercase; }
+.account__session dd { margin: 0; color: #ddd; font-size: .8rem; }
+.account__session-note { color: #8f8f8f; font-size: .72rem; line-height: 1.5; }
+.account__note { margin-top: 22px; color: #b5b5b5; font-size: .85rem; line-height: 1.6; }
+.account__google, .account__signout { display: flex; align-items: center; justify-content: center; gap: 10px; width: 100%; min-height: 48px; padding: 12px; font: inherit; font-size: .85rem; font-weight: 600; border-radius: 4px; cursor: pointer; transition: background-color 200ms ease, color 200ms ease, border-color 200ms ease; }
+.account__google { margin-top: 14px; color: #14100a; background: #c5a45b; border: 1px solid #c5a45b; }
+.account__google:hover { background: #e3c57b; }
+.account__signout { margin-top: 10px; color: #eee; background: transparent; border: 1px solid #ffffff30; }
+.account__signout:hover { color: #ffaaa1; border-color: #ffaaa160; }
+.account__signout:disabled { opacity: .6; cursor: wait; }
+.login-dialog .account__google:focus-visible, .login-dialog .account__signout:focus-visible { outline: 2px solid #e3c57b; outline-offset: 3px; }
