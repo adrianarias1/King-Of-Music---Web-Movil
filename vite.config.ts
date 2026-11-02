@@ -37,7 +37,10 @@ export default defineConfig({
       },
       workbox: {
         globPatterns: ['**/*.{js,css,html,ico,png,svg,webp,jpg,jpeg,woff2,json,webmanifest}'],
-        globIgnores: ['**/*.glb'],
+        // Storyboard e ilustraciones de personajes son pesadas y no hacen
+        // falta para arrancar: se excluyen de la precarga y se guardan en
+        // caché la primera vez que el usuario las ve (runtimeCaching).
+        globIgnores: ['**/*.glb', 'images/storyboard/**', 'images/characters/**'],
         maximumFileSizeToCacheInBytes: 8 * 1024 * 1024,
         cleanupOutdatedCaches: true,
         skipWaiting: true,
@@ -47,6 +50,14 @@ export default defineConfig({
           {
             urlPattern: /^https:\/\/pub-635f10d16c96474cb14af54616e8ce39\.r2\.dev\/models\/characters\/.*\.glb(?:\?.*)?$/i,
             handler: 'NetworkOnly',
+          },
+          {
+            urlPattern: /\/images\/(?:storyboard|characters)\/[^?]+\.(?:webp|png|jpe?g)(?:\?.*)?$/i,
+            handler: 'CacheFirst',
+            options: {
+              cacheName: 'kom-artwork',
+              expiration: { maxEntries: 60, maxAgeSeconds: 60 * 60 * 24 * 30 },
+            },
           },
         ],
       },

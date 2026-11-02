@@ -29,6 +29,7 @@ import {
 } from '../../data/storyboard'
 
 import { SmartImage } from '../ui/SmartImage'
+import { assetExists } from '../../utils/assets'
 import { SectionHeading } from '../ui/SectionHeading'
 
 import './Storyboard.css'
@@ -117,6 +118,20 @@ export function Storyboard() {
   const turningFrom = pageTurn
     ? storyboardPages[pageTurn.from]
     : undefined
+
+  // Precarga la página anterior y la siguiente: al pasar la hoja la
+  // imagen ya está en caché y no aparece el placeholder intermedio.
+  useEffect(() => {
+    for (const offset of [1, -1]) {
+      const src = storyboardPages[safePage + offset]?.image
+      if (!src) continue
+      void assetExists(src)
+      const img = new Image()
+      img.decoding = 'async'
+      // Misma URL que usa SmartImage para aprovechar la caché.
+      img.src = src
+    }
+  }, [safePage])
 
   // =====================================================
   // 3. NAVEGACIÓN
@@ -535,6 +550,12 @@ const flipTransition = {
               <div className="story__details-heading">
 
                 <span className="story__details-index label">
+                  {current?.scene ? (
+                    <>
+                      ESCENA {String(current.scene).padStart(2, '0')}
+                      {' · '}
+                    </>
+                  ) : null}
                   PÁGINA{' '}
                   {String(
                     safePage + 1,

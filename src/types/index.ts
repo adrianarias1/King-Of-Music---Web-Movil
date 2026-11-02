@@ -89,6 +89,8 @@ export interface SocialLink {
 /** Página del storyboard / cómic. */
 export interface StoryboardPage {
   id: string
+  /** Número de escena del documento del proyecto. */
+  scene?: number
   /** Título o pie de viñeta. */
   caption: string
   /** Ruta a la imagen de la página. Placeholder si no existe. */
