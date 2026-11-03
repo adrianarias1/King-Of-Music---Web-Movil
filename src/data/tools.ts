@@ -69,14 +69,31 @@ export const tools: Tool[] = [
 
 /* ==========================================================================
    GALERIA DE DESARROLLO
-   Colocar capturas en public/images/dev/
+   Capturas reales del proceso en public/images/dev/ (WebP 1280 x 800,
+   recortadas a 16:10 para los recuadros de la galería).
    ========================================================================== */
 
 export const devShots: DevShot[] = [
-  { id: 'shot-01', caption: 'Concept art y storyboard en Krita', image: '/images/dev/shot-01.jpg' },
-  { id: 'shot-02', caption: 'Modelado de personaje en Blender', image: '/images/dev/shot-02.jpg' },
-  { id: 'shot-03', caption: 'Rigging y animación base con Mixamo', image: '/images/dev/shot-03.jpg' },
-  { id: 'shot-04', caption: 'Pruebas de combate en Unity', image: '/images/dev/shot-04.jpg' },
+  {
+    id: 'krita-escenario-la-madrugadora',
+    caption: 'Edición del escenario La Madrugadora en Krita',
+    image: '/images/dev/krita-escenario-la-madrugadora.webp',
+  },
+  {
+    id: 'blender-esculpido-personaje',
+    caption: 'Esculpido de personaje en Blender',
+    image: '/images/dev/blender-esculpido-personaje.webp',
+  },
+  {
+    id: 'blender-rigging-personajes',
+    caption: 'Rigging y animación del roster en Blender',
+    image: '/images/dev/blender-rigging-personajes.webp',
+  },
+  {
+    id: 'unity-prueba-de-combate',
+    caption: 'Prueba de combate en Unity: Juan Grabriel vs. José José José',
+    image: '/images/dev/unity-prueba-de-combate.webp',
+  },
 ]
 
 /* ==========================================================================
