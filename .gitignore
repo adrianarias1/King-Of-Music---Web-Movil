@@ -32,6 +32,8 @@ android/keystore.properties
 release/
 *.apk
 *.glb
+# Modelos optimizados del visor (texturas 2048 px, ~22 MB en total).
+!public/models/characters/*.glb
 
 # NOT ignored on purpose (checked in once generated):
 # android/  -> Capacidad Android nativo generado por Capacitor

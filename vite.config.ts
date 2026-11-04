@@ -1,6 +1,7 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 import { VitePWA } from 'vite-plugin-pwa'
+import { MODELS_CACHE } from './src/modelsVersion.ts'
 
 // https://vite.dev/config/
 export default defineConfig({
@@ -48,8 +49,16 @@ export default defineConfig({
         navigateFallback: 'index.html',
         runtimeCaching: [
           {
-            urlPattern: /^https:\/\/pub-635f10d16c96474cb14af54616e8ce39\.r2\.dev\/models\/characters\/.*\.glb(?:\?.*)?$/i,
-            handler: 'NetworkOnly',
+            // Modelos 3D: se sirven desde la caché aunque no haya internet.
+            // La página los precarga en esta misma caché al abrirse
+            // (src/lib/modelCache.ts). La versión va en la URL (?v=…).
+            urlPattern: /\/models\/characters\/[^/?]+\.glb(?:\?.*)?$/i,
+            handler: 'CacheFirst',
+            options: {
+              cacheName: MODELS_CACHE,
+              cacheableResponse: { statuses: [200] },
+              matchOptions: { ignoreVary: true },
+            },
           },
           {
             urlPattern: /\/images\/(?:storyboard|characters)\/[^?]+\.(?:webp|png|jpe?g)(?:\?.*)?$/i,

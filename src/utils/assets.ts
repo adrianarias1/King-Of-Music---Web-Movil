@@ -1,3 +1,5 @@
+import { MODELS_VERSION } from '../modelsVersion'
+
 /**
  * Resuelve rutas de assets de forma compatible con:
  *  - dev server de Vite (http://localhost:5173)
@@ -9,9 +11,12 @@
 export function assetUrl(path: string): string {
   if (/^(https?:)?\/\//.test(path) || path.startsWith('data:')) return path
   if (path.startsWith('/models/characters/')) {
-    const r2Base = (import.meta.env.VITE_R2_PUBLIC_BASE_URL ||
-      'https://pub-635f10d16c96474cb14af54616e8ce39.r2.dev').replace(/\/+$/, '')
-    return `${r2Base}${path}`
+    // Los modelos viven en el propio sitio (public/models/characters) y
+    // también se empaquetan dentro del APK. Opcionalmente pueden servirse
+    // desde otro origen con VITE_MODELS_BASE_URL.
+    const external = (import.meta.env.VITE_MODELS_BASE_URL || '').replace(/\/+$/, '')
+    const local = `${import.meta.env.BASE_URL || '/'}${path.slice(1)}`
+    return `${external ? `${external}${path}` : local}?v=${MODELS_VERSION}`
   }
   const base = import.meta.env.BASE_URL || '/'
   const normalized = path.startsWith('/') ? path.slice(1) : path

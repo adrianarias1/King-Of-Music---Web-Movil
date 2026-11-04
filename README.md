@@ -79,7 +79,17 @@ En Chrome o Edge de Windows, abre el sitio desplegado por HTTPS y usa el icono *
 
 ### Anadir un modelo GLB
 
-Subir el archivo a Cloudflare R2 bajo `models/characters/nombre.glb`. Actualizar la ruta conservando `/models/characters/nombre.glb` en `src/data/characters.ts`. `assetUrl()` resuelve estas rutas al bucket público de R2; la URL base se puede sustituir con `VITE_R2_PUBLIC_BASE_URL`. El visor carga los modelos de forma diferida y permite reintentar una descarga fallida.
+1. Optimizar el modelo (texturas a 2048 px; suele bajar de ~30–40 MB a ~2–6 MB):
+   `python3 scripts/optimize-glb.py original.glb public/models/characters/nombre.glb`
+2. Usar la ruta `/models/characters/nombre.glb` en `src/data/characters.ts`.
+3. Si se reemplaza un modelo existente, cambiar `MODELS_VERSION` en `src/modelsVersion.ts`.
+
+Los modelos se publican con el sitio y van dentro del APK. En la web, al abrir la
+página se guardan en la caché sin conexión (`src/lib/modelCache.ts` + regla
+`CacheFirst` del service worker en `vite.config.ts`), salvo con ahorro de datos
+o 2G. Así el visor cambia de personaje sin volver a descargar y funciona sin
+internet. Opcionalmente se pueden servir desde otro origen con
+`VITE_MODELS_BASE_URL`.
 
 ### Anadir una habilidad
 

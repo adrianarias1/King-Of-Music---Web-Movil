@@ -19,13 +19,17 @@ interface Entry {
 const entries = new Map<string, Entry>()
 let accessClock = 0
 
+// Modelos ya interpretados que se conservan en memoria (GPU). Con las
+// texturas optimizadas a 2048 px cada modelo ocupa ~1/4 de lo que ocupaba
+// con 4096 px. Los demás se vuelven a interpretar desde la caché del
+// navegador (sin descargar).
 function cacheLimit(): number {
   if (typeof navigator === 'undefined') return 2
 
   const device = navigator as Navigator & { deviceMemory?: number }
   const mobile = /android|iphone|ipad|ipod/i.test(navigator.userAgent)
-  if (mobile) return device.deviceMemory && device.deviceMemory <= 2 ? 1 : 2
-  return device.deviceMemory && device.deviceMemory >= 8 ? 3 : 2
+  if (mobile) return device.deviceMemory && device.deviceMemory <= 2 ? 2 : 3
+  return device.deviceMemory && device.deviceMemory >= 8 ? 6 : 4
 }
 
 function cacheKey(path: string): string {
@@ -113,7 +117,7 @@ export function retainModel(path: string, scene: Object3D): () => void {
   }
 }
 
-/** Preloads only caller-selected URLs; GLB requests remain outside Workbox. */
+/** Interpreta por adelantado un modelo (el archivo sale de la caché del SW si ya está guardado). */
 export function preloadModel(path: string): void {
   const url = cacheKey(path)
   if (isModelPrepared(path)) return
