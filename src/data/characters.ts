@@ -98,6 +98,7 @@ export const characters: Character[] = [
     tagline: 'Corridos tumbados',
     description:
       'Combatiente rápido y ágil especializado en ataques consecutivos y movimientos capaces de sorprender al rival.',
+    model: '/models/characters/NatanaelChano.glb',
     preview: '/images/characters/natanael-chano.png',
     scale: 0.95,
     cameraPosition: [0, 1.05, 3.1],
