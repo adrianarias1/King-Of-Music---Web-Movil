@@ -1,6 +1,7 @@
 
 import {
-  motion,
+  animate,
+  useMotionValue,
   useReducedMotion,
 } from 'motion/react'
 
@@ -20,7 +21,7 @@ import {
 
 import type {
   KeyboardEvent,
-  TouchEvent,
+  PointerEvent as ReactPointerEvent,
 } from 'react'
 
 import {
@@ -29,21 +30,23 @@ import {
 } from '../../data/storyboard'
 
 import { SmartImage } from '../ui/SmartImage'
+import { StoryPageTurn } from './StoryPageTurn'
 import { assetExists } from '../../utils/assets'
 import { SectionHeading } from '../ui/SectionHeading'
 
 import './Storyboard.css'
 
 // =========================================================
-// KING OF MUSIC — STORYBOARD CINEMATOGRÁFICO V3
-//
-// NOVEDADES:
+// KING OF MUSIC — STORYBOARD CINEMATOGRÁFICO V4
 //
 // 1. Flechas flotantes dentro del visor 16:9.
-// 2. Giro tridimensional en ambas direcciones.
-// 3. Desvanecimiento progresivo al terminar el giro.
-// 4. La nueva página permanece visible bajo la hoja.
-// 5. Navegación con teclado, botones y swipe.
+// 2. Hoja con curvatura real (StoryPageTurn): la esquina se
+//    levanta primero, el papel se dobla y se aplana al final.
+// 3. Luz y sombra según el ángulo, sombra proyectada sobre
+//    la página de abajo y sombra del lomo.
+// 4. La hoja se puede arrastrar con el dedo o el mouse; al
+//    soltar termina de pasar o regresa con un resorte.
+// 5. Navegación con teclado, flechas y arrastre.
 // 6. Bloqueo de navegación durante las transiciones.
 // 7. Compatibilidad con movimiento reducido.
 //
@@ -53,8 +56,20 @@ import './Storyboard.css'
 // src/data/storyboard.ts
 // =========================================================
 
-// Duración total de la transición en segundos.
-const FLIP_DURATION = 0.95
+// Duración del giro automático (flechas y teclado), en segundos.
+const FLIP_DURATION = 1.05
+
+// Curva del giro automático: arranca despacio (se levanta la esquina),
+// acelera a la mitad y se asienta suavemente.
+const FLIP_EASE: [number, number, number, number] = [0.42, 0.02, 0.16, 1]
+
+// Al soltar la hoja arrastrada, termina o regresa con un resorte.
+const RELEASE_SPRING = { type: 'spring' as const, stiffness: 190, damping: 27, restDelta: 0.0008 }
+
+// Arrastre: distancia mínima para empezar y umbrales para completar.
+const DRAG_START_PX = 10
+const COMMIT_PROGRESS = 0.38
+const COMMIT_VELOCITY = 0.9
 
 // 1 = avanzar, -1 = retroceder.
 type Direction = -1 | 1
@@ -63,6 +78,8 @@ interface PageTurn {
   from: number
   to: number
   direction: Direction
+  /** auto = flechas/teclado; drag = el usuario sostiene la hoja. */
+  mode: 'auto' | 'drag'
 }
 
 export function Storyboard() {
@@ -78,9 +95,18 @@ export function Storyboard() {
     useState<PageTurn | null>(null)
   const [imageExpanded, setImageExpanded] = useState(false)
 
-  const touchStart = useRef<{
+  // Avance del giro (0 → 1) compartido por la hoja y sus sombras.
+  const progress = useMotionValue(0)
+
+  const viewportRef = useRef<HTMLDivElement>(null)
+
+  // Estado del arrastre con dedo o mouse.
+  const drag = useRef<{
+    pointerId: number
     x: number
     y: number
+    active: boolean
+    direction: Direction | null
   } | null>(null)
 
   useEffect(() => {
@@ -162,6 +188,7 @@ export function Storyboard() {
         from: safePage,
         to: target,
         direction,
+        mode: 'auto',
       })
     },
     [pageTurn, total, safePage, reduced, imageExpanded],
@@ -176,18 +203,36 @@ export function Storyboard() {
   }, [navigate])
 
   // =====================================================
-  // 4. FINALIZAR EL GIRO
+  // 4. GIRO AUTOMÁTICO Y FINALIZACIÓN
   //
-  // La hoja terminará con opacidad cero.
-  // Así podrá retirarse sin generar un corte visible.
+  // commit = true  → la hoja terminó de pasar.
+  // commit = false → el usuario la soltó antes y regresó.
   // =====================================================
 
-  const finishTurn = useCallback(() => {
-    if (!pageTurn) return
-
-    setCurrentPage(pageTurn.to)
-    setPageTurn(null)
+  // Giro en curso, legible desde callbacks de animación ya registrados.
+  const turnRef = useRef<PageTurn | null>(null)
+  useEffect(() => {
+    turnRef.current = pageTurn
   }, [pageTurn])
+
+  const finishTurn = useCallback(
+    (commit: boolean) => {
+      const turn = turnRef.current
+      if (turn && commit) setCurrentPage(turn.to)
+      turnRef.current = null
+      setPageTurn(null)
+      progress.jump(0)
+    },
+    [progress],
+  )
+
+  useEffect(() => {
+    if (!pageTurn || pageTurn.mode !== 'auto') return undefined
+    progress.jump(0)
+    const controls = animate(progress, 1, { duration: FLIP_DURATION, ease: FLIP_EASE })
+    void controls.then(() => finishTurn(true))
+    return () => controls.stop()
+  }, [pageTurn, progress, finishTurn])
 
   // =====================================================
   // 5. NAVEGACIÓN CON TECLADO
@@ -208,48 +253,81 @@ export function Storyboard() {
   }
 
   // =====================================================
-  // 6. GESTOS TÁCTILES
+  // 6. ARRASTRAR LA HOJA (dedo o mouse)
+  //
+  // La hoja sigue al puntero. Al soltar, si se pasó lo
+  // suficiente (o se soltó con impulso) termina de pasar;
+  // si no, regresa a su lugar. El scroll vertical de la
+  // página no se bloquea (touch-action: pan-y).
   // =====================================================
 
-  const handleTouchStart = (
-    event: TouchEvent<HTMLDivElement>,
-  ) => {
-    const touch = event.touches[0]
-
-    if (!touch || turning) return
-
-    touchStart.current = {
-      x: touch.clientX,
-      y: touch.clientY,
-    }
+  const handlePointerDown = (event: ReactPointerEvent<HTMLDivElement>) => {
+    if (turning || imageExpanded) return
+    if (event.pointerType === 'mouse' && event.button !== 0) return
+    if ((event.target as HTMLElement).closest('button')) return
+    drag.current = { pointerId: event.pointerId, x: event.clientX, y: event.clientY, active: false, direction: null }
   }
 
-  const handleTouchEnd = (
-    event: TouchEvent<HTMLDivElement>,
-  ) => {
-    const start = touchStart.current
-    touchStart.current = null
+  const handlePointerMove = (event: ReactPointerEvent<HTMLDivElement>) => {
+    const state = drag.current
+    if (!state || state.pointerId !== event.pointerId) return
+    const dx = event.clientX - state.x
+    const dy = event.clientY - state.y
 
-    const touch = event.changedTouches[0]
+    if (!state.active) {
+      if (Math.abs(dx) < DRAG_START_PX) return
+      // Gesto vertical: es scroll, se abandona el arrastre.
+      if (Math.abs(dx) < Math.abs(dy) * 1.3) {
+        drag.current = null
+        return
+      }
+      const direction: Direction = dx < 0 ? 1 : -1
+      const target = safePage + direction
+      if (target < 0 || target >= total) {
+        drag.current = null
+        return
+      }
+      state.active = true
+      state.direction = direction
+      event.currentTarget.setPointerCapture(event.pointerId)
+      if (!reduced) {
+        progress.jump(0)
+        const turn: PageTurn = { from: safePage, to: target, direction, mode: 'drag' }
+        turnRef.current = turn
+        setPageTurn(turn)
+      }
+    }
 
-    if (!start || !touch || turning) return
+    if (reduced || !state.direction) return
+    const width = viewportRef.current?.clientWidth || 1
+    // Avanzar = arrastrar a la izquierda; retroceder = a la derecha.
+    const travel = state.direction === 1 ? -dx : dx
+    progress.set(Math.min(1, Math.max(0, travel / (width * 0.85))))
+  }
 
-    const dx = touch.clientX - start.x
-    const dy = touch.clientY - start.y
+  const handlePointerUp = (event: ReactPointerEvent<HTMLDivElement>) => {
+    const state = drag.current
+    drag.current = null
+    if (!state || state.pointerId !== event.pointerId || !state.active || !state.direction) return
+    if (event.currentTarget.hasPointerCapture(event.pointerId)) {
+      event.currentTarget.releasePointerCapture(event.pointerId)
+    }
 
-    // Ignorar desplazamientos pequeños y verticales.
-    if (
-      Math.abs(dx) < 50 ||
-      Math.abs(dx) < Math.abs(dy) * 1.4
-    ) {
+    // Movimiento reducido: el gesto cambia de página sin animación.
+    if (reduced) {
+      navigate(state.direction)
       return
     }
 
-    if (dx > 0) {
-      goPrev()
-    } else {
-      goNext()
-    }
+    const current = progress.get()
+    const velocity = progress.getVelocity()
+    const commit =
+      event.type !== 'pointercancel' &&
+      (current > COMMIT_PROGRESS || velocity > COMMIT_VELOCITY) &&
+      velocity > -COMMIT_VELOCITY
+
+    const controls = animate(progress, commit ? 1 : 0, { ...RELEASE_SPRING, velocity })
+    void controls.then(() => finishTurn(commit))
   }
 
   // =====================================================
@@ -260,52 +338,6 @@ export function Storyboard() {
 
   const canGoNext =
     safePage < total - 1 && !turning
-
-  // =====================================================
-  // 8. CONFIGURACIÓN DEL GIRO SUAVIZADO
-  //
-  // La rotación comienza con la hoja visible.
-  //
-  // Durante la última parte:
-  // - El giro continúa.
-  // - La opacidad disminuye progresivamente.
-  // - La página de destino queda descubierta.
-  //
-  // Al terminar, la hoja ya es invisible y
-  // React puede desmontarla sin un salto brusco.
-  // =====================================================
-
-  const turnAngle: number =
-    pageTurn?.direction === 1 ? -180 : 180
-
-  const flipAnimation = {
-    rotateY: [
-      0,
-      turnAngle * 0.55,
-      turnAngle * 0.86,
-      turnAngle,
-    ],
-
-    opacity: [
-      1,
-      1,
-      0.65,
-      0,
-    ],
-  }
-
-  
-const flipTransition = {
-  duration: FLIP_DURATION,
-  times: [0, 0.6, 0.84, 1],
-  ease: [0.45, 0.05, 0.2, 1] as [
-    number,
-    number,
-    number,
-    number,
-  ],
-}
-
 
   // =====================================================
   // 9. INTERFAZ PRINCIPAL
@@ -348,10 +380,14 @@ const flipTransition = {
           <div className="story__viewer">
 
             <div
-              className="story__viewport"
+              ref={viewportRef}
+              className={`story__viewport${turning ? ' is-turning' : ''}`}
               onKeyDown={handleKeyDown}
-              onTouchStart={handleTouchStart}
-              onTouchEnd={handleTouchEnd}
+              onPointerDown={handlePointerDown}
+              onPointerMove={handlePointerMove}
+              onPointerUp={handlePointerUp}
+              onPointerCancel={handlePointerUp}
+              onDragStart={(event) => event.preventDefault()}
               tabIndex={0}
               role="group"
               aria-label="Storyboard interactivo. Usa las flechas izquierda y derecha para cambiar de página."
@@ -411,75 +447,19 @@ const flipTransition = {
                 </div>
 
                 {/* =======================================
-                    HOJA QUE GIRA
+                    HOJA QUE GIRA (StoryPageTurn)
 
-                    Avanzar:
-                    rotación hacia la izquierda.
-
-                    Retroceder:
-                    rotación hacia la derecha.
-
-                    La hoja se desvanece al finalizar
-                    para evitar el corte abrupto.
+                    Avanzar: bisagra a la izquierda.
+                    Retroceder: bisagra a la derecha.
                     ======================================= */}
 
                 {pageTurn && turningFrom && (
-                  <motion.div
-                    key={[
-                      pageTurn.from,
-                      pageTurn.to,
-                      pageTurn.direction,
-                    ].join('-')}
-                    className={[
-                      'story__turning-page',
-                      pageTurn.direction === 1
-                        ? 'story__turning-page--next'
-                        : 'story__turning-page--prev',
-                    ].join(' ')}
-                    initial={{
-                      rotateY: 0,
-                      opacity: 1,
-                    }}
-                    animate={flipAnimation}
-                    transition={flipTransition}
-                    onAnimationComplete={finishTurn}
-                    aria-hidden="true"
-                  >
-
-                    {/* Cara frontal */}
-
-                    <div className="story__page-front">
-                      <SmartImage
-                        src={turningFrom.image}
-                        alt=""
-                        placeholderLabel="Viñeta"
-                        index={String(
-                          pageTurn.from + 1,
-                        ).padStart(2, '0')}
-                        ratio="16 / 9"
-                        fit="contain"
-                      />
-
-                      <span
-                        className="story__page-shadow"
-                        aria-hidden="true"
-                      />
-                    </div>
-
-                    {/* Reverso */}
-
-                    <div className="story__page-back">
-                      <div
-                        className="story__paper-texture"
-                        aria-hidden="true"
-                      />
-
-                      <span className="story__page-back-label label">
-                        KING OF MUSIC
-                      </span>
-                    </div>
-
-                  </motion.div>
+                  <StoryPageTurn
+                    key={[pageTurn.from, pageTurn.to, pageTurn.direction].join('-')}
+                    image={turningFrom.image}
+                    direction={pageTurn.direction}
+                    progress={progress}
+                  />
                 )}
               </div>
 

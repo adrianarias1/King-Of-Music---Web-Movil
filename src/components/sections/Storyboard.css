@@ -337,210 +337,155 @@
 
 
 /* =========================================================
-   9. HOJA QUE GIRA
+   9. HOJA QUE SE DOBLA (StoryPageTurn.tsx)
 
-   Motion controla:
-   - rotateY
-   - opacity
-
-   La opacidad disminuye en la parte final
-   para permitir un desmontaje suave.
-
+   JavaScript escribe en cada cuadro:
+     - clip-path de la parte plana y de la solapa,
+     - transform (reflejo) de la solapa,
+     - --fold / --fold-r: posición del doblez desde la
+       izquierda / derecha, y --lift (0 → 1 → 0).
+   Todo queda dentro del marco (overflow: hidden).
    ========================================================= */
 
-.story__turning-page {
+.turn {
   position: absolute;
   inset: 0;
-
   z-index: 5;
 
-  width: 100%;
-  height: 100%;
-
-  transform-style: preserve-3d;
-
-  backface-visibility: visible;
-  -webkit-backface-visibility: visible;
+  overflow: hidden;
+  border-radius: var(--radius-md);
 
   pointer-events: none;
-
-  will-change: transform, opacity;
 }
 
-
-/* =========================================================
-   10. DIRECCIÓN DEL GIRO
-
-   AVANZAR:
-   La hoja gira hacia la izquierda.
-
-   RETROCEDER:
-   La hoja gira hacia la derecha.
-   ========================================================= */
-
-.story__turning-page--next {
-  transform-origin: left center;
-}
-
-.story__turning-page--prev {
-  transform-origin: right center;
-}
-
-
-/* =========================================================
-   11. CARAS DE LA HOJA
-   ========================================================= */
-
-.story__page-front,
-.story__page-back {
+.turn__flat,
+.turn__flap {
   position: absolute;
   inset: 0;
 
-  width: 100%;
-  height: 100%;
-
-  overflow: hidden;
-
-  backface-visibility: hidden;
-  -webkit-backface-visibility: hidden;
+  background-color: #fff;
+  background-size: 100% 100%;
+  background-repeat: no-repeat;
 }
 
-
-/* =========================================================
-   12. CARA FRONTAL
-   ========================================================= */
-
-.story__page-front {
-  z-index: 2;
-
-  background: #fff;
-
-  border: 1px solid rgba(0, 0, 0, 0.08);
-
-  box-shadow:
-    8px 0 35px rgba(0, 0, 0, 0.12);
+.turn__flat {
+  will-change: clip-path;
 }
 
-.story__page-front .smart-img {
-  width: 100%;
-  height: 100%;
-
-  aspect-ratio: 16 / 9;
+.turn__flap {
+  transform-origin: 0 0;
+  will-change: transform, clip-path;
 }
 
-.story__page-front .smart-img__el {
-  display: block;
-
-  width: 100%;
-  height: 100%;
-
-  object-fit: contain;
-  object-position: center;
-}
-
-
-/* =========================================================
-   13. SOMBRA DINÁMICA
-
-   Da profundidad al borde del papel.
-
-   La opacidad final de la hoja también
-   desvanece esta sombra.
-   ========================================================= */
-
-.story__page-shadow {
+.turn__flat-shade,
+.turn__flap-paper {
   position: absolute;
   inset: 0;
+}
 
+/* Curvatura: la hoja se oscurece al acercarse al doblez */
+.turn--next .turn__flat-shade {
   background: linear-gradient(
     to right,
-    rgba(0, 0, 0, 0.02) 0%,
-    rgba(0, 0, 0, 0.05) 45%,
-    rgba(0, 0, 0, 0.32) 100%
+    rgba(0, 0, 0, 0) calc(var(--fold) - 18%),
+    rgba(0, 0, 0, calc(0.16 * var(--lift))) calc(var(--fold) - 1.5%),
+    rgba(0, 0, 0, calc(0.26 * var(--lift))) var(--fold)
   );
-
-  pointer-events: none;
 }
 
-/* Sombra invertida al retroceder */
-
-.story__turning-page--prev .story__page-shadow {
+.turn--prev .turn__flat-shade {
   background: linear-gradient(
     to left,
-    rgba(0, 0, 0, 0.02) 0%,
-    rgba(0, 0, 0, 0.05) 45%,
-    rgba(0, 0, 0, 0.32) 100%
+    rgba(0, 0, 0, 0) calc(var(--fold-r) - 18%),
+    rgba(0, 0, 0, calc(0.16 * var(--lift))) calc(var(--fold-r) - 1.5%),
+    rgba(0, 0, 0, calc(0.26 * var(--lift))) var(--fold-r)
   );
 }
 
-
-/* =========================================================
-   14. REVERSO DE LA HOJA
-   ========================================================= */
-
-.story__page-back {
-  z-index: 1;
-
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  background: linear-gradient(
-    125deg,
-    #d8d8d8 0%,
-    #f8f8f8 38%,
-    #e3e3e3 100%
-  );
-
-  transform: rotateY(180deg);
-
-  border: 1px solid rgba(0, 0, 0, 0.12);
-
-  box-shadow:
-    -8px 0 35px rgba(0, 0, 0, 0.14);
+/* Reverso del papel: color cálido, la imagen apenas se
+   transparenta, sombra en el doblez y brillo de la curva.
+   (Coordenadas de la hoja antes del reflejo.) */
+.turn--next .turn__flap-paper {
+  background:
+    linear-gradient(
+      to right,
+      rgba(0, 0, 0, 0.3) var(--fold),
+      rgba(255, 255, 255, 0.35) calc(var(--fold) + 2.5%),
+      rgba(255, 255, 255, 0) calc(var(--fold) + 12%),
+      rgba(0, 0, 0, 0.08) 100%
+    ),
+    rgba(238, 234, 226, 0.9);
 }
 
+.turn--prev .turn__flap-paper {
+  background:
+    linear-gradient(
+      to left,
+      rgba(0, 0, 0, 0.3) var(--fold-r),
+      rgba(255, 255, 255, 0.35) calc(var(--fold-r) + 2.5%),
+      rgba(255, 255, 255, 0) calc(var(--fold-r) + 12%),
+      rgba(0, 0, 0, 0.08) 100%
+    ),
+    rgba(238, 234, 226, 0.9);
+}
 
-/* =========================================================
-   15. TEXTURA DEL PAPEL
-   ========================================================= */
+/* Sombra que proyecta la solapa sobre la hoja (se aplica al
+   contenedor para que el recorte no la elimine) */
+.turn__flap-shadow {
+  position: absolute;
+  inset: 0;
+}
 
-.story__paper-texture {
+.turn--next .turn__flap-shadow {
+  filter: drop-shadow(-7px 3px 10px rgba(0, 0, 0, 0.3));
+}
+
+.turn--prev .turn__flap-shadow {
+  filter: drop-shadow(7px 3px 10px rgba(0, 0, 0, 0.3));
+}
+
+/* Sombra sobre la página de abajo, junto al doblez */
+.turn__cast {
   position: absolute;
   inset: 0;
 
-  background-image:
-    linear-gradient(
-      to right,
-      rgba(0, 0, 0, 0.02) 1px,
-      transparent 1px
-    ),
-    linear-gradient(
-      to bottom,
-      rgba(0, 0, 0, 0.02) 1px,
-      transparent 1px
-    );
-
-  background-size: 14px 14px;
-  opacity: 0.5;
+  opacity: 0;
 }
 
+.turn--next .turn__cast {
+  background: linear-gradient(
+    to right,
+    rgba(0, 0, 0, 0) calc(var(--fold) - 1%),
+    rgba(0, 0, 0, 0.34) var(--fold),
+    rgba(0, 0, 0, 0.1) calc(var(--fold) + 5%),
+    rgba(0, 0, 0, 0) calc(var(--fold) + 16%)
+  );
+}
 
-/* =========================================================
-   16. TEXTO DEL REVERSO
-   ========================================================= */
+.turn--prev .turn__cast {
+  background: linear-gradient(
+    to left,
+    rgba(0, 0, 0, 0) calc(var(--fold-r) - 1%),
+    rgba(0, 0, 0, 0.34) var(--fold-r),
+    rgba(0, 0, 0, 0.1) calc(var(--fold-r) + 5%),
+    rgba(0, 0, 0, 0) calc(var(--fold-r) + 16%)
+  );
+}
 
-.story__page-back-label {
-  position: relative;
-  z-index: 2;
+/* El visor se puede arrastrar para pasar la hoja */
 
-  color: rgba(0, 0, 0, 0.45);
+.story__viewport {
+  cursor: grab;
+  user-select: none;
+  -webkit-user-select: none;
+}
 
-  font-family: var(--font-display);
-  font-size: clamp(0.7rem, 1.5vw, 1rem);
-  font-weight: 700;
+.story__viewport.is-turning {
+  cursor: grabbing;
+}
 
-  letter-spacing: 0.35em;
+.story__viewport img {
+  -webkit-user-drag: none;
 }
 
 
@@ -924,11 +869,6 @@
   .story__nav--next {
     right: 0.25rem;
   }
-
-  .story__page-back-label {
-    font-size: 0.6rem;
-    letter-spacing: 0.2em;
-  }
 }
 
 
@@ -941,7 +881,8 @@
     transition: none !important;
   }
 
-  .story__turning-page {
+  .turn__flat,
+  .turn__flap {
     will-change: auto;
   }
 }
