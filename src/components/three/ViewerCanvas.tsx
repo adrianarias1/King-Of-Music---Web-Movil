@@ -163,6 +163,7 @@ export function ViewerCanvas({
     <div
       ref={containerRef}
       className="viewer-canvas"
+      style={{ ['--viewer-glow' as string]: character.glow ?? '#002F61' }}
       onPointerDown={handlePointerDown}
       onPointerMove={handlePointerMove}
       onPointerUp={handlePointerUp}
@@ -199,7 +200,7 @@ export function ViewerCanvas({
         {/* Iluminacion de estudio: clave, relleno y contraluz */}
         <ambientLight intensity={0.45} />
         <directionalLight position={[3.5, 6, 4]} intensity={1.5} castShadow={false} />
-        <directionalLight position={[-4, 2.5, -3]} intensity={0.55} color="#002F61" />
+        <directionalLight position={[-4, 2.5, -3]} intensity={0.55} color={character.glow ?? '#002F61'} />
         <pointLight position={[0, 1.6, 2.4]} intensity={12} distance={9} color="#ffffff" />
 
         <ContactShadows

@@ -19,6 +19,7 @@ export const characters: Character[] = [
     scale: 0.95,
     cameraPosition: [0, 1.25, 3.8],
     accent: '#002F61',
+    glow: '#C5A45B',
     abilities: [
       {
         id: 'rayo-de-la-interpretacion',
@@ -40,6 +41,7 @@ export const characters: Character[] = [
     scale: 0.98,
     cameraPosition: [0, 1.1, 3.2],
     accent: '#BABABA',
+    glow: '#D65A9E',
     abilities: [
       {
         id: 'nota-del-desamor',
@@ -61,6 +63,7 @@ export const characters: Character[] = [
     scale: 0.95,
     cameraPosition: [0, 1.05, 3.1],
     accent: '#002F61',
+    glow: '#C62828',
     abilities: [
       {
         id: 'guitarrazo-de-rock',
@@ -82,6 +85,7 @@ export const characters: Character[] = [
     scale: 0.98,
     cameraPosition: [0, 1.1, 3.2],
     accent: '#333333',
+    glow: '#2E8B57',
     abilities: [
       {
         id: 'acordeon-de-poder',
@@ -103,6 +107,7 @@ export const characters: Character[] = [
     scale: 0.95,
     cameraPosition: [0, 1.05, 3.1],
     accent: '#002F61',
+    glow: '#7B2CBF',
     abilities: [
       {
         id: 'paso-tumbado',
@@ -124,6 +129,7 @@ export const characters: Character[] = [
     scale: 1,
     cameraPosition: [0, 1.15, 3.4],
     accent: '#002F61',
+    glow: '#287BCE',
     abilities: [
       {
         id: 'cadena-belica',
@@ -144,6 +150,7 @@ export const characters: Character[] = [
     scale: 1,
     cameraPosition: [0, 1.1, 3.2],
     accent: '#BABABA',
+    glow: '#7A0019',
     abilities: [],
   },
 ]
