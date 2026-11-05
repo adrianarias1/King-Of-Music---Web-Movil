@@ -103,6 +103,11 @@ export default function App() {
   }
   return (
     <>
+      {/* Ancla del inicio (scroll 0). Va fuera del Hero porque GSAP fija y
+          desplaza esa sección durante el portal: un ancla dentro de él
+          llevaba a una posición más abajo. */}
+      <span id="inicio" className="page-top-anchor" aria-hidden="true" />
+
       {/* Accesibilidad: salto al contenido principal */}
 
       <a className="skip-link" href="#contenido">

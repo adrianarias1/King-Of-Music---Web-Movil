@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useInView } from '../../hooks/useInView'
-import { assetExists } from '../../utils/assets'
+import { assetExists, assetKnownToExist } from '../../utils/assets'
 import './SmartImage.css'
 
 interface Props {
@@ -48,7 +48,11 @@ function ImageBlock({
   placeholderLabel,
   index,
 }: Props) {
-  const [status, setStatus] = useState<Status>(src ? 'checking' : 'missing')
+  // Si la imagen ya se comprobó antes, se muestra desde el primer render
+  // (sin el parpadeo del placeholder al volver a montarse).
+  const [status, setStatus] = useState<Status>(() =>
+    !src ? 'missing' : assetKnownToExist(src) ? 'ready' : 'checking',
+  )
   const contain = fit === 'contain'
 
   // No se comprueba nada hasta que la imagen se acerca al viewport.

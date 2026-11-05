@@ -689,7 +689,7 @@ export function Hero({
   return (
     <section
       ref={heroRef}
-      id="inicio"
+      id="portada"
       className="hero"
       aria-label="Portada de King of Music"
     >

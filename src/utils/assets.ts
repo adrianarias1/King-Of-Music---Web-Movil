@@ -41,6 +41,17 @@ const RETRY_DELAY_MS = 250
  * Las respuestas positivas se cachean durante la sesion. Los 404 y los
  * fallbacks HTML se cachean brevemente; los errores de red no se cachean.
  */
+/**
+ * true si ya se confirmó que el asset existe (sin esperar).
+ * Permite mostrar de inmediato una imagen ya comprobada, sin pasar por el
+ * placeholder.
+ */
+export function assetKnownToExist(path: string | undefined): boolean {
+  if (!path) return false
+  const cached = availability.get(path)
+  return Boolean(cached && cached.exists && cached.expiresAt > Date.now())
+}
+
 export async function assetExists(path: string | undefined): Promise<boolean> {
   if (!path) return false
 

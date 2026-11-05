@@ -87,7 +87,10 @@ export function StoryPageTurn({ image, direction, progress }: Props) {
       root.style.setProperty('--fold', `${fmt(fold)}px`)
       root.style.setProperty('--fold-r', `${fmt(W - fold)}px`)
       root.style.setProperty('--lift', lift.toFixed(3))
-      if (castRef.current) castRef.current.style.opacity = (0.35 + 0.65 * lift).toFixed(3)
+      // La sombra sobre la página de abajo nace y termina en 0: al
+      // retirar la hoja no queda ninguna franja oscura que desaparezca
+      // de golpe (eso causaba el parpadeo al final).
+      if (castRef.current) castRef.current.style.opacity = Math.min(1, 1.6 * lift).toFixed(3)
     }
 
     update(progress.get())
