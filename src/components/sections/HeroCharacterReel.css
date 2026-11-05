@@ -151,7 +151,35 @@
 
   background:
     radial-gradient(ellipse 85% 80% at 55% 50%, transparent 45%, rgba(0, 0, 0, 0.75) 100%),
-    linear-gradient(90deg, rgba(0, 0, 0, 0.55) 0%, transparent 30%, transparent 75%, rgba(0, 0, 0, 0.35) 100%);
+    linear-gradient(90deg, rgba(0, 0, 0, 0.45) 0%, transparent 28%, transparent 72%, rgba(0, 0, 0, 0.45) 100%);
+}
+
+/* =========================================================
+   LADO IZQUIERDO (personajes intercalados): todo en espejo.
+   El personaje se desliza a la izquierda y el resplandor,
+   los haces y el destello van a la derecha.
+   ========================================================= */
+
+.reel__slide--left .reel__glow {
+  transform: scaleX(-1);
+  animation-name: reel-glow-left;
+}
+
+.reel__slide--left .reel__beams {
+  animation-name: reel-beams-left;
+}
+
+.reel__slide--left .reel__flare {
+  animation-name: reel-flare-left;
+}
+
+.reel__slide--left .reel__character {
+  left: 26%;
+  animation-name: reel-character-left;
+}
+
+.reel__slide--left .reel__floor {
+  left: 0;
 }
 
 /* --- Pausa fuera de pantalla --- */
@@ -200,6 +228,30 @@
   100% { transform: translate3d(-60%, 0, 0) scaleX(1.2); opacity: 0; }
 }
 
+/* Espejo (lado izquierdo). El resplandor lleva scaleX(-1) para
+   reflejar su composición. */
+@keyframes reel-glow-left {
+  from { transform: translate3d(-12%, 0, 0) scale(-1.06, 1.06); }
+  to { transform: translate3d(12%, 0, 0) scale(-1, 1); }
+}
+
+@keyframes reel-beams-left {
+  from { transform: translate3d(-14%, 0, 0); }
+  to { transform: translate3d(14%, 0, 0); }
+}
+
+@keyframes reel-flare-left {
+  0% { transform: translate3d(-60%, 0, 0) scaleX(0.6); opacity: 0; }
+  18% { opacity: 0.9; }
+  55% { opacity: 0.55; }
+  100% { transform: translate3d(120%, 0, 0) scaleX(1.2); opacity: 0; }
+}
+
+@keyframes reel-character-left {
+  from { transform: translate3d(-42%, 0, 0) scale(1.04); }
+  to { transform: translate3d(-58%, 0, 0) scale(1.08); }
+}
+
 /* Personaje: izquierda → derecha, con un acercamiento suave */
 @keyframes reel-character {
   from { transform: translate3d(-58%, 0, 0) scale(1.04); }
@@ -219,6 +271,20 @@
 
   .reel__floor {
     left: 20%;
+  }
+
+  /* En móvil ambos lados van al centro; solo cambia la dirección. */
+  .reel__slide--left .reel__character {
+    left: 50%;
+  }
+
+  .reel__slide--left .reel__floor {
+    left: 20%;
+  }
+
+  @keyframes reel-character-left {
+    from { transform: translate3d(-40%, 0, 0) scale(1.03); }
+    to { transform: translate3d(-60%, 0, 0) scale(1.07); }
   }
 
   @keyframes reel-character {
