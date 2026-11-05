@@ -42,6 +42,8 @@ export interface Character {
   cameraPosition?: Vec3
   /** Color de acento usado en la interfaz (de la paleta del juego). */
   accent?: string
+  /** Color de la luz de fondo en el visor 3D. */
+  glow?: string
   abilities: Ability[]
 }
 
