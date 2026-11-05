@@ -3,7 +3,8 @@
 //
 // Recibe coordenadas { lat, lng } de un usuario con sesión iniciada y
 // devuelve su ubicación como texto "Estado, País" (p. ej. "Nayarit,
-// México"), usando OpenStreetMap Nominatim.
+// México"). Usa OpenStreetMap: Nominatim y, si falla, Photon. Los errores
+// de cada proveedor quedan en los logs de la función.
 //
 // Privacidad: las coordenadas no se guardan en ningún lado; solo se usan
 // para esta consulta. A la base de datos llega únicamente el texto.
@@ -38,6 +39,56 @@ function clean(value: unknown): string {
     : ''
 }
 
+/** "Estado, País" o null si falta alguna parte (p. ej. coordenadas en el mar). */
+function format(region: unknown, country: unknown): string | null {
+  const r = clean(region)
+  const c = clean(country)
+  return r && c ? `${r}, ${c}` : null
+}
+
+async function getJson(url: URL): Promise<Record<string, unknown>> {
+  const response = await fetch(url, {
+    headers: { 'User-Agent': USER_AGENT, Accept: 'application/json' },
+    signal: AbortSignal.timeout(6000),
+  })
+  if (!response.ok) {
+    const body = (await response.text().catch(() => '')).slice(0, 160)
+    throw new Error(`HTTP ${response.status} ${body}`)
+  }
+  return await response.json()
+}
+
+/** OpenStreetMap Nominatim (nombres en español). */
+async function nominatim(lat: number, lng: number): Promise<string | null> {
+  const url = new URL('https://nominatim.openstreetmap.org/reverse')
+  url.searchParams.set('format', 'jsonv2')
+  url.searchParams.set('lat', String(lat))
+  url.searchParams.set('lon', String(lng))
+  url.searchParams.set('zoom', '5') // nivel estado
+  url.searchParams.set('addressdetails', '1')
+  url.searchParams.set('accept-language', 'es')
+  const data = await getJson(url)
+  const address = (data.address ?? {}) as Record<string, unknown>
+  return format(
+    address.state ?? address.region ?? address.province ?? address.state_district ??
+      address.county ?? address.city,
+    address.country,
+  )
+}
+
+/** Photon (komoot), también con datos de OpenStreetMap. Sin "lang" devuelve
+ *  el nombre local (en México: español). */
+async function photon(lat: number, lng: number): Promise<string | null> {
+  const url = new URL('https://photon.komoot.io/reverse')
+  url.searchParams.set('lat', String(lat))
+  url.searchParams.set('lon', String(lng))
+  url.searchParams.set('limit', '1')
+  const data = await getJson(url)
+  const feature = (data.features as Array<{ properties?: Record<string, unknown> }> | undefined)?.[0]
+  const props = feature?.properties ?? {}
+  return format(props.state ?? props.county ?? props.city, props.country)
+}
+
 Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') return new Response('ok', { headers: CORS })
   if (req.method !== 'POST') return json({ error: 'method_not_allowed' }, 405)
@@ -58,36 +109,20 @@ Deno.serve(async (req) => {
   const hit = cache.get(key)
   if (hit && Date.now() - hit.at < CACHE_MS) return json({ location: hit.location })
 
-  const url = new URL('https://nominatim.openstreetmap.org/reverse')
-  url.searchParams.set('format', 'jsonv2')
-  url.searchParams.set('lat', String(lat))
-  url.searchParams.set('lon', String(lng))
-  url.searchParams.set('zoom', '5') // nivel estado
-  url.searchParams.set('addressdetails', '1')
-  url.searchParams.set('accept-language', 'es')
-
-  let response: Response
-  try {
-    response = await fetch(url, {
-      headers: { 'User-Agent': USER_AGENT, Accept: 'application/json' },
-      signal: AbortSignal.timeout(8000),
-    })
-  } catch {
-    return json({ error: 'geocoder_unavailable' }, 502)
+  // Proveedores en orden: si uno falla o lo bloquean, se usa el siguiente.
+  let location: string | null = null
+  let resolved = false
+  for (const provider of [nominatim, photon]) {
+    try {
+      location = await provider(lat, lng)
+      resolved = true
+      break
+    } catch (error) {
+      console.error(`[reverse-geocode] ${provider.name} falló:`, String(error))
+    }
   }
-  if (!response.ok) return json({ error: 'geocoder_unavailable' }, 502)
+  if (!resolved) return json({ error: 'geocoder_unavailable' }, 502)
 
-  const data = await response.json().catch(() => null)
-  const address = data?.address ?? {}
-  const country = clean(address.country)
-  const region = clean(
-    address.state ?? address.region ?? address.province ?? address.state_district ??
-      address.county ?? address.city,
-  )
-
-  // Formato "Estado, País". Sin alguna de las dos partes (p. ej.
-  // coordenadas en el mar) no se devuelve ubicación.
-  const location = country && region ? `${region}, ${country}` : null
   cache.set(key, { location, at: Date.now() })
   return json({ location })
 })

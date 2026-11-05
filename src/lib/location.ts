@@ -10,7 +10,9 @@ import { isNativeApp } from './native'
         - App Android: @capacitor/geolocation (permiso de ubicación aproximada).
    2. Obtiene coordenadas de baja precisión (no hace falta GPS exacto).
    3. La Edge Function "reverse-geocode" de Supabase las convierte en texto
-      "Estado, País" (OpenStreetMap). Las coordenadas no se guardan.
+      "Estado, País" (OpenStreetMap: Nominatim → Photon). Si no responde,
+      el dispositivo usa BigDataCloud como respaldo. Las coordenadas no se
+      guardan en ningún lado.
 
    Uso: resolveLocation() → { status: 'ok', location } o el motivo del fallo.
    ========================================================================== */
@@ -75,15 +77,50 @@ function webPosition(): Promise<Coords> {
   })
 }
 
+/** Limpia una parte del texto (sin comas ni espacios dobles). */
+function clean(value: unknown): string {
+  return typeof value === 'string' ? value.replace(/,/g, ' ').replace(/\s+/g, ' ').trim().slice(0, 60) : ''
+}
+
+/** 1) Edge Function de Supabase (OpenStreetMap: Nominatim → Photon). */
+async function viaSupabase(coords: Coords): Promise<string | null> {
+  const { data, error } = await supabase.functions.invoke<{ location: string | null }>(
+    'reverse-geocode',
+    { body: coords },
+  )
+  if (error) throw error
+  return data?.location ?? null
+}
+
+/**
+ * 2) Respaldo desde el propio dispositivo: BigDataCloud ofrece un servicio
+ *    gratuito y sin clave pensado para usarse desde el cliente.
+ */
+async function viaBigDataCloud({ lat, lng }: Coords): Promise<string | null> {
+  const url = new URL('https://api.bigdatacloud.net/data/reverse-geocode-client')
+  url.searchParams.set('latitude', String(lat))
+  url.searchParams.set('longitude', String(lng))
+  url.searchParams.set('localityLanguage', 'es')
+  const response = await fetch(url, { signal: AbortSignal.timeout(8000) })
+  if (!response.ok) throw new Error(`HTTP ${response.status}`)
+  const data = (await response.json()) as { principalSubdivision?: unknown; countryName?: unknown }
+  const region = clean(data.principalSubdivision)
+  const country = clean(data.countryName)
+  return region && country ? `${region}, ${country}` : null
+}
+
 async function resolve(): Promise<LocationResult> {
   try {
     const coords = isNativeApp ? await nativePosition() : await webPosition()
-    const { data, error } = await supabase.functions.invoke<{ location: string | null }>(
-      'reverse-geocode',
-      { body: coords },
-    )
-    if (error || !data?.location) return { status: 'error' }
-    return { status: 'ok', location: data.location }
+    for (const provider of [viaSupabase, viaBigDataCloud]) {
+      try {
+        const location = await provider(coords)
+        if (location) return { status: 'ok', location }
+      } catch (error) {
+        console.warn('[KingOfMusic] Geocodificación falló, probando el siguiente servicio:', error)
+      }
+    }
+    return { status: 'error' }
   } catch (error) {
     if (error instanceof LocationError) return { status: error.reason }
     return { status: 'error' }
