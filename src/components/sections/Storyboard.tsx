@@ -71,6 +71,26 @@ const DRAG_START_PX = 10
 const COMMIT_PROGRESS = 0.38
 const COMMIT_VELOCITY = 0.9
 
+// Espera máxima a que la imagen destino esté decodificada antes de girar.
+const DECODE_WAIT_MS = 600
+
+/**
+ * Descarga y DECODIFICA una imagen (una sola vez por URL). Así, al montarse
+ * bajo la hoja, se pinta en el mismo cuadro y no se ve negra un instante.
+ */
+const decoded = new Map<string, Promise<void>>()
+function decodeImage(src: string | undefined): Promise<void> {
+  if (!src) return Promise.resolve()
+  let pending = decoded.get(src)
+  if (!pending) {
+    const img = new Image()
+    img.src = src
+    pending = img.decode().catch(() => undefined)
+    decoded.set(src, pending)
+  }
+  return pending
+}
+
 // 1 = avanzar, -1 = retroceder.
 type Direction = -1 | 1
 
@@ -152,12 +172,14 @@ export function Storyboard() {
       const src = storyboardPages[safePage + offset]?.image
       if (!src) continue
       void assetExists(src)
-      const img = new Image()
-      img.decoding = 'async'
       // Misma URL que usa SmartImage para aprovechar la caché.
-      img.src = src
+      void decodeImage(src)
     }
+    void decodeImage(storyboardPages[safePage]?.image)
   }, [safePage])
+
+  // Evita iniciar otro giro mientras se espera la decodificación.
+  const startingRef = useRef(false)
 
   // =====================================================
   // 3. NAVEGACIÓN
@@ -184,14 +206,27 @@ export function Storyboard() {
         return
       }
 
-      setPageTurn({
-        from: safePage,
-        to: target,
-        direction,
-        mode: 'auto',
+      if (startingRef.current) return
+      startingRef.current = true
+
+      // El giro empieza cuando la imagen destino ya está decodificada
+      // (normalmente ya lo está por la precarga; si no, se espera poco).
+      const ready = decodeImage(storyboardPages[target]?.image)
+      const timeout = new Promise<void>((resolve) => setTimeout(resolve, DECODE_WAIT_MS))
+      void Promise.race([ready, timeout]).then(() => {
+        startingRef.current = false
+        // Reinicio antes de montar la hoja: así su primer cuadro ya es el
+        // de la hoja plana sobre la página actual.
+        progress.jump(0)
+        setPageTurn({
+          from: safePage,
+          to: target,
+          direction,
+          mode: 'auto',
+        })
       })
     },
-    [pageTurn, total, safePage, reduced, imageExpanded],
+    [pageTurn, total, safePage, reduced, imageExpanded, progress],
   )
 
   const goNext = useCallback(() => {
@@ -220,10 +255,12 @@ export function Storyboard() {
       const turn = turnRef.current
       if (turn && commit) setCurrentPage(turn.to)
       turnRef.current = null
+      // No se reinicia `progress` aquí: hacerlo antes de que React retire
+      // la hoja la redibujaba entera (plana, con la imagen anterior) durante
+      // un cuadro y se veía un destello. Se reinicia al empezar cada giro.
       setPageTurn(null)
-      progress.jump(0)
     },
-    [progress],
+    [],
   )
 
   useEffect(() => {
@@ -433,6 +470,8 @@ export function Storyboard() {
                       ).padStart(2, '0')}
                       ratio="16 / 9"
                       fit="contain"
+                      loading="eager"
+                      decoding="sync"
                     />
                   </div>
 

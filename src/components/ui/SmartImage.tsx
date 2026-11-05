@@ -9,6 +9,8 @@ interface Props {
   alt: string
   className?: string
   loading?: 'lazy' | 'eager'
+  /** 'sync' pinta la imagen en el mismo cuadro en que se monta (si ya está decodificada). */
+  decoding?: 'async' | 'sync'
   /** Proporciona el ratio y evita layout shift. */
   ratio?: string
   /**
@@ -43,6 +45,7 @@ function ImageBlock({
   alt,
   className,
   loading = 'lazy',
+  decoding = 'async',
   ratio,
   fit = 'cover',
   placeholderLabel,
@@ -90,7 +93,7 @@ function ImageBlock({
           src={src}
           alt={alt}
           loading={loading}
-          decoding="async"
+          decoding={decoding}
           draggable={false}
           onError={() => setStatus('missing')}
         />
