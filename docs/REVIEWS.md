@@ -33,6 +33,23 @@ El selector **Mostrar** ofrece:
 Los datos viven en Supabase (proyecto KING OF MUSIC). Las reseñas de la
 versión anterior (solo en el navegador) eran de prueba y se descartan.
 
+## Ubicación (opcional)
+
+Al escribir una reseña, la casilla **"Mostrar desde qué país publico"** (activada
+por defecto y recordada en el dispositivo) pide permiso de ubicación la primera
+vez que el usuario interactúa con el formulario:
+
+1. Web: geolocalización del navegador. App: `@capacitor/geolocation`
+   (ubicación aproximada; permisos en `AndroidManifest.xml`).
+2. La Edge Function `reverse-geocode` (Supabase, requiere sesión) convierte las
+   coordenadas en **"Estado, País"** con OpenStreetMap. Las coordenadas no se
+   guardan.
+3. Se guarda en `reviews.location`; en la lista se muestra **solo el país**, en
+   dorado. Si el usuario niega el permiso o desactiva la casilla, la reseña se
+   publica sin ubicación.
+
+Código: `src/lib/location.ts` · `supabase/functions/reverse-geocode/index.ts`.
+
 ## Reglas
 
 - Cualquiera puede **leer** las reseñas publicadas, sin iniciar sesión.
@@ -75,6 +92,7 @@ SQL: `supabase/migrations/20261102221718_reviews.sql` `20261102223909_reviews_ga
 | `author_name` | text | Nombre visible, desde el perfil |
 | `author_avatar_url` | text | Foto de Google (opcional) |
 | `status` | text | `published` · `hidden` |
+| `location` | text | "Estado, País" desde donde se publicó (opcional) |
 | `created_at` / `updated_at` | timestamptz | Publicación / última edición |
 
 Para agregar un personaje o escenario reseñable: añadirlo en `src/data` y

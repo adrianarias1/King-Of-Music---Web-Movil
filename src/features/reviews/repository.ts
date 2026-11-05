@@ -26,6 +26,8 @@ export interface Review {
   authorName: string
   authorAvatarUrl: string | null
   status: 'published' | 'hidden'
+  /** Desde dónde se publicó: "Estado, País" (opcional). */
+  location: string | null
   createdAt: string
   updatedAt: string
   /** true si se editó después de publicarse. */
@@ -42,7 +44,10 @@ export interface ReviewContent {
   comment: string
 }
 
-export type ReviewInput = ReviewTarget & ReviewContent
+export type ReviewInput = ReviewTarget & ReviewContent & {
+  /** "Estado, País" o null si el usuario no compartió su ubicación. */
+  location?: string | null
+}
 
 export type ReviewErrorCode = 'auth' | 'rate_limit' | 'validation' | 'not_found' | 'network' | 'unknown'
 
@@ -91,7 +96,7 @@ try {
 }
 
 const COLUMNS =
-  'id, user_id, section, subject_id, rating, comment, author_name, author_avatar_url, status, created_at, updated_at'
+  'id, user_id, section, subject_id, rating, comment, author_name, author_avatar_url, status, location, created_at, updated_at'
 
 interface ReviewRow {
   id: string
@@ -103,6 +108,7 @@ interface ReviewRow {
   author_name: string
   author_avatar_url: string | null
   status: 'published' | 'hidden'
+  location: string | null
   created_at: string
   updated_at: string
 }
@@ -118,6 +124,7 @@ function toReview(row: ReviewRow): Review {
     authorName: row.author_name,
     authorAvatarUrl: row.author_avatar_url,
     status: row.status,
+    location: row.location ?? null,
     createdAt: row.created_at,
     updatedAt: row.updated_at,
     // Margen de 1 s: inserción y fecha de edición se generan juntas.
@@ -196,10 +203,16 @@ export const supabaseReviewRepository: ReviewRepository = {
     return { total: row.total ?? 0, average: Number.isFinite(average) ? average : null }
   },
 
-  async create({ section, subjectId, rating, comment }) {
+  async create({ section, subjectId, rating, comment, location }) {
     const { data, error } = await supabase
       .from('reviews')
-      .insert({ section, subject_id: subjectId, rating, comment: normalizeComment(comment) })
+      .insert({
+        section,
+        subject_id: subjectId,
+        rating,
+        comment: normalizeComment(comment),
+        location: location ?? null,
+      })
       .select(COLUMNS)
       .single()
     if (error) throw toReviewError(error)

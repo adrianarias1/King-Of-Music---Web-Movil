@@ -53,5 +53,15 @@
     <!-- Permissions -->
 
     <uses-permission android:name="android.permission.INTERNET" />
+
+    <!--
+      Ubicación aproximada para mostrar desde qué país/estado se publica una
+      reseña (opcional; se pide al escribir). @capacitor/geolocation solicita
+      solo "coarseLocation"; FINE se declara porque el plugin la admite.
+    -->
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-feature android:name="android.hardware.location" android:required="false" />
+    <uses-feature android:name="android.hardware.location.gps" android:required="false" />
 </manifest>
 

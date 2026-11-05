@@ -2,7 +2,7 @@ import { useCallback, useEffect, useId, useMemo, useRef, useState } from 'react'
 import type { FormEvent } from 'react'
 import { createPortal } from 'react-dom'
 import { AnimatePresence, motion, useReducedMotion } from 'motion/react'
-import { ArrowLeft, LogIn, MessageSquareText, PenLine, Pencil, Star, Trash2, Users, X } from 'lucide-react'
+import { ArrowLeft, LogIn, MapPin, MessageSquareText, PenLine, Pencil, Star, Trash2, Users, X } from 'lucide-react'
 
 import { characters } from '../../data/characters'
 import { locations } from '../../data/locations'
@@ -11,6 +11,13 @@ import { useDialog } from '../../hooks/useDialog'
 import { useMediaQuery } from '../../hooks/useMediaQuery'
 import { useScrolledPast } from '../../hooks/useScrolledPast'
 import { useAuth } from '../auth/authContext'
+import {
+  countryOf,
+  getLocationPreference,
+  resolveLocation,
+  setLocationPreference,
+} from '../../lib/location'
+import type { LocationResult } from '../../lib/location'
 import { ReviewError, supabaseReviewRepository } from './repository'
 import type { Review, ReviewRepository, ReviewStats } from './repository'
 import { COMMENT_MAX, COMMENT_MIN, hasErrors, normalizeComment, validateReviewDraft } from './validation'
@@ -349,6 +356,28 @@ function ReviewPanel({
   const [formError, setFormError] = useState('')
   const [success, setSuccess] = useState('')
 
+  // Ubicación (opcional): "Estado, País". Se pide al empezar a escribir.
+  const [shareLocation, setShareLocation] = useState(getLocationPreference)
+  const [locationState, setLocationState] = useState<LocationResult | { status: 'idle' | 'loading' }>({ status: 'idle' })
+  const locationRequest = useRef<Promise<LocationResult> | null>(null)
+
+  const requestLocation = useCallback(() => {
+    if (locationRequest.current) return locationRequest.current
+    setLocationState({ status: 'loading' })
+    const pending = resolveLocation().then((result) => {
+      setLocationState(result)
+      if (result.status !== 'ok') locationRequest.current = null
+      return result
+    })
+    locationRequest.current = pending
+    return pending
+  }, [])
+
+  /** Primera interacción con el formulario: pide la ubicación si está activada. */
+  const maybeRequestLocation = () => {
+    if (shareLocation && !editing && locationState.status === 'idle') void requestLocation()
+  }
+
   // Borrado con confirmación
   const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null)
   const [deletingId, setDeletingId] = useState<string | null>(null)
@@ -464,7 +493,17 @@ function ReviewPanel({
         setSuccess('Tu reseña se actualizó.')
         if (paged) refreshStats()
       } else {
-        const created = await repository.create({ section, subjectId, rating, comment })
+        // Ubicación: si aún se está obteniendo, se espera un momento.
+        let location: string | null = null
+        if (shareLocation) {
+          const pending = locationRequest.current ?? requestLocation()
+          const result = await Promise.race([
+            pending,
+            new Promise<null>((resolve) => setTimeout(() => resolve(null), 4000)),
+          ])
+          if (result?.status === 'ok') location = result.location
+        }
+        const created = await repository.create({ section, subjectId, rating, comment, location })
         setReviews((current) => [created, ...current])
         setSuccess('¡Gracias! Tu reseña ya está publicada.')
         if (paged) refreshStats()
@@ -572,6 +611,7 @@ function ReviewPanel({
                       value={value}
                       checked={rating === value}
                       onChange={() => {
+                        maybeRequestLocation()
                         setRating(value)
                         setTouched((t) => ({ ...t, rating: true }))
                       }}
@@ -591,6 +631,7 @@ function ReviewPanel({
               value={comment}
               onChange={(e) => setComment(e.target.value.slice(0, COMMENT_MAX + 200))}
               onBlur={() => setTouched((t) => ({ ...t, comment: true }))}
+              onFocus={maybeRequestLocation}
               rows={5}
               disabled={saving}
               placeholder={general ? '¿Qué te pareció King of Music?' : '¿Qué te gustó? ¿Qué mejorarías?'}
@@ -606,6 +647,47 @@ function ReviewPanel({
               {normalizedLength}/{COMMENT_MAX} caracteres · mínimo {COMMENT_MIN}
             </small>
             {commentInvalid ? <p id={`${id}-comment-error`} className="reviews-dock__field-error">{errors.comment}</p> : null}
+
+            {!editing ? (
+              <div className="reviews-dock__location">
+                <label>
+                  <input
+                    type="checkbox"
+                    checked={shareLocation}
+                    disabled={saving}
+                    onChange={(event) => {
+                      const enabled = event.target.checked
+                      setShareLocation(enabled)
+                      setLocationPreference(enabled)
+                      if (enabled && (locationState.status === 'idle' || locationState.status === 'error' || locationState.status === 'unavailable')) {
+                        void requestLocation()
+                      }
+                    }}
+                  />
+                  <MapPin size={15} aria-hidden="true" />
+                  Mostrar desde qué país publico
+                </label>
+                {shareLocation ? (
+                  <p className="reviews-dock__location-status" role="status">
+                    {locationState.status === 'loading' && 'Obteniendo tu ubicación…'}
+                    {locationState.status === 'ok' && (
+                      <>Se publicará desde <strong>{countryOf(locationState.location)}</strong>.</>
+                    )}
+                    {locationState.status === 'denied' &&
+                      'Permiso de ubicación denegado: se publicará sin ubicación. Puedes activarlo en los ajustes del navegador o de la app.'}
+                    {locationState.status === 'unsupported' && 'Este dispositivo no ofrece ubicación: se publicará sin ella.'}
+                    {(locationState.status === 'unavailable' || locationState.status === 'error') && (
+                      <>
+                        No pudimos obtener tu ubicación.{' '}
+                        <button type="button" className="reviews-dock__link" onClick={() => void requestLocation()}>
+                          Reintentar
+                        </button>
+                      </>
+                    )}
+                  </p>
+                ) : null}
+              </div>
+            ) : null}
 
             <p id={`${id}-form-error`} role="alert" className="reviews-dock__error">{formError}</p>
             <p role="status" className="reviews-dock__success">{isMobile ? '' : success}</p>
@@ -725,10 +807,19 @@ function ReviewPanel({
                             <strong>{review.authorName}</strong>
                             {mine ? <span className="reviews-dock__badge">Tú</span> : null}
                           </span>
-                          <time dateTime={review.createdAt}>
-                            {dateFormat.format(Date.parse(review.createdAt))}
-                            {review.edited ? ' · editada' : ''}
-                          </time>
+                          <span className="reviews-dock__meta">
+                            {countryOf(review.location) ? (
+                              <span className="reviews-dock__country">
+                                <MapPin size={12} aria-hidden="true" />
+                                <span className="sr-only">Publicada desde </span>
+                                {countryOf(review.location)}
+                              </span>
+                            ) : null}
+                            <time dateTime={review.createdAt}>
+                              {dateFormat.format(Date.parse(review.createdAt))}
+                              {review.edited ? ' · editada' : ''}
+                            </time>
+                          </span>
                         </div>
                         {paged ? (
                           review.section === 'juego' ? (

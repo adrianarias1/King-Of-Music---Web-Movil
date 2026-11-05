@@ -613,6 +613,77 @@ body.is-locked .reviews-fab {
 }
 
 /* ---------------------------------------------------------
+   6a-bis. UBICACIÓN
+   --------------------------------------------------------- */
+
+.reviews-dock__location {
+  display: grid;
+  gap: 0.35rem;
+  margin-top: 0.35rem;
+}
+
+.reviews-dock__location label {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  min-height: 36px;
+  color: #ddd;
+  font-size: 0.82rem;
+  cursor: pointer;
+}
+
+/* Más específico que la regla general de inputs del panel */
+.reviews-dock .reviews-dock__location input[type='checkbox'] {
+  flex: none;
+  width: 18px;
+  height: 18px;
+  min-height: 0;
+  margin: 0;
+  padding: 0;
+  accent-color: var(--rv-gold);
+  cursor: pointer;
+}
+
+.reviews-dock__location label svg {
+  color: var(--rv-gold);
+}
+
+.reviews-dock__location-status {
+  color: var(--rv-muted);
+  font-size: 0.75rem;
+  line-height: 1.5;
+}
+
+.reviews-dock__location-status strong {
+  color: var(--rv-gold-soft);
+  font-weight: 600;
+}
+
+.reviews-dock__location-status .reviews-dock__link {
+  min-height: 0;
+  color: var(--rv-gold-soft);
+  text-decoration: underline;
+}
+
+/* País desde donde se publicó (en dorado) */
+.reviews-dock__meta {
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.2rem 0.6rem;
+}
+
+.reviews-dock__country {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  color: var(--rv-gold-soft);
+  font-size: 0.72rem;
+  letter-spacing: 0.04em;
+}
+
+/* ---------------------------------------------------------
    6b. SESIÓN, AUTOR Y ACCIONES (Supabase)
    --------------------------------------------------------- */
 
