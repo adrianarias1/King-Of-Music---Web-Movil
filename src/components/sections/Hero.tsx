@@ -11,11 +11,12 @@ import {
   siteConfig,
   gameLogoAsset,
   heroMobileAsset,
-  portalImageAsset,
 } from '../../config'
 
 import { useAssetExists } from '../../hooks/useAssetExists'
 import { useMediaQuery } from '../../hooks/useMediaQuery'
+
+import { HeroCharacterReel } from './HeroCharacterReel'
 
 import './Hero.css'
 
@@ -126,10 +127,6 @@ export function Hero({
     immediate: true,
   })
 
-  const { exists: hasPortalImage } = useAssetExists(
-    portalImageAsset,
-    { immediate: true },
-  )
 
   // =====================================================
   // 2. ANIMACIÓN CINEMATOGRÁFICA
@@ -487,10 +484,11 @@ export function Hero({
         at(2.3),
       )
 
+      // Capa negra leve: oscurece el carrusel sin ocultarlo.
       timeline.to(
         portalOverlay,
         {
-          opacity: 0.72,
+          opacity: 0.5,
           duration: span(2.55, 1.1),
         },
         at(2.55),
@@ -854,21 +852,12 @@ export function Hero({
           <div className="hero__portal">
             <div className="hero__portal-scene">
 
-              {/* Imagen anfitriona del portal */}
+              {/* Fondo animado del portal */}
 
               <div className="hero__portal-media">
-                {hasPortalImage ? (
-                  <img
-                    className="hero__portal-media-img"
-                    src={portalImageAsset}
-                    alt=""
-                    decoding="async"
-                    loading="eager"
-                    draggable={false}
-                  />
-                ) : (
-                  <div className="hero__portal-media-fallback" />
-                )}
+                {/* Carrusel cinematográfico de personajes (estilo
+                    pantalla de carga): personaje → y resplandor ←. */}
+                <HeroCharacterReel reduced={Boolean(reduced)} />
               </div>
 
               {/* Oscurecimiento ambiental */}

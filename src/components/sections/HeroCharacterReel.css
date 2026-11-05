@@ -1,0 +1,239 @@
+/* =========================================================
+   CARRUSEL CINEMATOGRÁFICO DE PERSONAJES (HeroCharacterReel)
+
+   Capas (de atrás hacia delante):
+     .reel__glow      resplandor del color del personaje  → ←
+     .reel__beams     haces de luz diagonales             → ←
+     .reel__flare     destello horizontal rápido          → ←
+     .reel__character recorte del personaje               ← →
+     .reel__floor     luz de piso bajo el personaje
+     .reel__vignette  viñeta fija
+   Encima, en Hero.css: capa negra (overlay) y el texto.
+
+   Solo se animan transform y opacity (fluido en móviles).
+   ========================================================= */
+
+.reel {
+  --reel-duration: 4500ms;
+
+  position: absolute;
+  inset: 0;
+
+  overflow: hidden;
+  background: #050505;
+  pointer-events: none;
+}
+
+.reel__slide {
+  position: absolute;
+  inset: 0;
+
+  animation: reel-fade var(--reel-duration) linear both;
+}
+
+/* --- Resplandor: grande, difuso, se desplaza a la izquierda --- */
+.reel__glow {
+  position: absolute;
+  top: -20%;
+  bottom: -20%;
+  left: -25%;
+  width: 150%;
+
+  background:
+    radial-gradient(
+      ellipse 32% 48% at 70% 52%,
+      color-mix(in srgb, var(--reel-color) 85%, transparent) 0%,
+      color-mix(in srgb, var(--reel-color) 35%, transparent) 38%,
+      transparent 70%
+    ),
+    radial-gradient(
+      ellipse 22% 30% at 30% 30%,
+      color-mix(in srgb, var(--reel-color) 45%, transparent) 0%,
+      transparent 70%
+    ),
+    radial-gradient(
+      ellipse 26% 34% at 85% 78%,
+      color-mix(in srgb, var(--reel-color) 40%, transparent) 0%,
+      transparent 72%
+    );
+
+  will-change: transform;
+  animation: reel-glow var(--reel-duration) cubic-bezier(0.3, 0, 0.7, 1) both;
+}
+
+/* --- Haces de luz diagonales (tipo luces de escenario) --- */
+.reel__beams {
+  position: absolute;
+  top: -10%;
+  bottom: -10%;
+  left: -30%;
+  width: 160%;
+
+  background: repeating-linear-gradient(
+    105deg,
+    transparent 0 9%,
+    color-mix(in srgb, var(--reel-color) 22%, transparent) 10% 11.5%,
+    transparent 13% 21%,
+    color-mix(in srgb, #fff 10%, transparent) 22% 22.6%,
+    transparent 23.5% 34%
+  );
+  mix-blend-mode: screen;
+  opacity: 0.55;
+
+  will-change: transform;
+  animation: reel-beams var(--reel-duration) linear both;
+}
+
+/* --- Destello horizontal que cruza más rápido --- */
+.reel__flare {
+  position: absolute;
+  top: 38%;
+  left: 0;
+  width: 70%;
+  height: 22%;
+
+  background: radial-gradient(
+    ellipse 50% 30% at 50% 50%,
+    color-mix(in srgb, #fff 55%, var(--reel-color)) 0%,
+    color-mix(in srgb, var(--reel-color) 40%, transparent) 30%,
+    transparent 70%
+  );
+  mix-blend-mode: screen;
+  filter: blur(6px);
+  opacity: 0;
+
+  will-change: transform, opacity;
+  animation: reel-flare var(--reel-duration) cubic-bezier(0.45, 0, 0.2, 1) both;
+}
+
+/* --- Personaje: se desliza a la derecha --- */
+.reel__character {
+  position: absolute;
+  bottom: 0;
+  /* Escritorio: tercio derecho, para no tapar el título; con aire
+     arriba porque GSAP acerca la cámara (escala ~1.15). */
+  left: 74%;
+  height: 86%;
+  max-width: none;
+
+  object-fit: contain;
+  object-position: bottom center;
+
+  /* Contraluz del color del personaje sobre el contorno */
+  filter:
+    drop-shadow(0 0 18px color-mix(in srgb, var(--reel-color) 55%, transparent))
+    drop-shadow(0 0 2px color-mix(in srgb, var(--reel-color) 70%, transparent));
+
+  user-select: none;
+  -webkit-user-select: none;
+
+  will-change: transform;
+  animation: reel-character var(--reel-duration) cubic-bezier(0.25, 0, 0.75, 1) both;
+}
+
+.reel__floor {
+  position: absolute;
+  bottom: -12%;
+  left: 48%;
+  width: 52%;
+  height: 30%;
+
+  background: radial-gradient(
+    ellipse 50% 50% at 50% 50%,
+    color-mix(in srgb, var(--reel-color) 45%, transparent) 0%,
+    transparent 70%
+  );
+}
+
+.reel__vignette {
+  position: absolute;
+  inset: 0;
+
+  background:
+    radial-gradient(ellipse 85% 80% at 55% 50%, transparent 45%, rgba(0, 0, 0, 0.75) 100%),
+    linear-gradient(90deg, rgba(0, 0, 0, 0.55) 0%, transparent 30%, transparent 75%, rgba(0, 0, 0, 0.35) 100%);
+}
+
+/* --- Pausa fuera de pantalla --- */
+.reel--paused .reel__slide,
+.reel--paused .reel__slide * {
+  animation-play-state: paused;
+}
+
+/* --- Sin movimiento: personaje fijo --- */
+.reel--static .reel__slide,
+.reel--static .reel__slide * {
+  animation: none;
+}
+
+.reel--static .reel__character {
+  transform: translateX(-50%);
+}
+
+/* =========================================================
+   KEYFRAMES
+   ========================================================= */
+
+/* Fundido de entrada y salida de cada personaje */
+@keyframes reel-fade {
+  0% { opacity: 0; }
+  12% { opacity: 1; }
+  86% { opacity: 1; }
+  100% { opacity: 0; }
+}
+
+/* Resplandor: derecha → izquierda, con un leve "respirar" */
+@keyframes reel-glow {
+  from { transform: translate3d(12%, 0, 0) scale(1.06); }
+  to { transform: translate3d(-12%, 0, 0) scale(1); }
+}
+
+@keyframes reel-beams {
+  from { transform: translate3d(14%, 0, 0); }
+  to { transform: translate3d(-14%, 0, 0); }
+}
+
+@keyframes reel-flare {
+  0% { transform: translate3d(120%, 0, 0) scaleX(0.6); opacity: 0; }
+  18% { opacity: 0.9; }
+  55% { opacity: 0.55; }
+  100% { transform: translate3d(-60%, 0, 0) scaleX(1.2); opacity: 0; }
+}
+
+/* Personaje: izquierda → derecha, con un acercamiento suave */
+@keyframes reel-character {
+  from { transform: translate3d(-58%, 0, 0) scale(1.04); }
+  to { transform: translate3d(-42%, 0, 0) scale(1.08); }
+}
+
+/* =========================================================
+   MÓVIL: personaje al centro y algo más chico
+   ========================================================= */
+
+@media (max-width: 767px) {
+  .reel__character {
+    left: 50%;
+    height: 84%;
+    opacity: 0.9;
+  }
+
+  .reel__floor {
+    left: 20%;
+  }
+
+  @keyframes reel-character {
+    from { transform: translate3d(-60%, 0, 0) scale(1.03); }
+    to { transform: translate3d(-40%, 0, 0) scale(1.07); }
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .reel__slide,
+  .reel__slide * {
+    animation: none !important;
+  }
+
+  .reel__character {
+    transform: translateX(-50%);
+  }
+}
