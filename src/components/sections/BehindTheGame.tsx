@@ -2,6 +2,7 @@ import { ArrowUpRight, CheckCircle2 } from 'lucide-react'
 import { devShots, processSteps, tools } from '../../data/tools'
 import { milestones, repositories, testCases, testingSummary, testStats } from '../../data/gameSpecs'
 import { GitHubMark } from '../ui/GitHubMark'
+import { SpecsBlocks } from './GameSpecs'
 import { Reveal } from '../ui/Reveal'
 import { SectionHeading } from '../ui/SectionHeading'
 import { SmartImage } from '../ui/SmartImage'
@@ -10,13 +11,13 @@ import { useI18n } from '../../i18n'
 import './BehindTheGame.css'
 
 // =========================================================
-// KING OF MUSIC — CÓMO SE CONSTRUYE
+// KING OF MUSIC — DESARROLLO
 //
-//   01 Herramientas   02 Proceso   03 Hitos y pruebas
-//   04 Repositorios   05 Galería de desarrollo
-//
-// La ficha técnica y los requisitos están en GameSpecs
-// (sección anterior, "Requerimientos y especificaciones").
+// Requerimientos y especificaciones (SpecsBlocks, GameSpecs.tsx):
+//   01 Ficha técnica   02 Requisitos   03 Especificaciones
+// Cómo se construye:
+//   04 Herramientas   05 Proceso   06 Hitos   07 Pruebas
+//   08 Repositorios   09 Galería de desarrollo
 // =========================================================
 
 export function BehindTheGame() {
@@ -24,13 +25,20 @@ export function BehindTheGame() {
   const copy = t.behind
 
   return (
-    <section id="construccion" className="section theme-light behind" aria-label={copy.title}>
+    <section id="desarrollo" className="section theme-light behind" aria-label={copy.eyebrow}>
       <div className="container">
-        <SectionHeading index="07" eyebrow={copy.eyebrow} title={copy.title} lead={copy.lead} />
+        {/* Parte 1: Requerimientos y especificaciones */}
+        <SectionHeading index="06" eyebrow={copy.eyebrow} title={t.specs.title} lead={t.specs.lead} />
+        <SpecsBlocks />
 
-        {/* 01. Herramientas */}
+        {/* Parte 2: Cómo se construye */}
+        <div className="behind__subhead">
+          <SectionHeading eyebrow={t.specs.eyebrow} title={copy.title} lead={copy.lead} />
+        </div>
+
+        {/* 04. Herramientas */}
         <div className="behind__block">
-          <BlockTitle number="01" title={copy.tools} />
+          <BlockTitle number="04" title={copy.tools} />
           <ul className="behind__tools">
             {tools.map((tool, index) => (
               <Reveal as="li" key={tool.id} delay={0.03 * index} distance={16}>
@@ -40,9 +48,9 @@ export function BehindTheGame() {
           </ul>
         </div>
 
-        {/* 02. Proceso */}
+        {/* 05. Proceso */}
         <div className="behind__block">
-          <BlockTitle number="02" title={copy.process} />
+          <BlockTitle number="05" title={copy.process} />
           <ol className="behind__steps">
             {processSteps.map((step, index) => (
               <Reveal as="li" key={step.id} className="behind__step" delay={0.05 * index} distance={18}>
@@ -54,10 +62,10 @@ export function BehindTheGame() {
           </ol>
         </div>
 
-        {/* 03. Hitos + pruebas */}
+        {/* 06. Hitos + 07. Pruebas */}
         <div className="behind__block behind__grid">
           <div>
-            <BlockTitle number="03" title={copy.milestones} />
+            <BlockTitle number="06" title={copy.milestones} />
             <ol className="behind__timeline">
               {milestones.map((item, index) => (
                 <Reveal as="li" key={item.id} className="behind__milestone" delay={0.04 * index} distance={14}>
@@ -70,7 +78,7 @@ export function BehindTheGame() {
           </div>
 
           <div>
-            <BlockTitle number="04" title={copy.testing} />
+            <BlockTitle number="07" title={copy.testing} />
             <p className="behind__testing-lead">{l(testingSummary)}</p>
             <ul className="behind__stats">
               {testStats.map((stat) => (
@@ -101,9 +109,9 @@ export function BehindTheGame() {
           </div>
         </div>
 
-        {/* 05. Repositorios */}
+        {/* 08. Repositorios */}
         <div className="behind__block">
-          <BlockTitle number="05" title={copy.repositories} />
+          <BlockTitle number="08" title={copy.repositories} />
           <ul className="behind__repos">
             {repositories.map((repo, index) => (
               <Reveal as="li" key={repo.id} delay={0.06 * index} distance={16}>
@@ -128,9 +136,9 @@ export function BehindTheGame() {
           </ul>
         </div>
 
-        {/* 06. Galería de desarrollo (capturas en public/images/dev/) */}
+        {/* 09. Galería de desarrollo (capturas en public/images/dev/) */}
         <div className="behind__block behind__block--last">
-          <BlockTitle number="06" title={copy.gallery} />
+          <BlockTitle number="09" title={copy.gallery} />
           <ul className="behind__shots">
             {devShots.map((shot, index) => (
               <Reveal as="li" key={shot.id} delay={0.05 * index} distance={18}>

@@ -1,151 +1,42 @@
 /* =========================================================
-   REQUERIMIENTOS Y ESPECIFICACIONES (GameSpecs)
-   Fondo negro con resplandor dorado; tarjetas con borde fino,
-   iconos dorados y el nivel "Recomendado" destacado.
+   REQUERIMIENTOS Y ESPECIFICACIONES (bloques 01–03)
+   Van dentro de la sección Desarrollo (.behind, tema claro) y
+   usan sus mismas variables: tarjetas claras con borde fino,
+   detalles dorados y el acento negro para lo destacado.
    ========================================================= */
 
-.specs {
-  --specs-gold: #c5a45b;
-  --specs-gold-soft: rgba(197, 164, 91, 0.14);
-  --specs-line: rgba(255, 255, 255, 0.1);
-  --specs-card: rgba(255, 255, 255, 0.025);
-
-  position: relative;
-  overflow: hidden;
-  isolation: isolate;
-}
-
-.specs__bg {
-  position: absolute;
-  inset: 0;
-  z-index: -1;
-  background:
-    radial-gradient(55% 40% at 85% 8%, rgba(197, 164, 91, 0.12), transparent 70%),
-    radial-gradient(45% 35% at 5% 60%, rgba(0, 47, 97, 0.35), transparent 70%),
-    linear-gradient(to bottom, #090909, #000 60%, #090909);
-}
-
-/* Rejilla sutil, como en el portal del Hero */
-.specs__bg::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background-image:
-    linear-gradient(rgba(255, 255, 255, 0.035) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(255, 255, 255, 0.035) 1px, transparent 1px);
-  background-size: 64px 64px;
-  mask-image: linear-gradient(to bottom, #000, transparent 55%);
-  -webkit-mask-image: linear-gradient(to bottom, #000, transparent 55%);
-}
-
-/* --- 1. Cifras destacadas --- */
-.specs__highlights {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  margin-top: clamp(2rem, 5vw, 3rem);
-  border-top: 1px solid var(--specs-line);
-  border-left: 1px solid var(--specs-line);
-}
-
-@media (min-width: 720px) {
-  .specs__highlights {
-    grid-template-columns: repeat(4, minmax(0, 1fr));
-  }
-}
-
-.specs__highlight {
-  display: flex;
-  flex-direction: column;
-  gap: 0.4rem;
-  padding: clamp(1.1rem, 3vw, 1.75rem);
-  border-right: 1px solid var(--specs-line);
-  border-bottom: 1px solid var(--specs-line);
-}
-
-.specs__highlight strong {
-  font-family: var(--font-display);
-  font-size: clamp(2.6rem, 7vw, 4.25rem);
-  font-weight: 400;
-  line-height: 0.9;
-  color: #fff;
-}
-
-.specs__highlight:first-child strong {
-  color: var(--specs-gold);
-}
-
-.specs__highlight span {
-  font-size: 0.72rem;
-  letter-spacing: 0.16em;
-  text-transform: uppercase;
-  color: var(--color-gray-light);
-}
-
-/* --- Bloques --- */
-.specs__block {
-  margin-top: clamp(3rem, 8vw, 5rem);
-}
-
-.specs__block-title {
-  display: flex;
-  align-items: center;
-  gap: 0.9rem;
-  margin-bottom: 1.5rem;
-  font-family: var(--font-display);
-  font-size: clamp(1.35rem, 3vw, 1.85rem);
-  font-weight: 400;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  color: #fff;
-}
-
-.specs__block-title::after {
-  content: '';
-  flex: 1;
-  height: 1px;
-  background: linear-gradient(90deg, rgba(197, 164, 91, 0.6), transparent);
-}
-
-.specs__block-num {
-  display: grid;
-  place-items: center;
-  flex: none;
-  width: 2.4rem;
-  height: 2.4rem;
-  font-family: var(--font-body);
-  font-size: 0.72rem;
-  font-weight: 600;
-  letter-spacing: 0.08em;
-  color: #000;
-  background: var(--specs-gold);
-  border-radius: 50%;
+/* Separación antes de "Cómo se construye" */
+.behind__subhead {
+  margin-top: clamp(4.5rem, 11vw, 7.5rem);
+  padding-top: clamp(3rem, 8vw, 5rem);
+  border-top: 1px solid var(--behind-line);
 }
 
 .specs__note {
   margin: -0.5rem 0 1.5rem;
   font-size: var(--fs-small);
-  color: var(--color-gray-light);
+  line-height: 1.6;
+  color: var(--color-muted-on-light);
 }
 
+/* Icono en círculo dorado */
 .specs__icon {
   display: grid;
   place-items: center;
   flex: none;
   width: 42px;
   height: 42px;
-  color: var(--specs-gold);
-  background: var(--specs-gold-soft);
-  border: 1px solid rgba(197, 164, 91, 0.35);
+  color: var(--behind-gold-text);
+  background: rgba(197, 164, 91, 0.14);
+  border: 1px solid rgba(197, 164, 91, 0.45);
   border-radius: 50%;
 }
 
-/* --- 2. Ficha técnica --- */
+/* --- 01. Ficha técnica --- */
 .specs__facts {
   display: grid;
   grid-template-columns: 1fr;
-  gap: 1px;
-  background: var(--specs-line);
-  border: 1px solid var(--specs-line);
+  gap: clamp(0.75rem, 2vw, 1rem);
 }
 
 @media (min-width: 640px) {
@@ -170,15 +61,22 @@
   grid-template-columns: auto 1fr;
   grid-template-rows: auto 1fr;
   column-gap: 1rem;
-  row-gap: 0.35rem;
+  row-gap: 0.3rem;
   align-content: start;
-  padding: clamp(1.1rem, 2.5vw, 1.5rem);
-  background: #070707;
-  transition: background-color 250ms ease;
+  padding: 1.25rem;
+  background: var(--behind-card);
+  border: 1px solid var(--behind-line);
+  border-radius: 6px;
+  transition:
+    border-color 250ms ease,
+    box-shadow 250ms ease,
+    transform 250ms ease;
 }
 
 .specs__fact:hover {
-  background: #0f0d09;
+  border-color: rgba(197, 164, 91, 0.7);
+  box-shadow: 0 18px 40px -26px rgba(0, 0, 0, 0.45);
+  transform: translateY(-3px);
 }
 
 .specs__fact .specs__icon {
@@ -187,20 +85,21 @@
 
 .specs__fact-label {
   align-self: end;
-  font-size: 0.7rem;
-  font-weight: 600;
-  letter-spacing: 0.16em;
+  font-family: var(--font-display);
+  font-size: 1.02rem;
+  letter-spacing: 0.06em;
   text-transform: uppercase;
-  color: var(--specs-gold);
+  line-height: 1.2;
+  color: #000;
 }
 
 .specs__fact-value {
   font-size: var(--fs-small);
-  line-height: 1.55;
-  color: #e6e6e6;
+  line-height: 1.6;
+  color: var(--color-muted-on-light);
 }
 
-/* --- 3. Requisitos: Mínimo vs. Recomendado --- */
+/* --- 02. Requisitos: Mínimo (claro) frente a Recomendado (negro) --- */
 .specs__reqs {
   display: grid;
   grid-template-columns: 1fr;
@@ -217,19 +116,19 @@
 .specs__tier {
   display: flex;
   flex-direction: column;
-  padding: clamp(1.25rem, 3vw, 2rem);
-  background: var(--specs-card);
-  border: 1px solid var(--specs-line);
-  border-radius: 6px;
+  padding: clamp(1.25rem, 3vw, 1.85rem);
+  background: var(--behind-card);
+  border: 1px solid var(--behind-line);
+  border-radius: 8px;
 }
 
 .specs__tier--best {
-  position: relative;
+  color: #f5f5f5;
   background:
-    radial-gradient(80% 60% at 100% 0%, rgba(197, 164, 91, 0.16), transparent 70%),
-    #0b0a07;
-  border-color: rgba(197, 164, 91, 0.55);
-  box-shadow: 0 24px 60px -30px rgba(197, 164, 91, 0.45);
+    radial-gradient(70% 60% at 100% 0%, rgba(197, 164, 91, 0.2), transparent 65%),
+    #0b0b0b;
+  border-color: #0b0b0b;
+  box-shadow: 0 26px 60px -34px rgba(0, 0, 0, 0.75);
 }
 
 .specs__tier-head {
@@ -240,26 +139,31 @@
   gap: 0.6rem 1rem;
   padding-bottom: 1.1rem;
   margin-bottom: 0.4rem;
-  border-bottom: 1px solid var(--specs-line);
+  border-bottom: 1px solid var(--behind-line);
+}
+
+.specs__tier--best .specs__tier-head {
+  border-bottom-color: rgba(255, 255, 255, 0.1);
 }
 
 .specs__tier-name {
   font-family: var(--font-display);
-  font-size: clamp(1.4rem, 3vw, 1.75rem);
+  font-size: clamp(1.35rem, 3vw, 1.7rem);
   letter-spacing: 0.06em;
   text-transform: uppercase;
-  color: #fff;
+  color: #000;
 }
 
 .specs__tier--best .specs__tier-name {
-  color: var(--specs-gold);
+  color: var(--behind-gold);
 }
 
 .specs__tier-sub {
-  font-size: 0.7rem;
+  font-size: 0.68rem;
+  font-weight: 600;
   letter-spacing: 0.14em;
   text-transform: uppercase;
-  color: var(--color-gray-light);
+  color: var(--color-muted-on-light);
 }
 
 .specs__tier-badge {
@@ -267,12 +171,12 @@
   align-items: center;
   gap: 0.4rem;
   padding: 0.35rem 0.7rem;
-  font-size: 0.66rem;
+  font-size: 0.64rem;
   font-weight: 600;
   letter-spacing: 0.14em;
   text-transform: uppercase;
   color: #000;
-  background: var(--specs-gold);
+  background: var(--behind-gold);
   border-radius: 999px;
 }
 
@@ -288,7 +192,11 @@
   column-gap: 0.85rem;
   row-gap: 0.2rem;
   padding: 0.85rem 0;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  border-bottom: 1px solid var(--behind-line);
+}
+
+.specs__tier--best .specs__req {
+  border-bottom-color: rgba(255, 255, 255, 0.07);
 }
 
 .specs__req:last-child {
@@ -299,29 +207,37 @@
 .specs__req-icon {
   grid-row: 1 / 3;
   margin-top: 0.1rem;
-  color: #8f8f8f;
+  color: var(--behind-gold-text);
 }
 
 .specs__tier--best .specs__req-icon {
-  color: var(--specs-gold);
+  color: var(--behind-gold);
 }
 
 .specs__req dt {
-  font-size: 0.68rem;
+  font-size: 0.66rem;
   font-weight: 600;
   letter-spacing: 0.14em;
   text-transform: uppercase;
-  color: var(--color-gray-light);
+  color: var(--color-muted-on-light);
+}
+
+.specs__tier--best .specs__req dt {
+  color: #9a9a9a;
 }
 
 .specs__req dd {
   margin: 0;
   font-size: var(--fs-small);
   line-height: 1.5;
+  color: #111;
+}
+
+.specs__tier--best .specs__req dd {
   color: #f2f2f2;
 }
 
-/* --- 4. Especificaciones técnicas --- */
+/* --- 03. Especificaciones técnicas --- */
 .specs__tech {
   display: grid;
   grid-template-columns: 1fr;
@@ -348,13 +264,14 @@
   align-items: center;
   column-gap: 0.75rem;
   row-gap: 0.45rem;
-  padding: 1.1rem 1.15rem 1.15rem;
-  background: var(--specs-card);
-  border: 1px solid var(--specs-line);
-  border-radius: 6px;
+  padding: 1.15rem 1.2rem 1.2rem;
   overflow: hidden;
+  background: var(--behind-card);
+  border: 1px solid var(--behind-line);
+  border-radius: 6px;
   transition:
     border-color 250ms ease,
+    box-shadow 250ms ease,
     transform 250ms ease;
 }
 
@@ -364,15 +281,16 @@
   position: absolute;
   inset: 0 0 auto;
   height: 2px;
-  background: linear-gradient(90deg, var(--specs-gold), transparent);
+  background: linear-gradient(90deg, var(--behind-gold), transparent);
   transform: scaleX(0);
   transform-origin: left;
   transition: transform 350ms ease;
 }
 
 .specs__tech-item:hover {
-  border-color: rgba(197, 164, 91, 0.4);
-  transform: translateY(-2px);
+  border-color: rgba(197, 164, 91, 0.7);
+  box-shadow: 0 18px 40px -26px rgba(0, 0, 0, 0.45);
+  transform: translateY(-3px);
 }
 
 .specs__tech-item:hover::before {
@@ -381,24 +299,23 @@
 
 .specs__tech-icon {
   display: block;
-  color: var(--specs-gold);
+  color: var(--behind-gold-text);
 }
 
 .specs__tech-label {
-  align-self: center;
-  font-size: 0.7rem;
-  font-weight: 600;
-  letter-spacing: 0.16em;
+  font-family: var(--font-display);
+  font-size: 1rem;
+  letter-spacing: 0.06em;
   text-transform: uppercase;
-  color: #fff;
+  color: #000;
 }
 
 .specs__tech-value {
   grid-column: 1 / -1;
   align-self: start;
   font-size: var(--fs-small);
-  line-height: 1.55;
-  color: var(--color-gray-light);
+  line-height: 1.6;
+  color: var(--color-muted-on-light);
 }
 
 .specs__verified {
@@ -406,10 +323,14 @@
   align-items: center;
   gap: 0.5rem;
   margin-top: 1.5rem;
-  font-size: 0.72rem;
+  padding: 0.45rem 0.9rem;
+  font-size: 0.7rem;
+  font-weight: 600;
   letter-spacing: 0.14em;
   text-transform: uppercase;
-  color: var(--specs-gold);
+  color: #1d5c2e;
+  background: rgba(46, 139, 87, 0.12);
+  border-radius: 999px;
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -419,6 +340,7 @@
     transition: none;
   }
 
+  .specs__fact:hover,
   .specs__tech-item:hover {
     transform: none;
   }

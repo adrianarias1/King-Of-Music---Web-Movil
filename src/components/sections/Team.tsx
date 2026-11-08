@@ -39,7 +39,7 @@ export function TeamSection() {
   return (
     <section id="equipo" className="section theme-dark team" aria-label={copy.title}>
       <div className="container">
-        <SectionHeading index="08" eyebrow={copy.eyebrow} title={copy.title} lead={copy.lead} />
+        <SectionHeading index="07" eyebrow={copy.eyebrow} title={copy.title} lead={copy.lead} />
 
         <ul className="team__grid">
           {team.map((member, index) => (

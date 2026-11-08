@@ -32,7 +32,6 @@ import { CharacterCollage } from './components/sections/CharacterCollage'
 import { Storyboard } from './components/sections/Storyboard'
 import { GameMap } from './components/sections/GameMap'
 import { BehindTheGame } from './components/sections/BehindTheGame'
-import { GameSpecs } from './components/sections/GameSpecs'
 import { TeamSection } from './components/sections/Team'
 import { DownloadCTA } from './components/sections/DownloadCTA'
 import { ReviewsDock } from './features/reviews/Reviews'
@@ -192,13 +191,8 @@ export default function App() {
         <GameMap mapImage={mapAsset} />
 
         {/* =================================================
-            07. REQUERIMIENTOS Y ESPECIFICACIONES
-            ================================================= */}
-
-        <GameSpecs />
-
-        {/* =================================================
-            08. CÓMO SE CONSTRUYE
+            07. DESARROLLO
+            Requerimientos y especificaciones + Cómo se construye
             ================================================= */}
 
         <SectionBlend from="#090909" to="#fff" />
@@ -206,13 +200,13 @@ export default function App() {
         <SectionBlend from="#fff" to="#000" />
 
         {/* =================================================
-            09. EQUIPO DE DESARROLLO
+            08. EQUIPO DE DESARROLLO
             ================================================= */}
 
         <TeamSection />
 
         {/* =================================================
-            10. DESCARGA DEL VIDEOJUEGO
+            09. DESCARGA DEL VIDEOJUEGO
             ================================================= */}
 
         <DownloadCTA />
