@@ -295,3 +295,7 @@
   color: var(--color-white);
   transform: translateX(2px);
 }
+/* Título de la sección de combos, separado de las habilidades */
+.viewer__combos-title {
+  margin-top: clamp(1.5rem, 3vw, 2.25rem);
+}

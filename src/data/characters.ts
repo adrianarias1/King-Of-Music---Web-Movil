@@ -1,4 +1,14 @@
-import type { Character } from '../types'
+import { comboVideo } from '../lib/media'
+import type { Character, Combo } from '../types'
+
+/** Combos 1–3 de un personaje (teclas por definir). */
+function combos(prefix: string, characterId: string): Combo[] {
+  return [1, 2, 3].map((n) => ({
+    id: `${characterId}-combo-${n}`,
+    name: `Combo ${n}`,
+    media: { type: 'video', src: comboVideo(`${prefix}_combo${n}.mp4`) },
+  }))
+}
 
 /* ==========================================================================
    PERSONAJES — DATOS DEL ROSTER
@@ -27,8 +37,11 @@ export const characters: Character[] = [
         description:
           'Concentra la energía de su interpretación y el apoyo del público en una esfera musical que dirige hacia el adversario.',
         icon: 'Zap',
+        combo: 'U',
+        media: { type: 'video', src: comboVideo('juan_grabriel_special_beam.mp4') },
       },
     ],
+    combos: combos('juan_grabriel', 'juan-grabriel'),
   },
   {
     id: 'jose-jose-jose',
@@ -49,8 +62,11 @@ export const characters: Character[] = [
         description:
           'Utiliza un micrófono para ejecutar una interpretación de gran intensidad que genera una poderosa onda sonora.',
         icon: 'Mic2',
+        combo: 'U',
+        media: { type: 'video', src: comboVideo('jose_jose_special_wave.mp4') },
       },
     ],
+    combos: combos('jose_jose', 'jose-jose-jose'),
   },
   {
     id: 'alex-llora',
@@ -71,8 +87,11 @@ export const characters: Character[] = [
         description:
           'Utiliza su guitarra eléctrica para realizar un golpe de gran potencia acompañado por una descarga sonora.',
         icon: 'Activity',
+        combo: 'U',
+        media: { type: 'video', src: comboVideo('alex_llora_special_club.mp4') },
       },
     ],
+    combos: combos('alex_llora', 'alex-llora'),
   },
   {
     id: 'roman-ayala',
@@ -93,8 +112,11 @@ export const characters: Character[] = [
         description:
           'Lanza su acordeón hacia el oponente siguiendo una trayectoria de ida y regreso para atacar a media distancia.',
         icon: 'Music2',
+        combo: 'U',
+        media: { type: 'video', src: comboVideo('roman_ayala_special_boomerang.mp4') },
       },
     ],
+    combos: combos('roman_ayala', 'roman-ayala'),
   },
   {
     id: 'natanael-chano',
@@ -115,8 +137,11 @@ export const characters: Character[] = [
         description:
           'Ejecuta un fuerte pisotón que genera una vibración y una onda de impacto dirigida hacia el adversario.',
         icon: 'Footprints',
+        combo: 'U',
+        media: { type: 'video', src: comboVideo('natanael_chano_special_slam.mp4') },
       },
     ],
+    combos: combos('natanael_chano', 'natanael-chano'),
   },
   {
     id: 'peso-plomo',
@@ -137,21 +162,76 @@ export const characters: Character[] = [
         description:
           'Utiliza su cadena para alcanzar al oponente a media distancia y generar un impacto acompañado por una descarga de baja frecuencia.',
         icon: 'Zap',
+        combo: 'U',
+        media: { type: 'video', src: comboVideo('peso_plomo_special_chain.mp4') },
       },
     ],
+    combos: combos('peso_plomo', 'peso-plomo'),
   },
   {
     id: 'flavia',
     name: 'Flavia',
-    tagline: 'Artista',
-    description: 'Personaje del roster de King of Music.',
+    tagline: 'Villana · Jefa final',
+    description:
+      'Organizadora del Torneo del Bienestar y jefa final del modo historia. No representa un género: combate con fragmentos de las habilidades de los géneros eliminados.',
     model: '/models/characters/Flavia.glb',
     preview: '/images/characters/flavia.png',
     scale: 1,
     cameraPosition: [0, 1.1, 3.2],
     accent: '#BABABA',
     glow: '#7A0019',
-    abilities: [],
+    abilities: [
+      // Absorbe la habilidad especial de cada uno de los otros seis.
+      {
+        id: 'flavia-rayo-de-la-interpretacion',
+        name: 'Rayo de la Interpretación',
+        description: 'Absorbida de Juan Grabriel: una esfera de energía musical dirigida contra el rival.',
+        icon: 'Zap',
+        combo: 'U',
+        media: { type: 'video', src: comboVideo('flavia_special_beam.mp4') },
+      },
+      {
+        id: 'flavia-nota-del-desamor',
+        name: 'Nota del Desamor',
+        description: 'Absorbida de José José José: una onda cargada de desamor que golpea a distancia.',
+        icon: 'Mic2',
+        combo: 'U',
+        media: { type: 'video', src: comboVideo('flavia_special_wave.mp4') },
+      },
+      {
+        id: 'flavia-guitarrazo-de-rock',
+        name: 'Guitarrazo de Rock',
+        description: 'Absorbida de Alex Llora: un golpe explosivo con la energía del rock mexicano.',
+        icon: 'Activity',
+        combo: 'U',
+        media: { type: 'video', src: comboVideo('flavia_special_club.mp4') },
+      },
+      {
+        id: 'flavia-acordeon-de-poder',
+        name: 'Acordeón de Poder',
+        description: 'Absorbida de Román Ayala: ráfagas de energía musical lanzadas con el acordeón.',
+        icon: 'Music2',
+        combo: 'U',
+        media: { type: 'video', src: comboVideo('flavia_special_boomerang.mp4') },
+      },
+      {
+        id: 'flavia-paso-tumbado',
+        name: 'Paso Tumbado',
+        description: 'Absorbida de Natanael Chano: un ataque veloz al ritmo de los corridos tumbados.',
+        icon: 'Footprints',
+        combo: 'U',
+        media: { type: 'video', src: comboVideo('flavia_special_slam.mp4') },
+      },
+      {
+        id: 'flavia-cadena-belica',
+        name: 'Cadena Bélica',
+        description: 'Absorbida de Peso Plomo: una combinación de golpes rápidos con ritmos contemporáneos.',
+        icon: 'Zap',
+        combo: 'U',
+        media: { type: 'video', src: comboVideo('flavia_special_chain.mp4') },
+      },
+    ],
+    combos: combos('flavia', 'flavia'),
   },
 ]
 

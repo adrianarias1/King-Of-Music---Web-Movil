@@ -2,11 +2,12 @@ import { Info, MousePointer2, Move3d } from 'lucide-react'
 import { useCallback, useEffect, useState } from 'react'
 import { characters, defaultCharacterId } from '../../data/characters'
 import { useInView } from '../../hooks/useInView'
-import type { Ability } from '../../types'
+import type { Ability, Combo } from '../../types'
 import { ErrorBoundary } from '../ui/ErrorBoundary'
 import { Reveal } from '../ui/Reveal'
 import { SectionHeading } from '../ui/SectionHeading'
 import { AbilityModal } from './AbilityModal'
+import type { MoveDetail } from './AbilityModal'
 import { ViewerCanvas, type ModelState } from './ViewerCanvas'
 import { clearModel, isModelPrepared, preloadModel } from './gltfModelCache'
 import './CharacterViewer.css'
@@ -19,7 +20,12 @@ const copy = {
 
 export function CharacterViewer() {
   const [activeId, setActiveId] = useState(defaultCharacterId)
-  const [ability, setAbility] = useState<Ability | null>(null)
+  const [move, setMove] = useState<MoveDetail | null>(null)
+
+  const openAbility = (entry: Ability) =>
+    setMove({ kind: 'Habilidad', id: entry.id, name: entry.name, description: entry.description, keys: entry.combo, media: entry.media, preview: entry.preview })
+  const openCombo = (entry: Combo, characterName: string) =>
+    setMove({ kind: 'Combo', id: entry.id, name: entry.name, description: `Secuencia de ataques encadenados de ${characterName}.`, keys: entry.keys, media: entry.media })
   const [loadAttempt, setLoadAttempt] = useState(0)
   const [modelStates, setModelStates] = useState<Partial<Record<string, ModelState>>>({})
 
@@ -60,7 +66,7 @@ export function CharacterViewer() {
     setActiveId(id)
     const next = characters.find((item) => item.id === id)
     setModelStates((previous) => ({ ...previous, [id]: !next?.model ? 'placeholder' : isModelPrepared(next.model) ? 'loaded' : 'loading' }))
-    setAbility(null)
+    setMove(null)
     setLoadAttempt(0)
   }, [])
 
@@ -186,7 +192,7 @@ export function CharacterViewer() {
                   <button
                     type="button"
                     className="ability"
-                    onClick={() => setAbility(entry)}
+                    onClick={() => openAbility(entry)}
                     aria-haspopup="dialog"
                   >
                     <span className="ability__main">
@@ -203,11 +209,46 @@ export function CharacterViewer() {
                 </li>
               ))}
             </ul>
+
+            {character.combos?.length ? (
+              <>
+                <h4 className="label viewer__abilities-title viewer__combos-title">
+                  Combos
+                  <span className="viewer__abilities-count">
+                    {String(character.combos.length).padStart(2, '0')}
+                  </span>
+                </h4>
+
+                <ul className="viewer__abilities">
+                  {character.combos.map((entry) => (
+                    <li key={entry.id}>
+                      <button
+                        type="button"
+                        className="ability"
+                        onClick={() => openCombo(entry, character.name)}
+                        aria-haspopup="dialog"
+                      >
+                        <span className="ability__main">
+                          <span className="ability__name">{entry.name}</span>
+                          {entry.keys ? <span className="ability__combo">{entry.keys}</span> : null}
+                        </span>
+                        <MousePointer2
+                          className="ability__cue"
+                          size={15}
+                          strokeWidth={1.5}
+                          aria-hidden="true"
+                        />
+                      </button>
+                    </li>
+                  ))}
+                </ul>
+              </>
+            ) : null}
           </Reveal>
         </div>
       </div>
 
-      <AbilityModal ability={ability} characterName={character.name} onClose={() => setAbility(null)} />
+      <AbilityModal move={move} characterName={character.name} onClose={() => setMove(null)} />
     </section>
   )
 }

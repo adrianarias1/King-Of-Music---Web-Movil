@@ -47,3 +47,51 @@
   padding-top: 1.1rem;
   border-top: 1px solid var(--color-line);
 }
+/* --- Video en bucle de la habilidad / combo --- */
+.ability-modal__video {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  overflow: hidden;
+  background:
+    radial-gradient(ellipse 60% 60% at 50% 50%, rgba(197, 164, 91, 0.12), transparent 70%),
+    #050505;
+  border: 1px solid var(--color-line);
+  border-radius: var(--radius-md);
+}
+
+.ability-modal__video video {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  opacity: 0;
+  transition: opacity 280ms ease;
+}
+
+.ability-modal__video.is-ready video {
+  opacity: 1;
+}
+
+.ability-modal__video-state {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.65rem;
+  color: var(--color-gray-light);
+  font-size: var(--fs-small);
+  text-align: center;
+}
+
+.ability-modal__video-state svg {
+  color: #c5a45b;
+}
+
+.ability-modal__hint {
+  margin-left: 0.35rem;
+  color: var(--color-gray-light);
+  font-size: var(--fs-small);
+}

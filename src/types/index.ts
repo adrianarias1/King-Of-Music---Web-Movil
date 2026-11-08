@@ -45,6 +45,17 @@ export interface Character {
   /** Color de la luz de fondo en el visor 3D. */
   glow?: string
   abilities: Ability[]
+  /** Combos del personaje (cada uno con su video en bucle). */
+  combos?: Combo[]
+}
+
+/** Combo de ataques de un personaje. */
+export interface Combo {
+  id: string
+  name: string
+  /** Teclas, p. ej. "G + G + J + H". Si falta, se muestra "por definir". */
+  keys?: string
+  media?: AbilityMedia
 }
 
 /** Ubicación del mapa conceptual del juego. Coordenadas en porcentaje 0-100. */
