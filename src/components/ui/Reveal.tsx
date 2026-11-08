@@ -12,7 +12,7 @@ interface Props {
   /** Duracion en segundos (0.2 - 0.6). */
   duration?: number
   className?: string
-  as?: 'div' | 'li' | 'article' | 'figure'
+  as?: 'div' | 'li' | 'ul' | 'article' | 'figure'
 }
 
 const OFFSET: Record<Direction, { x: number; y: number }> = {

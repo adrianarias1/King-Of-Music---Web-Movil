@@ -43,6 +43,15 @@ export interface Repository {
 
 const same = (text: string): L => ({ es: text, en: text })
 
+/* --- Cifras destacadas (encabezado de la sección) ----------------------- */
+
+export const specHighlights: { id: string; value: string; label: L }[] = [
+  { id: 'fighters', value: '7', label: { es: 'Luchadores', en: 'Fighters' } },
+  { id: 'stages', value: '3', label: { es: 'Escenarios', en: 'Stages' } },
+  { id: 'fps', value: '60', label: { es: 'fps a 1080p', en: 'fps at 1080p' } },
+  { id: 'size', value: '154', label: { es: 'MB de instalador', en: 'MB installer' } },
+]
+
 /* --- Ficha técnica (identificación del producto) ------------------------ */
 
 export const specSheet: SpecRow[] = [
