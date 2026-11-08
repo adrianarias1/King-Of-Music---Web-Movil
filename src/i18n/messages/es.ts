@@ -191,6 +191,18 @@ export const es = {
     process: 'Proceso',
     gallery: 'Galería de desarrollo',
     pendingShot: 'Captura pendiente',
+    specSheet: 'Ficha técnica',
+    requirements: 'Requisitos del sistema',
+    requirementsCaption: 'Requisitos de hardware mínimos y recomendados para jugar King of Music en PC',
+    component: 'Componente',
+    minimum: 'Mínimo',
+    recommended: 'Recomendado',
+    technical: 'Especificaciones técnicas',
+    milestones: 'Hitos del desarrollo',
+    testing: 'Pruebas',
+    testCases: (n: number) => `Ver los ${n} casos de prueba`,
+    passed: 'Pasa',
+    repositories: 'Repositorios en GitHub',
   },
 
   team: {
@@ -204,7 +216,7 @@ export const es = {
   },
 
   download: {
-    soon: (label: string, platform: string) => `${label} — build ${platform}`,
+    downloadOf: (name: string) => `Descargar ${name}`,
   },
 
   auth: {

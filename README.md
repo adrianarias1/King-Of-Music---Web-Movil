@@ -112,19 +112,20 @@ Editar el array `abilities` de cada personaje en `src/data/characters.ts`. Puede
 
 La fuente está preparada pero no incluida. Colocar `Kings.woff2` en `public/fonts/` y descomentar el bloque `@font-face` en `src/fonts.css`. Se usa únicamente para títulos grandes, nombre de marca y encabezados importantes.
 
-### Habilitar la descarga (APK)
+### Habilitar las descargas (juego para Windows y app Android)
 
-1. Colocar el APK en `public/downloads/king-of-music.apk` (o cualquier nombre).
-2. Editar `src/config.ts`:
-   ```ts
-   export const download = {
-     available: true,
-     url: './downloads/king-of-music.apk',
-   } as const
-   ```
-3. Opcional: pasar valores por `window.KING_OF_MUSIC` en builds nativos.
+En `src/config.ts`, arreglo `downloads`, pon el enlace en `url`:
 
-Mientras `available` sea `false`, el CTA aparece deshabilitado con "Próximamente" y no apunta a archivos inexistentes.
+```ts
+{ id: 'game', url: 'https://github.com/tic-310019-alt/KingOfMusic/releases/download/v0.1.0/KingOfMusic_Setup.exe', … },
+{ id: 'app',  url: './downloads/king-of-music.apk', … },
+```
+
+- Enlace externo (GitHub Releases, Drive, R2…): se abre en una pestaña nueva.
+- Archivo local: colócalo en `public/downloads/`.
+
+Mientras `url` esté vacío, el botón aparece desactivado con "Próximamente".
+Dentro de la app Android solo se muestra la descarga del juego.
 
 ## Capacitor / Android
 

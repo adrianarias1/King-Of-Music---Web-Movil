@@ -53,3 +53,67 @@
   color: var(--color-gray-light);
 }
 
+
+/* --- Tarjetas: juego (Windows) y app (Android) --- */
+.download__cards {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: clamp(0.9rem, 2.5vw, 1.5rem);
+  width: min(100%, 860px);
+  margin-top: clamp(1rem, 3vw, 2rem);
+  text-align: left;
+}
+
+@media (min-width: 720px) {
+  .download__cards {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .download__cards.is-single {
+    grid-template-columns: minmax(0, 420px);
+    justify-content: center;
+  }
+}
+
+.download__card {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.6rem;
+  height: 100%;
+  padding: clamp(1.25rem, 3.5vw, 2rem);
+  background: linear-gradient(160deg, rgba(197, 164, 91, 0.09), rgba(255, 255, 255, 0.02) 55%);
+  border: 1px solid rgba(197, 164, 91, 0.35);
+  border-radius: var(--radius-sm, 4px);
+}
+
+.download__card-icon {
+  color: #c5a45b;
+}
+
+.download__card-title {
+  font-family: var(--font-display);
+  font-size: clamp(1.3rem, 3vw, 1.6rem);
+  font-weight: 400;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.download__card-desc {
+  font-size: var(--fs-small);
+  line-height: 1.6;
+  color: var(--color-gray-light);
+}
+
+.download__card-details {
+  color: #c5a45b;
+}
+
+.download__card .download__btn {
+  margin-top: auto;
+  width: 100%;
+}
+
+.download__card .download__soon {
+  align-self: center;
+}

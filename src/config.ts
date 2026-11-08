@@ -22,26 +22,58 @@ export const siteConfig = {
 } as const
 
 /* --------------------------------------------------------------------------
-   DESCARGA / ANDROID
+   DESCARGAS: JUEGO (WINDOWS) Y APP MÓVIL (ANDROID)
    --------------------------------------------------------------------------
-   Para habilitar la descarga:
-     1. Coloca el archivo en `public/downloads/`
-        (por ejemplo `public/downloads/king-of-music.apk`)
-     2. Define `download.url` con la ruta correcta
-     3. Cambia `download.available` a `true`
+   Para activar un botón basta con poner su enlace en `url`:
+     - Un enlace externo (GitHub Releases, Google Drive, Cloudflare R2…):
+         url: 'https://…/KingOfMusic_Setup.exe'
+     - O un archivo dentro de `public/downloads/`:
+         url: './downloads/king-of-music.apk'
 
-   Mientras `available` sea `false`, el CTA no apunta a ningún archivo
-   inexistente y muestra el estado "Próximamente".
+   Mientras `url` esté vacío, el botón aparece desactivado con el aviso
+   "Próximamente" y nunca apunta a un archivo inexistente.
    -------------------------------------------------------------------------- */
-export const download = {
-  available: false,
-  /** Ruta dentro de `public/`. Solo se usa si available === true. */
-  url: './downloads/king-of-music.apk',
-  platformLabel: 'Android',
-  sizeLabel: '',
-  /** Texto mostrado en el CTA cuando no hay build disponible. */
-  comingSoonLabel: { es: 'Próximamente', en: 'Coming soon' } satisfies L,
-} as const
+export interface DownloadTarget {
+  id: 'game' | 'app'
+  /** Enlace de descarga. Vacío = "Próximamente". */
+  url: string
+  title: L
+  description: L
+  /** Plataforma y tamaño, p. ej. "Windows 10/11 · 64 bits · 154 MB". */
+  details: L
+}
+
+export const downloads: DownloadTarget[] = [
+  {
+    id: 'game',
+    url: '',
+    title: { es: 'Juego para PC', en: 'PC game' },
+    description: {
+      es: 'El torneo completo: campaña, versus local y los siete luchadores.',
+      en: 'The full tournament: campaign, local versus and all seven fighters.',
+    },
+    details: {
+      es: 'Windows 10/11 · 64 bits · instalador de 154 MB',
+      en: 'Windows 10/11 · 64-bit · 154 MB installer',
+    },
+  },
+  {
+    id: 'app',
+    url: '',
+    title: { es: 'App para Android', en: 'Android app' },
+    description: {
+      es: 'Este sitio como app: personajes en 3D, historia, mapa y reseñas.',
+      en: 'This site as an app: 3D characters, story, map and reviews.',
+    },
+    details: {
+      es: 'Android · APK',
+      en: 'Android · APK',
+    },
+  },
+]
+
+/** Texto del botón cuando todavía no hay enlace. */
+export const comingSoonLabel: L = { es: 'Próximamente', en: 'Coming soon' }
 
 
 /* =========================================================
@@ -76,24 +108,3 @@ export const trailerPosterAsset = '/images/imagen-hero.jpeg'
 
 export const mapAsset: string | undefined =
   '/images/map.webp'
-
-
-/** Puede sobrescribirse con window.KING_OF_MUSIC en builds nativos. */
-declare global {
-  interface Window {
-    KING_OF_MUSIC?: Partial<{
-      downloadUrl: string
-      downloadAvailable: boolean
-    }>
-  }
-}
-
-const runtime = typeof window !== 'undefined' ? window.KING_OF_MUSIC : undefined
-
-export const resolvedDownload = {
-  available: runtime?.downloadAvailable ?? download.available,
-  url: runtime?.downloadUrl ?? download.url,
-  platformLabel: download.platformLabel,
-  sizeLabel: download.sizeLabel,
-  comingSoonLabel: download.comingSoonLabel,
-} as const

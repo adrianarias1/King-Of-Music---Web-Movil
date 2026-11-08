@@ -75,15 +75,15 @@ public/videos/  public/models/  public/fonts/  public/downloads/
 2. Descomentar el bloque `@font-face` en `src/fonts.css`.
 3. El fallback (`Georgia, serif`) ya esta configurado, por lo que el diseño no se rompe si falta.
 
-## Descarga / APK
-1. Compilar y copiar el APK a `public/downloads/king-of-music.apk`.
-2. En `src/config.ts`, poner `download.available = true` y ajustar `download.url`.
-3. Para builds nativos, `window.KING_OF_MUSIC.downloadUrl` sobreescribe la ruta sin recompilar.
+## Descargas (juego y APK)
+1. Juego: subir el instalador (p. ej. a GitHub Releases) y poner el enlace en `downloads[0].url` de `src/config.ts`.
+2. App: copiar el APK a `public/downloads/king-of-music.apk` (o usar un enlace externo) y ponerlo en `downloads[1].url`.
+3. Con `url` vacío, el botón muestra "Próximamente".
 
 ## Checklist antes de publicar
 - [ ] Sin rutas hacia archivos inexistentes.
 - [ ] Sin errores 404 en consola.
 - [ ] Imagenes optimizadas y con `alt` descriptivo.
-- [ ] `download.available` coherente con la existencia real del APK.
+- [ ] Enlaces de `downloads` coherentes con los archivos publicados.
 - [ ] Storyboard, mapa y personajes con assets definitivos.
 - [ ] Consola limpia de warnings.

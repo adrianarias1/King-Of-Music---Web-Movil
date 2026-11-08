@@ -11,7 +11,7 @@ import type { DevShot, L, Tool } from '../types'
 export const tools: Tool[] = [
   {
     id: 'unity',
-    name: 'Unity 6.3',
+    name: 'Unity 6.6',
     description: {
       es: 'Motor principal. Integra modelos, animaciones, escenarios, interfaz, audio y la programación de las mecánicas de combate.',
       en: 'Main engine. It brings together models, animations, stages, UI, audio and the programming of the combat mechanics.',

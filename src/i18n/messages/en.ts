@@ -185,6 +185,18 @@ export const en: Messages = {
     process: 'Process',
     gallery: 'Development gallery',
     pendingShot: 'Screenshot pending',
+    specSheet: 'Fact sheet',
+    requirements: 'System requirements',
+    requirementsCaption: 'Minimum and recommended hardware requirements to play King of Music on PC',
+    component: 'Component',
+    minimum: 'Minimum',
+    recommended: 'Recommended',
+    technical: 'Technical specifications',
+    milestones: 'Development milestones',
+    testing: 'Testing',
+    testCases: (n: number) => `See all ${n} test cases`,
+    passed: 'Pass',
+    repositories: 'GitHub repositories',
   },
 
   team: {
@@ -198,7 +210,7 @@ export const en: Messages = {
   },
 
   download: {
-    soon: (label: string, platform: string) => `${label} — ${platform} build`,
+    downloadOf: (name: string) => `Download ${name}`,
   },
 
   auth: {
