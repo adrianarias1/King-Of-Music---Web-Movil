@@ -1,12 +1,16 @@
 import { comboVideo } from '../lib/media'
 import type { Character, Combo } from '../types'
 
-/** Combos 1–3 de un personaje (teclas por definir). */
+/** Teclas de cada combo (iguales para todos los personajes). */
+const COMBO_KEYS = ['G + G + G', 'H + H + H', 'J + J + J'] as const
+
+/** Combos 1–3 de un personaje, con sus teclas y su video. */
 function combos(prefix: string, characterId: string): Combo[] {
-  return [1, 2, 3].map((n) => ({
-    id: `${characterId}-combo-${n}`,
-    name: `Combo ${n}`,
-    media: { type: 'video', src: comboVideo(`${prefix}_combo${n}.mp4`) },
+  return COMBO_KEYS.map((keys, index) => ({
+    id: `${characterId}-combo-${index + 1}`,
+    name: `Combo ${index + 1}`,
+    keys,
+    media: { type: 'video', src: comboVideo(`${prefix}_combo${index + 1}.mp4`) },
   }))
 }
 
