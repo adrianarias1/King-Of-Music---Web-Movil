@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useInView } from '../../hooks/useInView'
 import { assetExists, assetKnownToExist } from '../../utils/assets'
+import { useI18n } from '../../i18n'
 import './SmartImage.css'
 
 interface Props {
@@ -75,6 +76,7 @@ function ImageBlock({
   }, [src, inView])
 
   const showPlaceholder = status !== 'ready'
+  const { t } = useI18n()
 
   // Con `contain` la caja se ajusta a la proporción real de la imagen, así que
   // el ratio declarado solo se aplica durante el placeholder (evita layout shift).
@@ -100,7 +102,7 @@ function ImageBlock({
       ) : null}
 
       {showPlaceholder ? (
-        <div className="smart-img__ph" role="img" aria-label={`${alt} — sin imagen definitiva`}>
+        <div className="smart-img__ph" role="img" aria-label={t.common.noFinalImage(alt)}>
           <span className="smart-img__grid" aria-hidden="true" />
           {index ? <span className="smart-img__index label">{index}</span> : null}
           {placeholderLabel ? (

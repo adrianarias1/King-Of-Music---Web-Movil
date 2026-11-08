@@ -1,4 +1,5 @@
 import { Component, type ErrorInfo, type ReactNode } from 'react'
+import { useI18n } from '../../i18n'
 
 interface Props {
   children: ReactNode
@@ -32,8 +33,11 @@ export class ErrorBoundary extends Component<Props, State> {
     if (this.props.fallback) return this.props.fallback
     return (
       <div className="boundary-fallback" role="status">
-        <span className="label">{this.props.label ?? 'Contenido no disponible'}</span>
+        <span className="label">{this.props.label ?? <DefaultLabel />}</span>
       </div>
     )
   }
+}
+function DefaultLabel() {
+  return <>{useI18n().t.app.unavailable}</>
 }

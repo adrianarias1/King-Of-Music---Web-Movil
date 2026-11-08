@@ -22,14 +22,17 @@ export interface SessionInfo {
   maxAgeAt: string
 }
 
+export type AuthErrorCode = 'not_enabled' | 'cancelled' | 'rejected' | 'browser' | 'generic'
+
 export interface AuthContextValue {
   status: AuthStatus
   session: Session | null
   user: User | null
   profile: Profile | null
   sessionInfo: SessionInfo | null
-  /** Mensaje de error del último intento de inicio de sesión. */
-  error: string | null
+  /** Motivo del último intento fallido de inicio de sesión (el texto
+   *  se traduce en la interfaz: t.auth.errors[código]). */
+  error: AuthErrorCode | null
   /** true dentro de la app Android (Capacitor). */
   isNative: boolean
   signInWithGoogle: () => Promise<void>
@@ -41,6 +44,6 @@ export const AuthContext = createContext<AuthContextValue | null>(null)
 
 export function useAuth(): AuthContextValue {
   const value = useContext(AuthContext)
-  if (!value) throw new Error('useAuth debe usarse dentro de <AuthProvider>.')
+  if (!value) throw new Error('useAuth must be used inside <AuthProvider>.')
   return value
 }

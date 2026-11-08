@@ -7,7 +7,7 @@ import { Browser } from '@capacitor/browser'
 import { supabase } from '../../lib/supabase'
 import { isNativeApp, NATIVE_AUTH_REDIRECT } from '../../lib/native'
 import { AuthContext } from './authContext'
-import type { AuthContextValue, AuthStatus, Profile, SessionInfo } from './authContext'
+import type { AuthContextValue, AuthErrorCode, AuthStatus, Profile, SessionInfo } from './authContext'
 import { SESSION_MAX_AGE_DAYS } from './sessionPolicy'
 
 /* ==========================================================================
@@ -79,7 +79,7 @@ function profileFromUser(user: User): Profile {
   const text = (value: unknown) => (typeof value === 'string' ? value.trim() : '')
   const { fullName, firstName } = displayNames(meta)
   return {
-    firstName: firstName || (user.email ?? '').split('@')[0] || 'Cuenta',
+    firstName: firstName || (user.email ?? '').split('@')[0] || '',
     fullName: fullName || firstName,
     email: user.email ?? '',
     avatarUrl: text(meta.avatar_url) || text(meta.picture) || null,
@@ -106,17 +106,11 @@ function consumeOAuthParams(): string | null {
   return error
 }
 
-function friendlyError(raw: string): string {
-  if (/provider is not enabled|Unsupported provider/i.test(raw)) {
-    return 'El inicio de sesión con Google todavía no está activado en el servidor.'
-  }
-  if (/access_denied|denied/i.test(raw)) {
-    return 'Cancelaste el inicio de sesión con Google.'
-  }
-  if (/Unable to exchange external code|invalid_client|server_error/i.test(raw)) {
-    return 'Google rechazó la conexión con el servidor. Revisa el Client ID y el Client Secret configurados en Supabase.'
-  }
-  return 'No se pudo iniciar sesión con Google. Inténtalo de nuevo.'
+function friendlyError(raw: string): AuthErrorCode {
+  if (/provider is not enabled|Unsupported provider/i.test(raw)) return 'not_enabled'
+  if (/access_denied|denied/i.test(raw)) return 'cancelled'
+  if (/Unable to exchange external code|invalid_client|server_error/i.test(raw)) return 'rejected'
+  return 'generic'
 }
 
 export function AuthProvider({ children }: { children: ReactNode }) {
@@ -124,7 +118,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [session, setSession] = useState<Session | null>(null)
   const [dbProfile, setDbProfile] = useState<{ userId: string; profile: Profile } | null>(null)
   const [sessionInfo, setSessionInfo] = useState<SessionInfo | null>(null)
-  const [error, setError] = useState<string | null>(null)
+  const [error, setError] = useState<AuthErrorCode | null>(null)
 
   const isNative = isNativeApp
   const user = session?.user ?? null
@@ -311,13 +305,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         },
       })
       if (oauthError || !data?.url) {
-        setError(friendlyError(oauthError?.message ?? 'No se pudo iniciar sesión'))
+        setError(friendlyError(oauthError?.message ?? ''))
         return
       }
       try {
         await Browser.open({ url: data.url, windowName: '_self' })
       } catch {
-        setError('No se pudo abrir el navegador para iniciar sesión. Inténtalo de nuevo.')
+        setError('browser')
       }
       return
     }

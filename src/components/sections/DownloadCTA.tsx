@@ -1,6 +1,7 @@
 import { Clock, Download } from 'lucide-react'
 import { resolvedDownload, siteConfig } from '../../config'
 import { Reveal } from '../ui/Reveal'
+import { useI18n } from '../../i18n'
 import './DownloadCTA.css'
 
 /**
@@ -14,9 +15,10 @@ import './DownloadCTA.css'
  */
 export function DownloadCTA() {
   const { available, url, platformLabel, sizeLabel, comingSoonLabel } = resolvedDownload
+  const { t, l } = useI18n()
 
   return (
-    <section id="descargar" className="section theme-dark download" aria-label="Descargar">
+    <section id="descargar" className="section theme-dark download" aria-label={t.header.download}>
       <div className="download__bg" aria-hidden="true">
         <span className="download__glow" />
       </div>
@@ -24,7 +26,7 @@ export function DownloadCTA() {
       <Reveal className="download__inner container" distance={24}>
         <p className="download__kicker label">{siteConfig.name}</p>
         <h2 className="download__title display">{siteConfig.name}</h2>
-        <p className="download__lead lead">{siteConfig.tagline}</p>
+        <p className="download__lead lead">{l(siteConfig.tagline)}</p>
 
         {available ? (
           <a
@@ -34,18 +36,18 @@ export function DownloadCTA() {
           >
             <span className="btn__label">
               <Download size={20} strokeWidth={1.5} aria-hidden="true" />
-              Descargar
+              {t.header.download}
             </span>
           </a>
         ) : (
           <>
             <button type="button" className="btn btn--primary btn--lg" disabled aria-disabled="true">
-              <span className="btn__label">Descargar</span>
+              <span className="btn__label">{t.header.download}</span>
             </button>
             <p className="download__soon notice">
               <Clock size={14} strokeWidth={1.5} aria-hidden="true" />
               <span>
-                {comingSoonLabel} — build {platformLabel}
+                {t.download.soon(l(comingSoonLabel), platformLabel)}
                 {sizeLabel ? ` · ${sizeLabel}` : ''}
               </span>
             </p>

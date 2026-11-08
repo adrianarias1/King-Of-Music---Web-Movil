@@ -132,27 +132,28 @@ function toReview(row: ReviewRow): Review {
   }
 }
 
-/** Traduce errores de Supabase/Postgres a mensajes para el usuario. */
+/** Convierte errores de Supabase/Postgres en un código. El texto para el
+ *  usuario se elige en la interfaz según el idioma (t.reviews.errors). */
 function toReviewError(error: { message?: string; code?: string; details?: string } | null | undefined): ReviewError {
   const message = `${error?.message ?? ''} ${error?.details ?? ''}`
   const code = error?.code ?? ''
 
   if (/KOM_RATE_LIMIT/.test(message)) {
-    return new ReviewError('rate_limit', 'Publicaste varias reseñas seguidas. Espera un minuto antes de escribir otra.')
+    return new ReviewError('rate_limit', 'Too many reviews in a row')
   }
   if (/KOM_AUTH_REQUIRED|JWT|not authenticated/i.test(message) || code === '42501' || code === 'PGRST301') {
-    return new ReviewError('auth', 'Tu sesión expiró. Inicia sesión de nuevo para continuar.')
+    return new ReviewError('auth', 'Session expired')
   }
   if (code === '23514' || code === '23503' || code === '22P02') {
-    return new ReviewError('validation', 'La reseña no cumple los requisitos. Revisa la calificación y el texto.')
+    return new ReviewError('validation', 'Review failed validation')
   }
   if (code === 'PGRST116') {
-    return new ReviewError('not_found', 'Esta reseña ya no existe o no te pertenece.')
+    return new ReviewError('not_found', 'Review not found or not owned by the user')
   }
   if (/Failed to fetch|NetworkError|network/i.test(message)) {
-    return new ReviewError('network', 'No hay conexión con el servidor. Revisa tu internet e inténtalo de nuevo.')
+    return new ReviewError('network', 'Network error')
   }
-  return new ReviewError('unknown', 'Ocurrió un error inesperado. Inténtalo de nuevo.')
+  return new ReviewError('unknown', 'Unexpected error')
 }
 
 export const supabaseReviewRepository: ReviewRepository = {
@@ -234,7 +235,7 @@ export const supabaseReviewRepository: ReviewRepository = {
     const { data, error } = await supabase.from('reviews').delete().eq('id', id).select('id')
     if (error) throw toReviewError(error)
     if (!data || data.length === 0) {
-      throw new ReviewError('not_found', 'Esta reseña ya no existe o no te pertenece.')
+      throw new ReviewError('not_found', 'Review not found or not owned by the user')
     }
   },
 }

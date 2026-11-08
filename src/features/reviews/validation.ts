@@ -22,10 +22,12 @@ export interface ReviewDraft {
   comment: string
 }
 
+/** Motivo de cada error. El texto se traduce en la interfaz
+ *  (t.reviews.validation). */
 export interface ReviewErrors {
-  subject?: string
-  rating?: string
-  comment?: string
+  subject?: 'missing'
+  rating?: 'invalid'
+  comment?: 'empty' | 'symbols' | 'short' | 'long'
 }
 
 /**
@@ -42,27 +44,27 @@ export function normalizeComment(value: string): string {
     .replace(/^[ \t\n]+|[ \t\n]+$/g, '')
 }
 
-/** Valida un borrador. Devuelve un mensaje por campo (vacío = válido). */
+/** Valida un borrador. Devuelve un código por campo (sin código = válido). */
 export function validateReviewDraft(draft: ReviewDraft): ReviewErrors {
   const errors: ReviewErrors = {}
 
   if (!REVIEW_SECTIONS.includes(draft.section as ReviewSection) || !draft.subjectId.trim()) {
-    errors.subject = 'Elige qué quieres evaluar.'
+    errors.subject = 'missing'
   }
 
   if (!Number.isInteger(draft.rating) || draft.rating < RATING_MIN || draft.rating > RATING_MAX) {
-    errors.rating = 'Selecciona una calificación de 1 a 5 estrellas.'
+    errors.rating = 'invalid'
   }
 
   const comment = normalizeComment(draft.comment)
   if (!comment) {
-    errors.comment = 'Escribe tu reseña.'
+    errors.comment = 'empty'
   } else if (!/[\p{L}\p{N}]/u.test(comment)) {
-    errors.comment = 'Tu reseña debe contener palabras, no solo símbolos.'
+    errors.comment = 'symbols'
   } else if (comment.length < COMMENT_MIN) {
-    errors.comment = `Escribe al menos ${COMMENT_MIN} caracteres (llevas ${comment.length}).`
+    errors.comment = 'short'
   } else if (comment.length > COMMENT_MAX) {
-    errors.comment = `Tu reseña supera los ${COMMENT_MAX} caracteres.`
+    errors.comment = 'long'
   }
 
   return errors

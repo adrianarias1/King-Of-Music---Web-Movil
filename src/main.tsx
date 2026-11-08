@@ -6,6 +6,7 @@ import { Capacitor } from '@capacitor/core'
 import { registerSW } from 'virtual:pwa-register'
 import App from './App'
 import { AuthProvider } from './features/auth/AuthProvider'
+import { I18nProvider } from './i18n'
 import { installExternalLinkHandler } from './lib/native'
 import { prefetchCharacterModels } from './lib/modelCache'
 import { characters } from './data/characters'
@@ -27,13 +28,15 @@ prefetchCharacterModels(characters.flatMap((character) => (character.model ? [ch
 const container = document.getElementById('root')
 
 if (!container) {
-  throw new Error('No se encontro el elemento #root en index.html')
+  throw new Error('Element #root not found in index.html')
 }
 
 createRoot(container).render(
   <StrictMode>
-    <AuthProvider>
-      <App />
-    </AuthProvider>
+    <I18nProvider>
+      <AuthProvider>
+        <App />
+      </AuthProvider>
+    </I18nProvider>
   </StrictMode>,
 )

@@ -16,6 +16,8 @@ import { locations } from '../../data/locations'
 import { Modal } from '../ui/Modal'
 import { SmartImage } from '../ui/SmartImage'
 
+import { useI18n } from '../../i18n'
+
 import './GameMap.css'
 
 // =========================================================
@@ -36,12 +38,6 @@ interface Props {
   mapImage?: string | undefined
 }
 
-const copy = {
-  eyebrow: 'Escenarios',
-  title: 'Mapa del juego',
-  lead:
-    'El torneo recorre los símbolos culturales de la ciudad. Selecciona un lugar para explorar sus detalles.',
-} as const
 
 // =========================================================
 // CONFIGURACIÓN DE CÁMARA
@@ -72,6 +68,8 @@ function clamp(
 
 export function GameMap({ mapImage }: Props) {
   const reduced = useReducedMotion()
+  const { t, l } = useI18n()
+  const copy = t.map
 
   // =====================================================
   // 1. ESTADOS
@@ -235,7 +233,7 @@ export function GameMap({ mapImage }: Props) {
 
           <ul
             className="map__legend"
-            aria-label="Lugares del mapa"
+            aria-label={copy.places}
           >
             {locations.map((location) => {
               const active =
@@ -259,8 +257,8 @@ export function GameMap({ mapImage }: Props) {
                     aria-pressed={focused}
                     aria-label={
                       focused
-                        ? `Quitar zoom de ${location.name}`
-                        : `Seleccionar y acercar ${location.name}`
+                        ? copy.unzoom(l(location.name))
+                        : copy.selectZoom(l(location.name))
                     }
                   >
                     <MapPin
@@ -270,7 +268,7 @@ export function GameMap({ mapImage }: Props) {
                     />
 
                     <span>
-                      {location.name}
+                      {l(location.name)}
                     </span>
                   </button>
                 </li>
@@ -333,7 +331,7 @@ export function GameMap({ mapImage }: Props) {
                 <img
                   className="map__img"
                   src={mapImage}
-                  alt="Mapa conceptual de los escenarios del videojuego"
+                  alt={copy.imageAlt}
                   loading="lazy"
                   decoding="async"
                 />
@@ -341,7 +339,7 @@ export function GameMap({ mapImage }: Props) {
                 <div
                   className="map__schematic"
                   role="img"
-                  aria-label="Mapa esquemático provisional"
+                  aria-label={copy.schematic}
                 >
                   <span
                     className="map__grid"
@@ -349,11 +347,11 @@ export function GameMap({ mapImage }: Props) {
                   />
 
                   <span className="map__schematic-label label">
-                    Mapa provisional
+                    {copy.provisional}
                   </span>
 
                   <span className="map__schematic-sub">
-                    Reemplazar con public/images/map.webp
+                    {copy.replaceHint}
                   </span>
                 </div>
               )}
@@ -414,8 +412,8 @@ export function GameMap({ mapImage }: Props) {
                     }
                     aria-label={
                       focused
-                        ? `${location.name}. Regresar a la vista general.`
-                        : `${location.name}. Seleccionar escenario y acercar mapa.`
+                        ? copy.hotspotBack(l(location.name))
+                        : copy.hotspotSelect(l(location.name))
                     }
                     aria-pressed={focused}
                   >
@@ -425,7 +423,7 @@ export function GameMap({ mapImage }: Props) {
                     />
 
                     <span className="map__hotspot-label">
-                      {location.name}
+                      {l(location.name)}
                     </span>
                   </button>
                 )
@@ -444,8 +442,8 @@ export function GameMap({ mapImage }: Props) {
                 type="button"
                 className="map__reset"
                 onClick={resetView}
-                aria-label="Restaurar vista general del mapa"
-                title="Vista general"
+                aria-label={copy.resetLabel}
+                title={copy.overview}
               >
                 <RotateCcw
                   size={16}
@@ -454,7 +452,7 @@ export function GameMap({ mapImage }: Props) {
                 />
 
                 <span>
-                  Vista general
+                  {copy.overview}
                 </span>
               </button>
             )}
@@ -476,12 +474,12 @@ export function GameMap({ mapImage }: Props) {
                     className="map__media-open"
                     onClick={openLightbox}
                     disabled={!selected.image}
-                    aria-label={`Ampliar imagen de ${selected.name}`}
+                    aria-label={copy.enlarge(l(selected.name))}
                   >
                     <SmartImage
                       src={selected.image}
-                      alt={`Imagen de ${selected.name}`}
-                      placeholderLabel={selected.name}
+                      alt={copy.imageOf(l(selected.name))}
+                      placeholderLabel={l(selected.name)}
                       ratio="4 / 3"
                       fit="contain"
                     />
@@ -492,8 +490,8 @@ export function GameMap({ mapImage }: Props) {
                       type="button"
                       className="map__media-expand"
                       onClick={openLightbox}
-                      aria-label={`Ampliar imagen de ${selected.name}`}
-                      title="Ampliar"
+                      aria-label={copy.enlarge(l(selected.name))}
+                      title={copy.enlargeShort}
                     >
                       <Maximize2
                         size={16}
@@ -505,16 +503,16 @@ export function GameMap({ mapImage }: Props) {
                 </div>
 
                 <h3 className="map__panel-name">
-                  {selected.name}
+                  {l(selected.name)}
                 </h3>
 
                 <p className="map__panel-desc">
-                  {selected.description}
+                  {l(selected.description)}
                 </p>
               </>
             ) : (
               <p className="notice">
-                Selecciona un lugar del mapa
+                {copy.selectPlace}
               </p>
             )}
           </aside>
@@ -528,8 +526,8 @@ export function GameMap({ mapImage }: Props) {
       <Modal
         open={lightboxOpen}
         onClose={closeLightbox}
-        title={selected?.name ?? ''}
-        description="Imagen ampliada del escenario"
+        title={selected ? l(selected.name) : ''}
+        description={copy.lightbox}
         wide
       >
         <div className="map__lightbox">
@@ -537,7 +535,7 @@ export function GameMap({ mapImage }: Props) {
             src={selected?.image}
             alt={
               selected
-                ? `Imagen ampliada de ${selected.name}`
+                ? copy.lightboxOf(l(selected.name))
                 : ''
             }
             ratio="4 / 3"

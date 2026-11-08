@@ -1,0 +1,84 @@
+/* =========================================================
+   SELECTOR DE IDIOMA (ES / EN)
+   Segmentado, dorado, mismo lenguaje visual que el header.
+   ========================================================= */
+
+.lang-switch {
+  display: inline-flex;
+  align-items: stretch;
+  flex: none;
+
+  padding: 2px;
+
+  border: 1px solid #c5a45b66;
+  border-radius: 4px;
+}
+
+.lang-switch__option {
+  display: grid;
+  place-items: center;
+
+  min-width: 40px;
+  min-height: 38px;
+  padding: 0 8px;
+
+  color: #bdbdbd;
+  background: transparent;
+  border: 0;
+  border-radius: 2px;
+
+  font-family: var(--font-body);
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+
+  cursor: pointer;
+  transition:
+    color 200ms ease,
+    background-color 200ms ease;
+}
+
+.lang-switch__option:hover {
+  color: #fff;
+  background: #c5a45b1f;
+}
+
+.lang-switch__option.is-active {
+  color: #000;
+  background: #c5a45b;
+  cursor: default;
+}
+
+.lang-switch__option:focus-visible {
+  outline: 2px solid #e3c57b;
+  outline-offset: 2px;
+}
+
+/* --- Header: en teléfonos no cabe junto al logo; ahí el selector
+       vive en el menú lateral (mobile-menu__lang). --- */
+@media (max-width: 767px) {
+  .site-header__lang {
+    display: none;
+  }
+}
+
+/* --- Menú lateral móvil --- */
+.mobile-menu__lang {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+
+  color: #9a9a9a;
+}
+
+.mobile-menu__lang .lang-switch__option {
+  min-width: 52px;
+  min-height: 42px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .lang-switch__option {
+    transition: none;
+  }
+}

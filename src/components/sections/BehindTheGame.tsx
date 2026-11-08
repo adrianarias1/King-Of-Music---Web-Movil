@@ -3,15 +3,12 @@ import { Reveal } from '../ui/Reveal'
 import { SectionHeading } from '../ui/SectionHeading'
 import { SmartImage } from '../ui/SmartImage'
 import { ToolCard } from '../ui/ToolCard'
+import { useI18n } from '../../i18n'
 import './BehindTheGame.css'
 
-const copy = {
-  eyebrow: 'Detrás del juego',
-  title: 'Cómo se construye',
-  lead: 'King of Music se desarrolla en Unity con modelos de Blender, arte en Krita y Photoshop y música original producida en FL Studio. Estas son las herramientas y las etapas del proyecto.',
-} as const
-
 export function BehindTheGame() {
+  const { t, l } = useI18n()
+  const copy = t.behind
   return (
     <section id="desarrollo" className="section theme-light behind" aria-label={copy.title}>
       <div className="container">
@@ -20,7 +17,7 @@ export function BehindTheGame() {
         <div className="behind__grid">
           {/* Herramientas */}
           <Reveal className="behind__tools" distance={24}>
-            <h3 className="label behind__subtitle">Herramientas</h3>
+            <h3 className="label behind__subtitle">{copy.tools}</h3>
             <ul>
               {tools.map((tool) => (
                 <li key={tool.id}>
@@ -32,14 +29,14 @@ export function BehindTheGame() {
 
           {/* Proceso */}
           <Reveal className="behind__process" distance={24} delay={0.08}>
-            <h3 className="label behind__subtitle">Proceso</h3>
+            <h3 className="label behind__subtitle">{copy.process}</h3>
             <ol className="behind__steps">
               {processSteps.map((step, index) => (
                 <li key={step.id} className="behind__step">
                   <span className="behind__step-num">{String(index + 1).padStart(2, '0')}</span>
                   <div>
-                    <h4 className="behind__step-title">{step.title}</h4>
-                    <p className="behind__step-desc">{step.description}</p>
+                    <h4 className="behind__step-title">{l(step.title)}</h4>
+                    <p className="behind__step-desc">{l(step.description)}</p>
                   </div>
                 </li>
               ))}
@@ -52,20 +49,20 @@ export function BehindTheGame() {
           Galeria de material de proceso: renders, capturas y documentacion visual.
         */}
         <div className="behind__gallery">
-          <h3 className="label behind__subtitle">Galería de desarrollo</h3>
+          <h3 className="label behind__subtitle">{copy.gallery}</h3>
           <ul className="behind__shots">
             {devShots.map((shot, index) => (
               <Reveal as="li" key={shot.id} delay={0.05 * index} distance={18}>
                 <figure className="behind__shot">
                   <SmartImage
                     src={shot.image}
-                    alt={shot.caption}
-                    placeholderLabel="Captura pendiente"
+                    alt={l(shot.caption)}
+                    placeholderLabel={copy.pendingShot}
                     ratio="16 / 10"
                   />
                   <figcaption className="behind__shot-cap">
                     <span className="label">{String(index + 1).padStart(2, '0')}</span>
-                    <span>{shot.caption}</span>
+                    <span>{l(shot.caption)}</span>
                   </figcaption>
                 </figure>
               </Reveal>

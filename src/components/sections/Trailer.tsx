@@ -10,6 +10,7 @@ import {
 import { useAssetExists } from '../../hooks/useAssetExists'
 import { assetExists } from '../../utils/assets'
 import { SectionHeading } from '../ui/SectionHeading'
+import { useI18n } from '../../i18n'
 
 import './Trailer.css'
 
@@ -31,13 +32,9 @@ interface Props {
   posterSrc?: string | undefined
 }
 
-const copy = {
-  eyebrow: 'Video',
-  title: 'Tráiler',
-  lead: 'El combate al ritmo de la escena musical mexicana.',
-} as const
-
 export function Trailer({ videoSrc, posterSrc }: Props) {
+  const { t } = useI18n()
+  const copy = t.trailer
   // =====================================================
   // 1. ESTADOS Y REFERENCIAS
   // =====================================================
@@ -120,7 +117,7 @@ export function Trailer({ videoSrc, posterSrc }: Props) {
     <section
       id="trailer"
       className="section theme-dark trailer"
-      aria-label="Tráiler oficial de King of Music"
+      aria-label={copy.sectionLabel}
     >
       {/* Encabezado */}
 
@@ -152,7 +149,7 @@ export function Trailer({ videoSrc, posterSrc }: Props) {
             <span className="trailer__grid" />
 
             <span className="trailer__badge label">
-              Tráiler oficial
+              {copy.badge}
             </span>
 
             <span className="trailer__ratio label">
@@ -166,7 +163,7 @@ export function Trailer({ videoSrc, posterSrc }: Props) {
             <img
               className="trailer__poster-img"
               src={posterSrc}
-              alt="Vista previa del tráiler de King of Music"
+              alt={copy.posterAlt}
               loading="lazy"
               decoding="async"
             />
@@ -189,7 +186,7 @@ export function Trailer({ videoSrc, posterSrc }: Props) {
               preload="metadata"
               onEnded={() => setPlaying(false)}
               onError={() => setPlaying(false)}
-              aria-label="Video del tráiler oficial de King of Music"
+              aria-label={copy.videoLabel}
             />
           )}
 
@@ -203,8 +200,8 @@ export function Trailer({ videoSrc, posterSrc }: Props) {
               disabled={!videoReady}
               aria-label={
                 videoReady
-                  ? 'Reproducir tráiler de King of Music'
-                  : 'Tráiler todavía no disponible'
+                  ? copy.play
+                  : copy.notYet
               }
             >
               <span
@@ -221,8 +218,8 @@ export function Trailer({ videoSrc, posterSrc }: Props) {
 
               <span className="trailer__play-text label">
                 {videoReady
-                  ? 'REPRODUCIR'
-                  : 'PRÓXIMAMENTE'}
+                  ? copy.playShort
+                  : copy.soonShort}
               </span>
             </button>
           )}
@@ -233,7 +230,7 @@ export function Trailer({ videoSrc, posterSrc }: Props) {
             className="notice notice--inline trailer__notice"
             role="status"
           >
-            Tráiler oficial próximamente disponible.
+            {copy.soonNotice}
           </p>
         )}
       </div>

@@ -6,18 +6,51 @@ import type { NavLink } from '../types'
    ========================================================================== */
 
 export const desktopNav: NavLink[] = [
-  { label: 'Personajes', href: '#personajes' },
-  { label: 'Historia', href: '#historia' },
-  { label: 'Mapa', href: '#mapa' },
-  { label: 'Desarrollo', href: '#desarrollo' },
+  { label: {
+   es: 'Personajes',
+   en: 'Characters',
+ }, href: '#personajes' },
+  { label: {
+   es: 'Historia',
+   en: 'Story',
+ }, href: '#historia' },
+  { label: {
+   es: 'Mapa',
+   en: 'Map',
+ }, href: '#mapa' },
+  { label: {
+   es: 'Desarrollo',
+   en: 'Development',
+ }, href: '#desarrollo' },
 ]
 
 export const mobileNav: NavLink[] = [
-  { label: 'Inicio', href: '#inicio' },
-  { label: 'Personajes', href: '#personajes' },
-  { label: 'Trailer', href: '#trailer' },
-  { label: 'Historia', href: '#historia' },
-  { label: 'Mapa', href: '#mapa' },
-  { label: 'Desarrollo', href: '#desarrollo' },
-  { label: 'Equipo', href: '#equipo' },
+  { label: {
+   es: 'Inicio',
+   en: 'Home',
+ }, href: '#inicio' },
+  { label: {
+   es: 'Personajes',
+   en: 'Characters',
+ }, href: '#personajes' },
+  { label: {
+   es: 'Trailer',
+   en: 'Trailer',
+ }, href: '#trailer' },
+  { label: {
+   es: 'Historia',
+   en: 'Story',
+ }, href: '#historia' },
+  { label: {
+   es: 'Mapa',
+   en: 'Map',
+ }, href: '#mapa' },
+  { label: {
+   es: 'Desarrollo',
+   en: 'Development',
+ }, href: '#desarrollo' },
+  { label: {
+   es: 'Equipo',
+   en: 'Team',
+ }, href: '#equipo' },
 ]

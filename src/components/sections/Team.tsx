@@ -5,13 +5,8 @@ import type { SocialLink } from '../../types'
 import { Reveal } from '../ui/Reveal'
 import { SectionHeading } from '../ui/SectionHeading'
 import { SmartImage } from '../ui/SmartImage'
+import { useI18n } from '../../i18n'
 import './Team.css'
-
-const copy = {
-  eyebrow: 'Equipo',
-  title: 'Detrás del proyecto',
-  lead: 'Cinco estudiantes desarrollan King of Music como proyecto de la materia Creación de Videojuegos: del videojuego en Unity a esta plataforma web y móvil.',
-} as const
 
 const ICONS: Record<string, LucideIcon> = {
   github: CodeXml,
@@ -22,11 +17,12 @@ const ICONS: Record<string, LucideIcon> = {
 
 function TeamSocial({ link }: { link: SocialLink }) {
   const Icon = ICONS[link.icon ?? 'globe'] ?? Globe
+  const { t } = useI18n()
   return (
     <a
       className="team__social"
       href={link.href || undefined}
-      aria-label={`${link.label} — ${team.find((m) => m.links?.includes(link))?.name ?? 'integrante'}`}
+      aria-label={`${link.label} — ${team.find((m) => m.links?.includes(link))?.name ?? t.team.member}`}
       target="_blank"
       rel="noreferrer noopener"
       tabIndex={link.href ? 0 : -1}
@@ -38,6 +34,8 @@ function TeamSocial({ link }: { link: SocialLink }) {
 }
 
 export function TeamSection() {
+  const { t, l } = useI18n()
+  const copy = t.team
   return (
     <section id="equipo" className="section theme-dark team" aria-label={copy.title}>
       <div className="container">
@@ -49,15 +47,15 @@ export function TeamSection() {
               <article className="team__card">
                 <SmartImage
                   src={member.image}
-                  alt={`Fotografía de ${member.name}`}
-                  placeholderLabel="Integrante"
+                  alt={copy.photoOf(member.name)}
+                  placeholderLabel={copy.member}
                   ratio="1 / 1"
                 />
                 <div className="team__info">
                   <h3 className="team__name">{member.name}</h3>
-                  <p className="team__role">{member.role}</p>
+                  <p className="team__role">{l(member.role)}</p>
                   {member.description ? (
-                    <p className="team__desc">{member.description}</p>
+                    <p className="team__desc">{l(member.description)}</p>
                   ) : null}
                 </div>
                 {member.links && member.links.length > 0 ? (
@@ -74,7 +72,7 @@ export function TeamSection() {
 
         <p className="team__meta notice">
           <span>
-            {projectMeta.subject} · Grupo {projectMeta.group} · Docente: {projectMeta.teacher}
+            {copy.meta(l(projectMeta.subject), projectMeta.group, projectMeta.teacher)}
           </span>
           <a
             className="team__repo"

@@ -32,6 +32,8 @@ import { useDialog } from '../../hooks/useDialog'
 import { useScrolledPast } from '../../hooks/useScrolledPast'
 
 import { useAuth } from '../../features/auth/authContext'
+import { useI18n } from '../../i18n'
+import { LanguageSwitch } from '../ui/LanguageSwitch'
 
 import './Header.css'
 
@@ -67,8 +69,9 @@ export function Header({ onLogin }: { onLogin: () => void }) {
   // Con sesión iniciada el botón muestra el primer nombre y abre el
   // panel de la cuenta; sin sesión abre el diálogo de inicio de sesión.
   const { status, profile } = useAuth()
+  const { t, l } = useI18n()
   const signedIn = status === 'signed_in' && Boolean(profile)
-  const accountLabel = signedIn ? profile?.firstName ?? 'Mi cuenta' : 'Iniciar sesión'
+  const accountLabel = signedIn ? profile?.firstName || t.header.myAccount : t.header.signIn
   const accountDialogId = signedIn ? 'account-dialog' : 'login-dialog'
   // =====================================================
   // 1. ESTADOS
@@ -236,7 +239,7 @@ const overlayTransition = {
           className="brand"
           href="#inicio"
           onClick={closeMenu}
-          aria-label={`${siteConfig.name} — inicio`}
+          aria-label={t.header.homeLink(siteConfig.name)}
           tabIndex={menuOpen ? -1 : undefined}
         >
           <img className="brand__logo" src={`${import.meta.env.BASE_URL}images/king-of-music-logo-sm.webp`} alt="" width={40} height={40} />
@@ -252,7 +255,7 @@ const overlayTransition = {
 
         <nav
           className="site-header__nav"
-          aria-label="Navegación principal"
+          aria-label={t.header.mainNav}
         >
           <ul>
             {desktopNav.map((link) => (
@@ -262,7 +265,7 @@ const overlayTransition = {
                   href={link.href}
                   tabIndex={menuOpen ? -1 : undefined}
                 >
-                  {link.label}
+                  {l(link.label)}
                 </a>
               </li>
             ))}
@@ -280,21 +283,23 @@ const overlayTransition = {
             onClick={onLogin}
             aria-haspopup="dialog"
             aria-controls={accountDialogId}
-            aria-label={signedIn ? `Cuenta de ${accountLabel}` : undefined}
+            aria-label={signedIn ? t.header.accountOf(accountLabel) : undefined}
             tabIndex={menuOpen ? -1 : undefined}
           >
             <UserRound size={18} aria-hidden="true" />
             <span className="site-header__login-name">{accountLabel}</span>
           </button>
 
+          <LanguageSwitch className="site-header__lang" tabIndex={menuOpen ? -1 : undefined} />
+
           {/* Descargar */}
 
           <a
-            className="site-header__cta" aria-label="Descargar"
+            className="site-header__cta" aria-label={t.header.download}
             href="#descargar"
             onClick={closeMenu}
             tabIndex={menuOpen ? -1 : undefined}
-          ><Download className="site-header__download-icon" size={22} strokeWidth={1.5} aria-hidden="true" /><span className="site-header__download-label">Descargar</span>
+          ><Download className="site-header__download-icon" size={22} strokeWidth={1.5} aria-hidden="true" /><span className="site-header__download-label">{t.header.download}</span>
           </a>
 
           {/* ===========================================
@@ -314,7 +319,7 @@ const overlayTransition = {
             className="site-header__burger"
             aria-expanded={menuOpen}
             aria-controls="menu-movil"
-            aria-label="Abrir menú de navegación"
+            aria-label={t.header.openMenu}
             onClick={openMenu}
             tabIndex={menuOpen ? -1 : undefined}
             style={{
@@ -385,7 +390,7 @@ const overlayTransition = {
               className="mobile-menu"
               role="dialog"
               aria-modal="true"
-              aria-label="Menú de navegación"
+              aria-label={t.header.menu}
               tabIndex={-1}
               initial={{
                 x: reduced ? 0 : '100%',
@@ -415,7 +420,7 @@ const overlayTransition = {
                   </span>
 
                   <span className="mobile-menu__title">
-                    Navegación
+                    {t.header.navigation}
                   </span>
 
                 </div>
@@ -431,7 +436,7 @@ const overlayTransition = {
                   type="button"
                   className="mobile-menu__close"
                   onClick={closeMenu}
-                  aria-label="Cerrar menú"
+                  aria-label={t.header.closeMenu}
                 >
                   <X
                     size={22}
@@ -457,7 +462,7 @@ const overlayTransition = {
 
               <nav
                 className="mobile-menu__nav"
-                aria-label="Navegación móvil"
+                aria-label={t.header.mobileNav}
               >
                 <ul className="mobile-menu__list">
 
@@ -509,7 +514,7 @@ const overlayTransition = {
                         {/* Nombre del apartado */}
 
                         <span className="mobile-menu__link-label">
-                          {link.label}
+                          {l(link.label)}
                         </span>
 
                         {/* Indicador */}
@@ -533,7 +538,7 @@ const overlayTransition = {
                       onClick={() => { loginAfterMenu.current = true; closeMenu() }}
                     >
                       <UserRound size={18} aria-hidden="true" />
-                      <span className="mobile-menu__link-label">{signedIn ? `Cuenta · ${accountLabel}` : 'Iniciar sesión'}</span>
+                      <span className="mobile-menu__link-label">{signedIn ? t.header.accountDot(accountLabel) : t.header.signIn}</span>
                       <ArrowUpRight className="mobile-menu__arrow" size={18} aria-hidden="true" />
                     </button>
                   </li>
@@ -547,6 +552,13 @@ const overlayTransition = {
 
               <div className="mobile-menu__bottom">
 
+                {/* Idioma */}
+
+                <div className="mobile-menu__lang">
+                  <span className="label">{t.lang.label}</span>
+                  <LanguageSwitch />
+                </div>
+
                 {/* Descargar */}
 
                 <a
@@ -555,7 +567,7 @@ const overlayTransition = {
                   onClick={closeMenu}
                 >
                   <span>
-                    Descargar
+                    {t.header.download}
                   </span>
 
                   <ArrowUpRight
@@ -568,7 +580,7 @@ const overlayTransition = {
                 {/* Mensaje decorativo */}
 
                 <p className="mobile-menu__footer-text label">
-                  EL COMBATE COMIENZA AQUÍ
+                  {t.header.menuFooter}
                 </p>
 
               </div>

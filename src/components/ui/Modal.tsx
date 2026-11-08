@@ -4,6 +4,7 @@ import type { ReactNode } from 'react'
 import { useCallback } from 'react'
 import { useDialog } from '../../hooks/useDialog'
 import { useBodyScrollLock } from '../../hooks/useBodyScrollLock'
+import { useI18n } from '../../i18n'
 import './Modal.css'
 
 interface Props {
@@ -27,6 +28,7 @@ interface Props {
  * - scroll del body bloqueado
  */
 export function Modal({ open, onClose, title, description, children, labelId, wide = false, className }: Props) {
+  const { t } = useI18n()
   const reduced = useReducedMotion()
   const { panelRef, handleOverlayClick } = useDialog(open, onClose)
   const close = useCallback(() => onClose(), [onClose])
@@ -68,7 +70,7 @@ export function Modal({ open, onClose, title, description, children, labelId, wi
                   </p>
                 ) : null}
               </div>
-              <button type="button" className="modal__close" onClick={close} aria-label="Cerrar">
+              <button type="button" className="modal__close" onClick={close} aria-label={t.common.close}>
                 <X size={20} strokeWidth={1.5} aria-hidden="true" />
               </button>
             </div>

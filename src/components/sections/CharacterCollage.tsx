@@ -2,15 +2,12 @@ import { useEffect, useRef } from 'react'
 import { characters } from '../../data/characters'
 import { SectionHeading } from '../ui/SectionHeading'
 import { SmartImage } from '../ui/SmartImage'
+import { useI18n } from '../../i18n'
 import './CharacterCollage.css'
 
-const copy = {
-  eyebrow: 'Roster',
-  title: 'Conoce a los artistas',
-  lead: 'Conoce a los artistas del roster y explora sus modelos 3D en la sección de selección.',
-} as const
-
 export function CharacterCollage() {
+  const { t, l } = useI18n()
+  const copy = t.collage
   const carouselRef = useRef<HTMLDivElement>(null)
   const trackRef = useRef<HTMLDivElement>(null)
   const offsetRef = useRef(0)
@@ -74,7 +71,7 @@ export function CharacterCollage() {
         <SectionHeading index="01" eyebrow={copy.eyebrow} title={copy.title} lead={copy.lead} split>
           <p className="collage__count">
             <span className="collage__count-num">{String(characters.length).padStart(2, '0')}</span>
-            <span className="label">Artistas</span>
+            <span className="label">{copy.artists}</span>
           </p>
         </SectionHeading>
 
@@ -82,7 +79,7 @@ export function CharacterCollage() {
         <div
           ref={carouselRef}
           className="collage__carousel"
-          aria-label="Carrusel de artistas; arrastra horizontalmente para recorrerlos"
+          aria-label={copy.carousel}
           onPointerDown={handlePointerDown}
           onPointerMove={handlePointerMove}
           onPointerUp={handlePointerUp}
@@ -98,7 +95,7 @@ export function CharacterCollage() {
                     <figure className="collage__figure">
                       <SmartImage
                         src={character.preview}
-                        alt={duplicate ? '' : `Ilustración de ${character.name}`}
+                        alt={duplicate ? '' : copy.illustration(character.name)}
                         placeholderLabel={character.name}
                         index={String(index + 1).padStart(2, '0')}
                         fit="contain"
@@ -106,7 +103,7 @@ export function CharacterCollage() {
                       />
                       <figcaption className="collage__caption">
                         <span className="collage__name">{character.name}</span>
-                        {character.tagline ? <span className="collage__tagline">{character.tagline}</span> : null}
+                        {character.tagline ? <span className="collage__tagline">{l(character.tagline)}</span> : null}
                       </figcaption>
                     </figure>
                   </li>

@@ -33,6 +33,7 @@ import { SmartImage } from '../ui/SmartImage'
 import { StoryPageTurn } from './StoryPageTurn'
 import { assetExists } from '../../utils/assets'
 import { SectionHeading } from '../ui/SectionHeading'
+import { useI18n } from '../../i18n'
 
 import './Storyboard.css'
 
@@ -103,6 +104,8 @@ interface PageTurn {
 }
 
 export function Storyboard() {
+  const { t, l } = useI18n()
+  const copy = t.story
   const reduced = useReducedMotion()
 
   // =====================================================
@@ -384,7 +387,7 @@ export function Storyboard() {
     <section
       id="historia"
       className="section theme-light story"
-      aria-label={storyIntro.title}
+      aria-label={l(storyIntro.title)}
     >
       <div className="container">
 
@@ -394,9 +397,9 @@ export function Storyboard() {
 
         <SectionHeading
           index="04"
-          eyebrow="Narrativa"
-          title={storyIntro.title}
-          lead={storyIntro.lead}
+          eyebrow={copy.eyebrow}
+          title={l(storyIntro.title)}
+          lead={l(storyIntro.lead)}
         />
 
         {/* ===============================================
@@ -405,7 +408,7 @@ export function Storyboard() {
 
         <div className="story__synopsis">
           {storyIntro.synopsis.map((paragraph) => (
-            <p key={paragraph.slice(0, 24)}>{paragraph}</p>
+            <p key={paragraph.es.slice(0, 24)}>{l(paragraph)}</p>
           ))}
         </div>
 
@@ -427,14 +430,14 @@ export function Storyboard() {
               onDragStart={(event) => event.preventDefault()}
               tabIndex={0}
               role="group"
-              aria-label="Storyboard interactivo. Usa las flechas izquierda y derecha para cambiar de página."
+              aria-label={copy.viewerLabel}
             >
               <button
                 type="button"
                 className="story__expand"
                 onClick={() => setImageExpanded(true)}
-                aria-label="Ver imagen completa"
-                title="Ver imagen completa"
+                aria-label={copy.expand}
+                title={copy.expand}
               >
                 <Maximize2 size={18} aria-hidden="true" />
               </button>
@@ -460,11 +463,9 @@ export function Storyboard() {
                     <SmartImage
                       src={visiblePage.image}
                       alt={
-                        visiblePage.caption
-                          ? `${visiblePage.caption} del storyboard`
-                          : 'Viñeta del storyboard'
+                        copy.panelAlt(l(visiblePage.caption))
                       }
-                      placeholderLabel="Viñeta"
+                      placeholderLabel={copy.panel}
                       index={String(
                         visibleIndex + 1,
                       ).padStart(2, '0')}
@@ -514,8 +515,8 @@ export function Storyboard() {
                 className="story__nav story__nav--prev"
                 onClick={goPrev}
                 disabled={!canGoPrev}
-                aria-label="Página anterior"
-                title="Página anterior"
+                aria-label={copy.prev}
+                title={copy.prev}
               >
                 <ChevronLeft
                   size={24}
@@ -533,8 +534,8 @@ export function Storyboard() {
                 className="story__nav story__nav--next"
                 onClick={goNext}
                 disabled={!canGoNext}
-                aria-label="Página siguiente"
-                title="Página siguiente"
+                aria-label={copy.next}
+                title={copy.next}
               >
                 <ChevronRight
                   size={24}
@@ -546,19 +547,19 @@ export function Storyboard() {
             </div>
 
             {imageExpanded && current ? (
-              <div className="story__lightbox" role="dialog" aria-modal="true" aria-label={`${current.caption || 'Imagen'} — vista completa`}>
-                <button className="story__lightbox-backdrop" onClick={() => setImageExpanded(false)} aria-label="Cerrar imagen completa" />
-                <button type="button" className="story__lightbox-close" onClick={() => setImageExpanded(false)} aria-label="Cerrar">
+              <div className="story__lightbox" role="dialog" aria-modal="true" aria-label={copy.fullView(l(current.caption))}>
+                <button className="story__lightbox-backdrop" onClick={() => setImageExpanded(false)} aria-label={copy.closeFull} />
+                <button type="button" className="story__lightbox-close" onClick={() => setImageExpanded(false)} aria-label={t.common.close}>
                   <X size={22} aria-hidden="true" />
                 </button>
-                <button type="button" className="story__lightbox-nav story__lightbox-nav--prev" onClick={goPrev} disabled={!canGoPrev} aria-label="Página anterior">
+                <button type="button" className="story__lightbox-nav story__lightbox-nav--prev" onClick={goPrev} disabled={!canGoPrev} aria-label={copy.prev}>
                   <ChevronLeft size={28} aria-hidden="true" />
                 </button>
                 <figure className="story__lightbox-content">
-                  <SmartImage src={current.image} alt={current.caption || 'Imagen narrativa'} fit="contain" />
-                  <figcaption>{current.caption} · {safePage + 1} / {total}</figcaption>
+                  <SmartImage src={current.image} alt={l(current.caption) || copy.image} fit="contain" />
+                  <figcaption>{l(current.caption)} · {safePage + 1} / {total}</figcaption>
                 </figure>
-                <button type="button" className="story__lightbox-nav story__lightbox-nav--next" onClick={goNext} disabled={!canGoNext} aria-label="Página siguiente">
+                <button type="button" className="story__lightbox-nav story__lightbox-nav--next" onClick={goNext} disabled={!canGoNext} aria-label={copy.next}>
                   <ChevronRight size={28} aria-hidden="true" />
                 </button>
               </div>
@@ -581,28 +582,28 @@ export function Storyboard() {
                 <span className="story__details-index label">
                   {current?.scene ? (
                     <>
-                      ESCENA {String(current.scene).padStart(2, '0')}
+                      {copy.scene} {String(current.scene).padStart(2, '0')}
                       {' · '}
                     </>
                   ) : null}
-                  PÁGINA{' '}
+                  {copy.page}{' '}
                   {String(
                     safePage + 1,
                   ).padStart(2, '0')}
                 </span>
 
                 <h3 className="story__details-title">
-                  {current?.caption || 'Sin título'}
+                  {(current && l(current.caption)) || copy.untitled}
                 </h3>
               </div>
 
               {current?.text ? (
                 <p className="story__text">
-                  {current.text}
+                  {l(current.text)}
                 </p>
               ) : (
                 <p className="story__text story__text--pending">
-                  Descripción pendiente de incorporar.
+                  {copy.pendingText}
                 </p>
               )}
             </div>
@@ -610,7 +611,7 @@ export function Storyboard() {
           </div>
         ) : (
           <p className="story__empty">
-            Las páginas del storyboard estarán disponibles próximamente.
+            {copy.empty}
           </p>
         )}
 
@@ -653,7 +654,7 @@ export function Storyboard() {
             =============================================== */}
 
         <p className="story__hint label">
-          Desliza o utiliza las flechas para pasar de página
+          {copy.hint}
         </p>
 
       </div>

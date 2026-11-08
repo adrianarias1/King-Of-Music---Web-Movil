@@ -1,14 +1,22 @@
 /* ==========================================================================
    KING OF MUSIC — Configuración de la aplicación
    Punto único de control para el CTA de descarga y datos globales.
+   Los textos visibles van en los dos idiomas (tipo L, ver src/i18n).
    ========================================================================== */
+
+import type { L } from './i18n/types'
 
 export const siteConfig = {
   name: 'King of Music',
   shortName: 'KOM',
-  tagline: 'Un videojuego de combate inspirado en la escena musical mexicana.',
-  description:
-    'King of Music es un videojuego de combate inspirado en la escena musical mexicana. Explora a los artistas, conoce sus habilidades y descubre los escenarios del juego.',
+  tagline: {
+    es: 'Un videojuego de combate inspirado en la escena musical mexicana.',
+    en: 'A fighting game inspired by the Mexican music scene.',
+  } satisfies L,
+  description: {
+    es: 'King of Music es un videojuego de combate inspirado en la escena musical mexicana. Explora a los artistas, conoce sus habilidades y descubre los escenarios del juego.',
+    en: 'King of Music is a fighting game inspired by the Mexican music scene. Explore the artists, learn their abilities and discover the game\'s stages.',
+  } satisfies L,
   repository: 'https://github.com/adrianarias1/King-Of-Music---Web-Movil',
   universityProject: true,
 } as const
@@ -32,7 +40,7 @@ export const download = {
   platformLabel: 'Android',
   sizeLabel: '',
   /** Texto mostrado en el CTA cuando no hay build disponible. */
-  comingSoonLabel: 'Próximamente',
+  comingSoonLabel: { es: 'Próximamente', en: 'Coming soon' } satisfies L,
 } as const
 
 

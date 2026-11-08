@@ -10,15 +10,12 @@ import { AbilityModal } from './AbilityModal'
 import type { MoveDetail } from './AbilityModal'
 import { ViewerCanvas, type ModelState } from './ViewerCanvas'
 import { clearModel, isModelPrepared, preloadModel } from './gltfModelCache'
+import { useI18n } from '../../i18n'
 import './CharacterViewer.css'
 
-const copy = {
-  eyebrow: 'Seleccion',
-  title: 'Elige a tu artista',
-  lead: 'Arrastra para girar cada modelo en cualquier dirección y usa la rueda o pellizca para acercarte. Doble toque para restablecer la vista.',
-} as const
-
 export function CharacterViewer() {
+  const { t, l } = useI18n()
+  const copy = t.viewer
   const [activeId, setActiveId] = useState(defaultCharacterId)
   const [move, setMove] = useState<MoveDetail | null>(null)
 
@@ -67,9 +64,10 @@ export function CharacterViewer() {
   }, [activeId])
 
   const openAbility = (entry: Ability) =>
-    setMove({ kind: 'Habilidad', id: entry.id, name: entry.name, description: entry.description, keys: entry.combo, media: entry.media, preview: entry.preview })
-  const openCombo = (entry: Combo, characterName: string) =>
-    setMove({ kind: 'Combo', id: entry.id, name: entry.name, description: `Secuencia de ataques encadenados de ${characterName}.`, keys: entry.keys, media: entry.media })
+    setMove({ kind: 'ability', id: entry.id, name: entry.name, description: entry.description, keys: entry.combo, media: entry.media, preview: entry.preview })
+  // La descripción del combo la arma el modal en el idioma actual.
+  const openCombo = (entry: Combo) =>
+    setMove({ kind: 'combo', id: entry.id, name: { es: entry.name, en: entry.name }, keys: entry.keys, media: entry.media })
   const [loadAttempt, setLoadAttempt] = useState(0)
   const [modelStates, setModelStates] = useState<Partial<Record<string, ModelState>>>({})
 
@@ -147,7 +145,7 @@ export function CharacterViewer() {
             className="viewer__selector-arrow viewer__selector-arrow--prev"
             onClick={() => scrollSelector(-1)}
             disabled={!canScroll.left}
-            aria-label="Ver personajes anteriores"
+            aria-label={copy.prevCharacters}
             tabIndex={-1}
           >
             <ChevronLeft size={20} strokeWidth={1.6} aria-hidden="true" />
@@ -156,7 +154,7 @@ export function CharacterViewer() {
             ref={selectorRef}
             className="viewer__selector"
             role="tablist"
-            aria-label="Seleccionar personaje"
+            aria-label={copy.selectCharacter}
             onScroll={updateScrollState}
           >
             {characters.map((item, index) => {
@@ -178,7 +176,7 @@ export function CharacterViewer() {
                   </span>
                   <span className="viewer__tab-body">
                     <span className="viewer__tab-name">{item.name}</span>
-                    {item.tagline ? <span className="viewer__tab-tag">{item.tagline}</span> : null}
+                    {item.tagline ? <span className="viewer__tab-tag">{l(item.tagline)}</span> : null}
                   </span>
                 </button>
               )
@@ -189,7 +187,7 @@ export function CharacterViewer() {
             className="viewer__selector-arrow viewer__selector-arrow--next"
             onClick={() => scrollSelector(1)}
             disabled={!canScroll.right}
-            aria-label="Ver más personajes"
+            aria-label={copy.nextCharacters}
             tabIndex={-1}
           >
             <ChevronRight size={20} strokeWidth={1.6} aria-hidden="true" />
@@ -209,11 +207,11 @@ export function CharacterViewer() {
             >
               <ErrorBoundary
                 key={`${character.id}-${loadAttempt}`}
-                label="Visor 3D no disponible"
+                label={copy.unavailable}
                 fallback={
                   <div className="viewer-fallback" role="status">
-                    <span className="label">No se pudo cargar el modelo.</span>
-                    <button type="button" onClick={retryModel}>Reintentar</button>
+                    <span className="label">{copy.loadFailed}</span>
+                    <button type="button" onClick={retryModel}>{t.common.retry}</button>
                   </div>
                 }
               >
@@ -231,28 +229,28 @@ export function CharacterViewer() {
 
               <p className="viewer__hint notice notice--inline">
                 <Move3d size={14} strokeWidth={1.5} aria-hidden="true" />
-                <span>Arrastra para girar</span>
-                <span className="viewer__hint-zoom">· Rueda para zoom</span>
-                <span className="viewer__hint-pinch">· Pellizca para zoom</span>
+                <span>{copy.hintDrag}</span>
+                <span className="viewer__hint-zoom">· {copy.hintWheel}</span>
+                <span className="viewer__hint-pinch">· {copy.hintPinch}</span>
               </p>
 
               {modelState === 'placeholder' ? (
                 <p className="viewer__model-notice notice">
                   <Info size={14} strokeWidth={1.5} aria-hidden="true" />
-                  Modelo provisional — pendiente{' '}
-                  {character.model ? <code>{character.model}</code> : 'archivo 3D'}
+                  {copy.placeholderModel}{' '}
+                  {character.model ? <code>{character.model}</code> : copy.modelFile}
                 </p>
               ) : null}
             </div>
           </Reveal>
 
           <Reveal className="viewer__info" direction="right" distance={22} delay={0.08}>
-            <p className="label viewer__info-kicker">{character.tagline ?? 'Artista'}</p>
+            <p className="label viewer__info-kicker">{character.tagline ? l(character.tagline) : copy.artist}</p>
             <h3 className="viewer__name">{character.name}</h3>
-            <p className="viewer__desc">{character.description}</p>
+            <p className="viewer__desc">{l(character.description)}</p>
 
             <h4 className="label viewer__abilities-title">
-              Habilidades
+              {copy.abilities}
               <span className="viewer__abilities-count">
                 {String(character.abilities.length).padStart(2, '0')}
               </span>
@@ -268,7 +266,7 @@ export function CharacterViewer() {
                     aria-haspopup="dialog"
                   >
                     <span className="ability__main">
-                      <span className="ability__name">{entry.name}</span>
+                      <span className="ability__name">{l(entry.name)}</span>
                       {entry.combo ? <span className="ability__combo">{entry.combo}</span> : null}
                     </span>
                     <MousePointer2
@@ -285,7 +283,7 @@ export function CharacterViewer() {
             {character.combos?.length ? (
               <>
                 <h4 className="label viewer__abilities-title viewer__combos-title">
-                  Combos
+                  {copy.combos}
                   <span className="viewer__abilities-count">
                     {String(character.combos.length).padStart(2, '0')}
                   </span>
@@ -297,7 +295,7 @@ export function CharacterViewer() {
                       <button
                         type="button"
                         className="ability"
-                        onClick={() => openCombo(entry, character.name)}
+                        onClick={() => openCombo(entry)}
                         aria-haspopup="dialog"
                       >
                         <span className="ability__main">

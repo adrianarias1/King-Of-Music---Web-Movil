@@ -1,5 +1,6 @@
 import { useAssetExists } from '../../hooks/useAssetExists'
 import type { Tool } from '../../types'
+import { useI18n } from '../../i18n'
 import './ToolCard.css'
 
 interface Props {
@@ -13,6 +14,7 @@ interface Props {
  */
 export function ToolCard({ tool }: Props) {
   const { ref, exists } = useAssetExists(tool.logo)
+  const { l } = useI18n()
 
   return (
     <article className="tool-card">
@@ -29,7 +31,7 @@ export function ToolCard({ tool }: Props) {
           {tool.name}
           {tool.version ? <span className="tool-card__version">{tool.version}</span> : null}
         </h3>
-        <p className="tool-card__desc">{tool.description}</p>
+        <p className="tool-card__desc">{l(tool.description)}</p>
       </div>
     </article>
   )

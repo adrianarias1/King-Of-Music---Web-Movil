@@ -1,0 +1,342 @@
+/* ==========================================================================
+   KING OF MUSIC — Textos de la interfaz · ESPAÑOL (idioma de referencia)
+   --------------------------------------------------------------------------
+   Cada texto nuevo se agrega aquí y en en.ts con la MISMA clave.
+   en.ts usa el tipo `Messages` de este archivo: si falta una clave en
+   inglés (o sobra), el proyecto no compila.
+
+   Los textos con datos variables son funciones: hello: (name) => `Hola, ${name}`.
+   Los datos de contenido (personajes, mapa, historia, equipo…) viven en
+   src/data con el formato { es, en }.
+
+   Este archivo no debe importar nada en tiempo de ejecución
+   (lo lee scripts/check-i18n.mjs directamente).
+   ========================================================================== */
+
+export const es = {
+  meta: {
+    title: 'King of Music — Videojuego de combate',
+    description:
+      'King of Music es un videojuego de combate inspirado en la escena musical mexicana. Conoce a los artistas, sus habilidades, la historia y los escenarios.',
+    tagline: 'Un videojuego de combate inspirado en la escena musical mexicana.',
+  },
+
+  lang: {
+    label: 'Idioma',
+    group: 'Cambiar idioma',
+    es: 'Español',
+    en: 'English',
+  },
+
+  common: {
+    close: 'Cerrar',
+    retry: 'Reintentar',
+    cancel: 'Cancelar',
+    loading: 'Cargando…',
+    newTab: '(se abre en una pestaña nueva)',
+    noFinalImage: (alt: string) => `${alt} — sin imagen definitiva`,
+  },
+
+  app: {
+    skipLink: 'Saltar al contenido principal',
+    viewerFailed: 'El visor 3D no pudo cargar',
+    unavailable: 'Contenido no disponible',
+  },
+
+  nav: {
+    characters: 'Personajes',
+    trailer: 'Trailer',
+    story: 'Historia',
+    map: 'Mapa',
+    team: 'Equipo',
+  },
+
+  header: {
+    homeLink: (name: string) => `${name} — inicio`,
+    mainNav: 'Navegación principal',
+    mobileNav: 'Navegación móvil',
+    myAccount: 'Mi cuenta',
+    signIn: 'Iniciar sesión',
+    accountOf: (name: string) => `Cuenta de ${name}`,
+    accountDot: (name: string) => `Cuenta · ${name}`,
+    download: 'Descargar',
+    openMenu: 'Abrir menú de navegación',
+    closeMenu: 'Cerrar menú',
+    menu: 'Menú de navegación',
+    navigation: 'Navegación',
+    menuFooter: 'EL COMBATE COMIENZA AQUÍ',
+  },
+
+  footer: {
+    nav: 'Navegación del pie',
+    project: 'Proyecto Integrador - Videojuegos 2026',
+  },
+
+  hero: {
+    sectionLabel: 'Portada de King of Music',
+    eyebrow: 'Proyecto Integrador 2026',
+    discover: 'Descubrir',
+    portalTitle: 'ELIGE A TU ARTISTA FAVORITO',
+    portalSubtitle: 'Y SALTA A LA ARENA DE COMBATE.',
+    downloadsLabel: 'Descargas en Steam',
+    toTrailer: 'Ir al tráiler oficial',
+    scroll: 'Scroll',
+  },
+
+  trailer: {
+    eyebrow: 'Video',
+    title: 'Tráiler',
+    lead: 'El combate al ritmo de la escena musical mexicana.',
+    sectionLabel: 'Tráiler oficial de King of Music',
+    badge: 'Tráiler oficial',
+    posterAlt: 'Vista previa del tráiler de King of Music',
+    videoLabel: 'Video del tráiler oficial de King of Music',
+    play: 'Reproducir tráiler de King of Music',
+    notYet: 'Tráiler todavía no disponible',
+    playShort: 'REPRODUCIR',
+    soonShort: 'PRÓXIMAMENTE',
+    soonNotice: 'Tráiler oficial próximamente disponible.',
+  },
+
+  collage: {
+    eyebrow: 'Roster',
+    title: 'Conoce a los artistas',
+    lead: 'Conoce a los artistas del roster y explora sus modelos 3D en la sección de selección.',
+    artists: 'Artistas',
+    carousel: 'Carrusel de artistas; arrastra horizontalmente para recorrerlos',
+    illustration: (name: string) => `Ilustración de ${name}`,
+  },
+
+  viewer: {
+    eyebrow: 'Selección',
+    title: 'Elige a tu artista',
+    lead: 'Arrastra para girar cada modelo en cualquier dirección y usa la rueda o pellizca para acercarte. Doble toque para restablecer la vista.',
+    prevCharacters: 'Ver personajes anteriores',
+    nextCharacters: 'Ver más personajes',
+    selectCharacter: 'Seleccionar personaje',
+    unavailable: 'Visor 3D no disponible',
+    loadFailed: 'No se pudo cargar el modelo.',
+    hintDrag: 'Arrastra para girar',
+    hintWheel: 'Rueda para zoom',
+    hintPinch: 'Pellizca para zoom',
+    placeholderModel: 'Modelo provisional — pendiente',
+    modelFile: 'archivo 3D',
+    artist: 'Artista',
+    abilities: 'Habilidades',
+    combos: 'Combos',
+    ability: 'Habilidad',
+    combo: 'Combo',
+    comboDescription: (name: string) => `Secuencia de ataques encadenados de ${name}.`,
+    previewOf: (name: string) => `Vista previa de ${name}`,
+    preview: 'Vista previa',
+    activation: 'Activación',
+    keys: 'Teclas',
+    pressKey: (key: string) => `Pulsar ${key}`,
+    keysPending: 'Teclas por definir',
+    videoOf: (name: string) => `Video de ${name}`,
+    videoLoading: 'Cargando video…',
+    videoUnavailable: 'Video no disponible por ahora.',
+    resetLabel: 'Restablecer vista del modelo',
+    reset: 'Restablecer vista',
+    loadingCharacter: 'Cargando personaje',
+  },
+
+  story: {
+    eyebrow: 'Narrativa',
+    viewerLabel: 'Storyboard interactivo. Usa las flechas izquierda y derecha para cambiar de página.',
+    expand: 'Ver imagen completa',
+    panel: 'Viñeta',
+    panelAlt: (caption: string) => (caption ? `${caption} del storyboard` : 'Viñeta del storyboard'),
+    prev: 'Página anterior',
+    next: 'Página siguiente',
+    fullView: (caption: string) => `${caption || 'Imagen'} — vista completa`,
+    closeFull: 'Cerrar imagen completa',
+    image: 'Imagen narrativa',
+    scene: 'ESCENA',
+    page: 'PÁGINA',
+    untitled: 'Sin título',
+    pendingText: 'Descripción pendiente de incorporar.',
+    empty: 'Las páginas del storyboard estarán disponibles próximamente.',
+    hint: 'Desliza o utiliza las flechas para pasar de página',
+  },
+
+  map: {
+    eyebrow: 'Escenarios',
+    title: 'Mapa del juego',
+    lead: 'El torneo recorre los símbolos culturales de la ciudad. Selecciona un lugar para explorar sus detalles.',
+    places: 'Lugares del mapa',
+    unzoom: (name: string) => `Quitar zoom de ${name}`,
+    selectZoom: (name: string) => `Seleccionar y acercar ${name}`,
+    imageAlt: 'Mapa conceptual de los escenarios del videojuego',
+    schematic: 'Mapa esquemático provisional',
+    provisional: 'Mapa provisional',
+    replaceHint: 'Reemplazar con public/images/map.webp',
+    hotspotBack: (name: string) => `${name}. Regresar a la vista general.`,
+    hotspotSelect: (name: string) => `${name}. Seleccionar escenario y acercar mapa.`,
+    resetLabel: 'Restaurar vista general del mapa',
+    overview: 'Vista general',
+    enlarge: (name: string) => `Ampliar imagen de ${name}`,
+    enlargeShort: 'Ampliar',
+    imageOf: (name: string) => `Imagen de ${name}`,
+    selectPlace: 'Selecciona un lugar del mapa',
+    lightbox: 'Imagen ampliada del escenario',
+    lightboxOf: (name: string) => `Imagen ampliada de ${name}`,
+  },
+
+  behind: {
+    eyebrow: 'Detrás del juego',
+    title: 'Cómo se construye',
+    lead: 'King of Music se desarrolla en Unity con modelos de Blender, arte en Krita y Photoshop y música original producida en FL Studio. Estas son las herramientas y las etapas del proyecto.',
+    tools: 'Herramientas',
+    process: 'Proceso',
+    gallery: 'Galería de desarrollo',
+    pendingShot: 'Captura pendiente',
+  },
+
+  team: {
+    eyebrow: 'Equipo',
+    title: 'Detrás del proyecto',
+    lead: 'Cinco estudiantes desarrollan King of Music como proyecto de la materia Creación de Videojuegos: del videojuego en Unity a esta plataforma web y móvil.',
+    member: 'Integrante',
+    photoOf: (name: string) => `Fotografía de ${name}`,
+    meta: (subject: string, group: string, teacher: string) =>
+      `${subject} · Grupo ${group} · Docente: ${teacher}`,
+  },
+
+  download: {
+    soon: (label: string, platform: string) => `${label} — build ${platform}`,
+  },
+
+  auth: {
+    closeLogin: 'Cerrar inicio de sesión',
+    eyebrow: 'King of Music · Comunidad',
+    title1: 'Tu voz forma parte',
+    title2: 'del juego.',
+    description:
+      'Inicia sesión con Google para compartir tus reseñas sobre los personajes, el mapa y los escenarios.',
+    connecting: 'Conectando con Google…',
+    continueGoogle: 'Continuar con Google',
+    nativeHint: 'Se abrirá Google en tu navegador y volverás a la app al terminar.',
+    firstTimeHint: 'Si es tu primera vez, tu cuenta se crea automáticamente.',
+    motto: 'La música nos une',
+    errors: {
+      not_enabled: 'El inicio de sesión con Google todavía no está activado en el servidor.',
+      cancelled: 'Cancelaste el inicio de sesión con Google.',
+      rejected:
+        'Google rechazó la conexión con el servidor. Revisa el Client ID y el Client Secret configurados en Supabase.',
+      browser: 'No se pudo abrir el navegador para iniciar sesión. Inténtalo de nuevo.',
+      generic: 'No se pudo iniciar sesión con Google. Inténtalo de nuevo.',
+    },
+  },
+
+  account: {
+    close: 'Cerrar panel de la cuenta',
+    eyebrow: 'Tu cuenta',
+    hello: (name: string) => (name ? `Hola, ${name}` : 'Hola'),
+    started: 'Sesión iniciada',
+    expires: 'Vence a más tardar',
+    inactivity: (days: number) => `También se cierra tras ${days} días sin usar King of Music.`,
+    note: 'Para cambiar los datos de la cuenta es necesario hacerlo desde los ajustes de Google.',
+    googleSettings: 'Ir a los ajustes de Google',
+    signingOut: 'Cerrando sesión…',
+    signOut: 'Cerrar sesión',
+  },
+
+  reviews: {
+    title: 'Reseñas',
+    eyebrow: 'La voz de la comunidad',
+    close: 'Cerrar reseñas',
+    back: 'Volver a la vista general',
+    category: 'Categoría',
+    character: 'Personaje',
+    stage: 'Escenario',
+    areas: 'Áreas de reseñas',
+    writeTab: 'Escribir reseña',
+    communityTab: 'Comunidad',
+    charactersCategory: 'Personajes',
+    stagesCategory: 'Mapa y escenarios',
+    checkingSession: 'Comprobando tu sesión…',
+    opineOn: 'Opina sobre',
+    rate: 'Evalúa a',
+    editOf: 'Editar tu reseña de',
+    loginPrompt:
+      'Inicia sesión con tu cuenta de Google para publicar tu reseña. Puedes leer las de la comunidad sin iniciar sesión.',
+    loginToWrite: 'Iniciar sesión para escribir',
+    postingAs: 'Publicarás como',
+    yourRating: 'Tu calificación',
+    stars: (n: number) => (n === 1 ? '1 estrella' : `${n} estrellas`),
+    yourReview: 'Tu reseña',
+    placeholderGeneral: '¿Qué te pareció King of Music?',
+    placeholder: '¿Qué te gustó? ¿Qué mejorarías?',
+    counter: (length: number, max: number, min: number) => `${length}/${max} caracteres · mínimo ${min}`,
+    saving: 'Guardando…',
+    saveChanges: 'Guardar cambios',
+    publish: 'Publicar reseña',
+    latest: 'Últimas reseñas de la comunidad',
+    allOf: (category: string) => `Todas las reseñas de ${category}`,
+    opinionsOn: (subject: string) => `Opiniones sobre ${subject}`,
+    loading: 'Cargando reseñas…',
+    count: (n: number) => (n === 1 ? '1 reseña' : `${n} reseñas`),
+    inCommunity: 'en toda la comunidad',
+    inCategory: (category: string) => `en ${category}`,
+    show: 'Mostrar',
+    sortRecent: 'Más recientes',
+    sortBest: 'Mejor calificación',
+    sortAll: 'Ver todas',
+    emptyTitle: 'Tu opinión abre la conversación',
+    emptyGeneral: 'Aún no hay reseñas. Sé el primero en opinar sobre King of Music.',
+    emptyCategory: (category: string) => `Aún no hay reseñas en ${category}.`,
+    emptySubject: (subject: string) => `Aún no hay reseñas para ${subject}. Comparte la primera.`,
+    you: 'Tú',
+    postedFrom: 'Publicada desde',
+    edited: 'editada',
+    aboutGame: 'Sobre: el juego',
+    about: 'Sobre:',
+    seeAllOfItem: 'Ver todas las reseñas de este elemento',
+    ratingOf: (n: number) => `${n} de 5 estrellas`,
+    hidden: 'Ocultada por moderación: solo tú puedes verla.',
+    confirmDelete: 'Confirmar eliminación',
+    deleteQuestion: '¿Eliminar esta reseña?',
+    deleting: 'Eliminando…',
+    deleteYes: 'Sí, eliminar',
+    edit: 'Editar',
+    delete: 'Eliminar',
+    more: 'Ver más reseñas',
+    location: {
+      toggle: 'Mostrar desde qué país publico',
+      loading: 'Obteniendo tu ubicación…',
+      willPost: 'Se publicará desde',
+      denied:
+        'Permiso de ubicación denegado: se publicará sin ubicación. Puedes activarlo en los ajustes del navegador o de la app.',
+      unsupported: 'Este dispositivo no ofrece ubicación: se publicará sin ella.',
+      failed: 'No pudimos obtener tu ubicación.',
+    },
+    feedback: {
+      load: 'No pudimos cargar las reseñas.',
+      loadMore: 'No pudimos cargar más reseñas.',
+      save: 'No pudimos guardar tu reseña. Tu texto se conserva.',
+      delete: 'No pudimos eliminar la reseña.',
+      updated: 'Tu reseña se actualizó.',
+      published: '¡Gracias! Tu reseña ya está publicada.',
+    },
+    errors: {
+      rate_limit: 'Publicaste varias reseñas seguidas. Espera un minuto antes de escribir otra.',
+      auth: 'Tu sesión expiró. Inicia sesión de nuevo para continuar.',
+      validation: 'La reseña no cumple los requisitos. Revisa la calificación y el texto.',
+      not_found: 'Esta reseña ya no existe o no te pertenece.',
+      network: 'No hay conexión con el servidor. Revisa tu internet e inténtalo de nuevo.',
+      unknown: 'Ocurrió un error inesperado. Inténtalo de nuevo.',
+    },
+    validation: {
+      missing: 'Elige qué quieres evaluar.',
+      rating: 'Selecciona una calificación de 1 a 5 estrellas.',
+      empty: 'Escribe tu reseña.',
+      symbols: 'Tu reseña debe contener palabras, no solo símbolos.',
+      short: (min: number, length: number) => `Escribe al menos ${min} caracteres (llevas ${length}).`,
+      long: (max: number) => `Tu reseña supera los ${max} caracteres.`,
+    },
+  },
+}
+
+/** Forma de los textos: en.ts debe tener exactamente las mismas claves. */
+export type Messages = typeof es

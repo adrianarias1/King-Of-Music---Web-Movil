@@ -21,27 +21,42 @@ import type { Location } from '../types'
 export const locations: Location[] = [
   {
     id: 'la-madrugadora',
-    name: 'La Madrugadora',
-    description:
-      'Escenario inicial y tutorial del Torneo del Bienestar. Un espacio de transmisión gubernamental donde el jugador aprende las mecánicas fundamentales antes de regresar para la batalla final.',
+    name: {
+      es: 'La Madrugadora',
+      en: 'La Madrugadora',
+    },
+    description: {
+      es: 'Escenario inicial y tutorial del Torneo del Bienestar. Un espacio de transmisión gubernamental donde el jugador aprende las mecánicas fundamentales antes de regresar para la batalla final.',
+      en: 'Opening stage and tutorial of the Wellbeing Tournament. A government broadcast studio where players learn the core mechanics before returning for the final battle.',
+    },
     x: 26.4,
     y: 69.5,
     image: '/images/locations/la-madrugadora.webp',
   },
   {
     id: 'bellas-artes',
-    name: 'Bellas Artes',
-    description:
-      'Primera arena completa del torneo. Su plataforma circular, obstáculos e ítems obligan al jugador a controlar con precisión la distancia frente al rival.',
+    name: {
+      es: 'Bellas Artes',
+      en: 'Bellas Artes',
+    },
+    description: {
+      es: 'Primera arena completa del torneo. Su plataforma circular, obstáculos e ítems obligan al jugador a controlar con precisión la distancia frente al rival.',
+      en: 'The tournament\'s first full arena. Its circular platform, obstacles and items force players to precisely control their distance from the rival.',
+    },
     x: 35.3,
     y: 36.5,
     image: '/images/locations/bellas-artes.webp',
   },
   {
     id: 'zocalo-ciudad-de-mexico',
-    name: 'Zócalo de la Ciudad de México',
-    description:
-      'Un escenario exterior amplio que favorece el desplazamiento, las persecuciones y los ataques de larga distancia.',
+    name: {
+      es: 'Zócalo de la Ciudad de México',
+      en: 'Mexico City Zócalo',
+    },
+    description: {
+      es: 'Un escenario exterior amplio que favorece el desplazamiento, las persecuciones y los ataques de larga distancia.',
+      en: 'A wide outdoor stage that rewards movement, chases and long-range attacks.',
+    },
     x: 74.68,
     y: 69.5,
     image: '/images/locations/zocalo.webp',

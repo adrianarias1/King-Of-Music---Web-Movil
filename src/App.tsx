@@ -38,6 +38,8 @@ import { ReviewsDock } from './features/reviews/Reviews'
 import { Login } from './features/auth/Login'
 import { Account } from './features/auth/Account'
 import { useAuth } from './features/auth/authContext'
+import type { AuthErrorCode } from './features/auth/authContext'
+import { useI18n } from './i18n'
 
 // Manejo de errores
 import { ErrorBoundary } from './components/ui/ErrorBoundary'
@@ -83,6 +85,7 @@ export default function App() {
   // Un solo botón de cuenta: sin sesión abre "Iniciar sesión";
   // con sesión abre el panel de la cuenta.
   const { status, error: authError } = useAuth()
+  const { t } = useI18n()
   const [loginOpen, setLoginOpen] = useState(false)
   const [accountOpen, setAccountOpen] = useState(false)
   const openAccount = useCallback(() => {
@@ -96,7 +99,7 @@ export default function App() {
   // Si el regreso de Google trae un error (p. ej. credenciales inválidas o
   // acceso cancelado), se abre el diálogo para mostrar el mensaje.
   // Se hace durante el render, una sola vez por mensaje.
-  const [shownAuthError, setShownAuthError] = useState<string | null>(null)
+  const [shownAuthError, setShownAuthError] = useState<AuthErrorCode | null>(null)
   if (authError && authError !== shownAuthError && status === 'signed_out') {
     setShownAuthError(authError)
     setLoginOpen(true)
@@ -111,7 +114,7 @@ export default function App() {
       {/* Accesibilidad: salto al contenido principal */}
 
       <a className="skip-link" href="#contenido">
-        Saltar al contenido principal
+        {t.app.skipLink}
       </a>
 
       {/* Navegación superior */}
@@ -167,7 +170,7 @@ export default function App() {
             Carga diferida mediante React.lazy.
             ================================================= */}
 
-        <ErrorBoundary label="El visor 3D no pudo cargar">
+        <ErrorBoundary label={t.app.viewerFailed}>
           <Suspense fallback={<SectionFallback />}>
             <CharacterViewer />
           </Suspense>

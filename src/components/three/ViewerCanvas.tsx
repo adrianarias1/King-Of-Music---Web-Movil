@@ -7,6 +7,7 @@ import type { Group as ThreeGroup } from 'three'
 import { ACESFilmicToneMapping, Vector3 } from 'three'
 import type { Character } from '../../types'
 import { CharacterModel } from './CharacterModel'
+import { useI18n } from '../../i18n'
 import './ViewerCanvas.css'
 
 export type ModelState = 'placeholder' | 'loading' | 'loaded'
@@ -73,6 +74,7 @@ export function ViewerCanvas({
   active,
   onModelStateChange,
 }: Props) {
+  const { t } = useI18n()
   const containerRef = useRef<HTMLDivElement>(null)
   const modelRef = useRef<ThreeGroup>(null)
   const zoomRef = useRef(CAMERA_POSITION[2])
@@ -223,14 +225,14 @@ export function ViewerCanvas({
         type="button"
         className="viewer-canvas__reset"
         onClick={resetView}
-        aria-label="Restablecer vista del modelo"
-        title="Restablecer vista"
+        aria-label={t.viewer.resetLabel}
+        title={t.viewer.reset}
       >
         <RotateCcw size={16} strokeWidth={1.5} aria-hidden="true" />
       </button>
       {modelState === 'loading' ? (
         <div className="viewer-canvas__loading label" role="status">
-          Cargando personaje
+          {t.viewer.loadingCharacter}
         </div>
       ) : null}
     </div>

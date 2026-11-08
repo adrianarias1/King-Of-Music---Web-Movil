@@ -1,6 +1,11 @@
 /* ==========================================================================
    KING OF MUSIC — Tipos de dominio
+   Todo texto visible se escribe en los dos idiomas: { es: '…', en: '…' }
+   (tipo L). Así TypeScript no compila si a algo le falta su traducción.
    ========================================================================== */
+
+import type { L } from '../i18n/types'
+export type { L }
 
 /** Vector 3D usado para posiciones de cámara. */
 export type Vec3 = [number, number, number]
@@ -8,8 +13,8 @@ export type Vec3 = [number, number, number]
 /** Habilidad de un personaje. */
 export interface Ability {
   id: string
-  name: string
-  description: string
+  name: L
+  description: L
   /** Notación de combo, p. ej. "A + A + B + C". */
   combo?: string
   /** Nombre de icono de Lucide. Opcional: si no existe, se usa uno por defecto. */
@@ -32,8 +37,8 @@ export interface Character {
   id: string
   name: string
   /** Alias o subtítulo corto (género / estilo). */
-  tagline?: string
-  description: string
+  tagline?: L
+  description: L
   /** Ruta al .glb/.gltf. Si falta, el visor usa un placeholder 3D. */
   model?: string
   /** Ruta a la ilustración/portrait. Placeholder si no existe. */
@@ -61,8 +66,8 @@ export interface Combo {
 /** Ubicación del mapa conceptual del juego. Coordenadas en porcentaje 0-100. */
 export interface Location {
   id: string
-  name: string
-  description: string
+  name: L
+  description: L
   /** Posición horizontal en % dentro de la imagen del mapa. */
   x: number
   /** Posición vertical en % dentro de la imagen del mapa. */
@@ -74,7 +79,7 @@ export interface Location {
 export interface Tool {
   id: string
   name: string
-  description: string
+  description: L
   /** Ruta a logo (opcional). */
   logo?: string
   /** Versión opcional. No se inventa si no se proporciona. */
@@ -85,9 +90,9 @@ export interface Tool {
 export interface TeamMember {
   id: string
   name: string
-  role: string
+  role: L
   /** Breve descripción de su aportación. */
-  description?: string
+  description?: L
   /** Ruta a foto. Placeholder si no existe. */
   image?: string
   links?: SocialLink[]
@@ -105,22 +110,22 @@ export interface StoryboardPage {
   /** Número de escena del documento del proyecto. */
   scene?: number
   /** Título o pie de viñeta. */
-  caption: string
+  caption: L
   /** Ruta a la imagen de la página. Placeholder si no existe. */
   image?: string
   /** Texto narrativo opcional. */
-  text?: string
+  text?: L
 }
 
 /** Elemento de la galería de desarrollo. */
 export interface DevShot {
   id: string
-  caption: string
+  caption: L
   image?: string
 }
 
 /** Enlace de navegación del header. */
 export interface NavLink {
-  label: string
+  label: L
   href: string
 }

@@ -165,3 +165,45 @@ export function setLocationPreference(enabled: boolean): void {
     // Almacenamiento no disponible: solo dura esta visita.
   }
 }
+
+/* --- País en el idioma de la página -------------------------------------- */
+
+const normalize = (value: string) =>
+  value.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().trim()
+
+let spanishToCode: Map<string, string> | null = null
+
+/** Nombre en español de cada país → código ISO (p. ej. "mexico" → "MX"). */
+function countryCodes(): Map<string, string> {
+  if (spanishToCode) return spanishToCode
+  spanishToCode = new Map()
+  try {
+    const names = new Intl.DisplayNames(['es'], { type: 'region', fallback: 'none' })
+    const letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
+    for (const a of letters) {
+      for (const b of letters) {
+        const code = a + b
+        const name = names.of(code)
+        if (name && name !== code) spanishToCode.set(normalize(name), code)
+      }
+    }
+  } catch {
+    // Intl.DisplayNames no disponible: se muestra el nombre tal cual.
+  }
+  return spanishToCode
+}
+
+/**
+ * Traduce el país guardado (en español, p. ej. "México") al idioma de la
+ * página: "Mexico" en inglés. Si no lo reconoce, lo deja igual.
+ */
+export function localizeCountry(country: string | null, lang: 'es' | 'en'): string | null {
+  if (!country || lang === 'es') return country
+  const code = countryCodes().get(normalize(country))
+  if (!code) return country
+  try {
+    return new Intl.DisplayNames([lang], { type: 'region' }).of(code) ?? country
+  } catch {
+    return country
+  }
+}

@@ -17,6 +17,7 @@ import { useAssetExists } from '../../hooks/useAssetExists'
 import { useMediaQuery } from '../../hooks/useMediaQuery'
 
 import { HeroCharacterReel } from './HeroCharacterReel'
+import { useI18n } from '../../i18n'
 
 import './Hero.css'
 
@@ -84,14 +85,12 @@ function remapTime(time: number, pace: number): number {
 //
 // La cifra de descargas es demostrativa.
 // No corresponde a descargas reales del videojuego.
+// Los textos están en src/i18n/messages (t.hero).
 // =========================================================
 
 const PORTAL_CONTENT = {
   eyebrow: 'KING OF MUSIC',
-  title: 'ELIGE A TU ARTISTA FAVORITO',
-  subtitle: 'Y SALTA A LA ARENA DE COMBATE.',
   downloads: 5000,
-  downloadsLabel: 'Descargas en Steam',
 } as const
 
 interface Props {
@@ -110,6 +109,7 @@ export function Hero({
   heroVideo,
 }: Props) {
   const reduced = useReducedMotion()
+  const { t, l } = useI18n()
 
   const isMobile = useMediaQuery(MOBILE_QUERY)
 
@@ -689,7 +689,7 @@ export function Hero({
       ref={heroRef}
       id="portada"
       className="hero"
-      aria-label="Portada de King of Music"
+      aria-label={t.hero.sectionLabel}
     >
       {/* ===================================================
           FONDO PRINCIPAL
@@ -743,7 +743,7 @@ export function Hero({
             delay: 0.05,
           }}
         >
-          Proyecto Integrador 2026
+          {t.hero.eyebrow}
         </motion.p>
 
         <h1 className="hero__title display">
@@ -796,7 +796,7 @@ export function Hero({
             delay: 0.36,
           }}
         >
-          {siteConfig.tagline}
+          {l(siteConfig.tagline)}
         </motion.p>
 
         <motion.div
@@ -813,7 +813,7 @@ export function Hero({
             href="#personajes"
           >
             <span className="btn__label">
-              Descubrir
+              {t.hero.discover}
             </span>
           </a>
 
@@ -822,7 +822,7 @@ export function Hero({
             href="#descargar"
           >
             <span className="btn__label">
-              Descargar
+              {t.header.download}
             </span>
           </a>
         </motion.div>
@@ -879,11 +879,11 @@ export function Hero({
                 </span>
 
                 <h2 className="hero__portal-title">
-                  {PORTAL_CONTENT.title}
+                  {t.hero.portalTitle}
                 </h2>
 
                 <p className="hero__portal-subtitle">
-                  {PORTAL_CONTENT.subtitle}
+                  {t.hero.portalSubtitle}
                 </p>
 
                 {/* Contador vinculado al scroll */}
@@ -900,7 +900,7 @@ export function Hero({
                   </div>
 
                   <span className="hero__portal-counter-label">
-                    {PORTAL_CONTENT.downloadsLabel}
+                    {t.hero.downloadsLabel}
                   </span>
                 </div>
               </div>
@@ -917,7 +917,7 @@ export function Hero({
       <motion.a
         className="hero__scroll"
         href="#trailer"
-        aria-label="Ir al tráiler oficial"
+        aria-label={t.hero.toTrailer}
         initial={reduced ? false : { opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{
@@ -926,7 +926,7 @@ export function Hero({
         }}
       >
         <span className="label">
-          Scroll
+          {t.hero.scroll}
         </span>
 
         <ChevronDown
