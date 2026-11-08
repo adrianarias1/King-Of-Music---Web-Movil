@@ -1,5 +1,5 @@
-import { Info, MousePointer2, Move3d } from 'lucide-react'
-import { useCallback, useEffect, useState } from 'react'
+import { ChevronLeft, ChevronRight, Info, MousePointer2, Move3d } from 'lucide-react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { characters, defaultCharacterId } from '../../data/characters'
 import { useInView } from '../../hooks/useInView'
 import type { Ability, Combo } from '../../types'
@@ -21,6 +21,50 @@ const copy = {
 export function CharacterViewer() {
   const [activeId, setActiveId] = useState(defaultCharacterId)
   const [move, setMove] = useState<MoveDetail | null>(null)
+
+  // ---------------------------------------------------------
+  // Selector horizontal: flechas para recorrerlo con el mouse
+  // ---------------------------------------------------------
+  const selectorRef = useRef<HTMLDivElement>(null)
+  const [canScroll, setCanScroll] = useState({ left: false, right: false })
+
+  const updateScrollState = useCallback(() => {
+    const node = selectorRef.current
+    if (!node) return
+    const max = node.scrollWidth - node.clientWidth
+    const next = { left: node.scrollLeft > 4, right: node.scrollLeft < max - 4 }
+    setCanScroll((prev) => (prev.left === next.left && prev.right === next.right ? prev : next))
+  }, [])
+
+  useEffect(() => {
+    const node = selectorRef.current
+    if (!node) return undefined
+    updateScrollState()
+    const observer = new ResizeObserver(updateScrollState)
+    observer.observe(node)
+    return () => observer.disconnect()
+  }, [updateScrollState])
+
+  /** Desplaza el selector ~80 % de su ancho visible. */
+  const scrollSelector = (direction: -1 | 1) => {
+    const node = selectorRef.current
+    if (!node) return
+    node.scrollBy({ left: direction * node.clientWidth * 0.8, behavior: 'smooth' })
+  }
+
+  // El personaje elegido siempre queda completo a la vista (solo se
+  // desplaza el selector, nunca la página).
+  useEffect(() => {
+    const node = selectorRef.current
+    const tab = node?.querySelector<HTMLElement>(`#tab-${activeId}`)
+    if (!node || !tab) return
+    const left = tab.offsetLeft - node.offsetLeft
+    const right = left + tab.offsetWidth
+    if (left < node.scrollLeft) node.scrollTo({ left: left - 8, behavior: 'smooth' })
+    else if (right > node.scrollLeft + node.clientWidth) {
+      node.scrollTo({ left: right - node.clientWidth + 8, behavior: 'smooth' })
+    }
+  }, [activeId])
 
   const openAbility = (entry: Ability) =>
     setMove({ kind: 'Habilidad', id: entry.id, name: entry.name, description: entry.description, keys: entry.combo, media: entry.media, preview: entry.preview })
@@ -96,32 +140,60 @@ export function CharacterViewer() {
       <div className="container">
         <SectionHeading index="02" eyebrow={copy.eyebrow} title={copy.title} lead={copy.lead} />
 
-        {/* Selector de personajes */}
-        <div className="viewer__selector" role="tablist" aria-label="Seleccionar personaje">
-          {characters.map((item, index) => {
-            const selected = item.id === activeId
-            return (
-              <button
-                key={item.id}
-                type="button"
-                role="tab"
-                id={`tab-${item.id}`}
-                aria-selected={selected}
-                aria-controls="viewer-stage"
-                className={`viewer__tab${selected ? ' is-active' : ''}`}
-                onClick={() => handleSelect(item.id)}
-                style={selected ? { ['--tab-accent' as string]: item.accent } : undefined}
-              >
-                <span className="viewer__tab-num label">
-                  {String(index + 1).padStart(2, '0')}
-                </span>
-                <span className="viewer__tab-body">
-                  <span className="viewer__tab-name">{item.name}</span>
-                  {item.tagline ? <span className="viewer__tab-tag">{item.tagline}</span> : null}
-                </span>
-              </button>
-            )
-          })}
+        {/* Selector de personajes (con flechas para recorrerlo con el mouse) */}
+        <div className={`viewer__selector-wrap${canScroll.left ? ' can-left' : ''}${canScroll.right ? ' can-right' : ''}`}>
+          <button
+            type="button"
+            className="viewer__selector-arrow viewer__selector-arrow--prev"
+            onClick={() => scrollSelector(-1)}
+            disabled={!canScroll.left}
+            aria-label="Ver personajes anteriores"
+            tabIndex={-1}
+          >
+            <ChevronLeft size={20} strokeWidth={1.6} aria-hidden="true" />
+          </button>
+          <div
+            ref={selectorRef}
+            className="viewer__selector"
+            role="tablist"
+            aria-label="Seleccionar personaje"
+            onScroll={updateScrollState}
+          >
+            {characters.map((item, index) => {
+              const selected = item.id === activeId
+              return (
+                <button
+                  key={item.id}
+                  type="button"
+                  role="tab"
+                  id={`tab-${item.id}`}
+                  aria-selected={selected}
+                  aria-controls="viewer-stage"
+                  className={`viewer__tab${selected ? ' is-active' : ''}`}
+                  onClick={() => handleSelect(item.id)}
+                  style={selected ? { ['--tab-accent' as string]: item.accent } : undefined}
+                >
+                  <span className="viewer__tab-num label">
+                    {String(index + 1).padStart(2, '0')}
+                  </span>
+                  <span className="viewer__tab-body">
+                    <span className="viewer__tab-name">{item.name}</span>
+                    {item.tagline ? <span className="viewer__tab-tag">{item.tagline}</span> : null}
+                  </span>
+                </button>
+              )
+            })}
+          </div>
+          <button
+            type="button"
+            className="viewer__selector-arrow viewer__selector-arrow--next"
+            onClick={() => scrollSelector(1)}
+            disabled={!canScroll.right}
+            aria-label="Ver más personajes"
+            tabIndex={-1}
+          >
+            <ChevronRight size={20} strokeWidth={1.6} aria-hidden="true" />
+          </button>
         </div>
 
         {/* Escena + informacion */}
