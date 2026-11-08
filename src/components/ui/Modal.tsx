@@ -15,6 +15,8 @@ interface Props {
   labelId?: string
   /** Panel mas ancho, para contenido visual (imagenes). */
   wide?: boolean
+  /** Clase extra para el panel (tamaños específicos). */
+  className?: string
 }
 
 /**
@@ -24,7 +26,7 @@ interface Props {
  * - foco atrapado y restaurado
  * - scroll del body bloqueado
  */
-export function Modal({ open, onClose, title, description, children, labelId, wide = false }: Props) {
+export function Modal({ open, onClose, title, description, children, labelId, wide = false, className }: Props) {
   const reduced = useReducedMotion()
   const { panelRef, handleOverlayClick } = useDialog(open, onClose)
   const close = useCallback(() => onClose(), [onClose])
@@ -44,7 +46,7 @@ export function Modal({ open, onClose, title, description, children, labelId, wi
         >
           <motion.div
             ref={panelRef}
-            className={`modal${wide ? ' modal--wide' : ''}`}
+            className={`modal${wide ? ' modal--wide' : ''}${className ? ` ${className}` : ''}`}
             role="dialog"
             aria-modal="true"
             aria-labelledby={labelId ?? 'modal-title'}

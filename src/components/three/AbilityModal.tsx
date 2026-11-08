@@ -36,7 +36,7 @@ export function AbilityModal({ move, characterName, onClose }: Props) {
       title={move?.name ?? ''}
       description={move ? `${characterName} — ${move.kind}` : undefined}
       labelId="ability-modal-title"
-      wide
+      className="modal--ability"
     >
       {move ? (
         <div className="ability-modal">
@@ -51,26 +51,28 @@ export function AbilityModal({ move, characterName, onClose }: Props) {
             />
           )}
 
-          {move.description ? <p className="ability-modal__desc">{move.description}</p> : null}
+          <div className="ability-modal__info">
+            {move.description ? <p className="ability-modal__desc">{move.description}</p> : null}
 
-          {move.keys ? (
-            <p className="ability-modal__combo">
-              <span className="label">{move.kind === 'Habilidad' ? 'Activación' : 'Teclas'}</span>
-              <span className="ability-modal__keys">
-                {move.keys.split('+').map((key) => key.trim()).map((key, index) => (
-                  <kbd key={`${key}-${index}`}>{key}</kbd>
-                ))}
-                {move.kind === 'Habilidad' && move.keys.trim() === 'U' ? (
-                  <span className="ability-modal__hint">Pulsar U</span>
-                ) : null}
-              </span>
-            </p>
-          ) : (
-            <p className="notice ability-modal__nocombo">
-              <Keyboard size={14} strokeWidth={1.5} aria-hidden="true" />
-              Teclas por definir
-            </p>
-          )}
+            {move.keys ? (
+              <p className="ability-modal__combo">
+                <span className="label">{move.kind === 'Habilidad' ? 'Activación' : 'Teclas'}</span>
+                <span className="ability-modal__keys">
+                  {move.keys.split('+').map((key) => key.trim()).map((key, index) => (
+                    <kbd key={`${key}-${index}`}>{key}</kbd>
+                  ))}
+                  {move.kind === 'Habilidad' && move.keys.trim() === 'U' ? (
+                    <span className="ability-modal__hint">Pulsar U</span>
+                  ) : null}
+                </span>
+              </p>
+            ) : (
+              <p className="notice ability-modal__nocombo">
+                <Keyboard size={14} strokeWidth={1.5} aria-hidden="true" />
+                Teclas por definir
+              </p>
+            )}
+          </div>
         </div>
       ) : null}
     </Modal>
