@@ -62,8 +62,12 @@ jobs:
           java-version: 21
           cache: gradle
 
-      - name: Android SDK
-        uses: android-actions/setup-android@v3
+      - name: Android SDK (preinstalado en el runner)
+        run: |
+          SDKMANAGER=$(ls -d "$ANDROID_HOME"/cmdline-tools/*/bin/sdkmanager | sort -V | tail -1)
+          echo "Usando $SDKMANAGER"
+          yes | "$SDKMANAGER" --licenses > /dev/null || true
+          "$SDKMANAGER" --install "platforms;android-36" "build-tools;36.0.0" > /dev/null
 
       - name: Versión
         id: version
