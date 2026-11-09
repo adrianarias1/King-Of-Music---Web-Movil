@@ -5,6 +5,7 @@
    ========================================================================== */
 
 import type { L } from './i18n/types'
+import { mediaUrl } from './lib/media'
 
 export const siteConfig = {
   name: 'King of Music',
@@ -46,7 +47,8 @@ export interface DownloadTarget {
 export const downloads: DownloadTarget[] = [
   {
     id: 'game',
-    url: '',
+    // Instalador en Cloudflare R2 (ver src/lib/media.ts).
+    url: mediaUrl('KingOfMusic_Setup.exe'),
     title: { es: 'Juego para PC', en: 'PC game' },
     description: {
       es: 'El torneo completo: campaña, versus local y los siete luchadores.',
@@ -100,9 +102,10 @@ export const portalImageAsset = '/images/imagen-hero.jpeg'
 
 // TRÁILER
 
-export const trailerAsset = '/videos/trailer.mp4'
+// Tráiler oficial y su miniatura en Cloudflare R2 (ver src/lib/media.ts).
+export const trailerAsset = mediaUrl('Trailer Oficial.mp4')
 
-export const trailerPosterAsset = '/images/imagen-hero.jpeg'
+export const trailerPosterAsset = mediaUrl('Miniatura trailer.png')
 
 // MAPA
 

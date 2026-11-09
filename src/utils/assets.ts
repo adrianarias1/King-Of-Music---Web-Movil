@@ -54,6 +54,10 @@ export function assetKnownToExist(path: string | undefined): boolean {
 
 export async function assetExists(path: string | undefined): Promise<boolean> {
   if (!path) return false
+  // Archivos externos (p. ej. Cloudflare R2): una petición HEAD entre
+  // dominios puede bloquearse por CORS aunque el archivo exista. Se dan por
+  // disponibles; si fallan, <img> y <video> lo notifican con onError.
+  if (/^(https?:)?\/\//.test(path)) return true
 
   const cached = availability.get(path)
   if (cached && cached.expiresAt > Date.now()) return cached.exists

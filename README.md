@@ -117,7 +117,7 @@ La fuente está preparada pero no incluida. Colocar `Kings.woff2` en `public/fon
 En `src/config.ts`, arreglo `downloads`, pon el enlace en `url`:
 
 ```ts
-{ id: 'game', url: 'https://github.com/tic-310019-alt/KingOfMusic/releases/download/v0.1.0/KingOfMusic_Setup.exe', … },
+{ id: 'game', url: mediaUrl('KingOfMusic_Setup.exe'), … },   // Cloudflare R2
 { id: 'app',  url: './downloads/king-of-music.apk', … },
 ```
 

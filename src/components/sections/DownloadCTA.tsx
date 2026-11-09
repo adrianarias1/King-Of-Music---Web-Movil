@@ -62,8 +62,10 @@ function DownloadCard({ target }: { target: DownloadTarget }) {
         <a
           className="btn btn--primary btn--lg download__btn"
           href={target.url}
-          download={external ? undefined : ''}
-          target={external ? '_blank' : undefined}
+          // Archivo (.exe / .apk): se descarga sin salir de la página ni abrir
+          // una pestaña vacía. En la app Android, native.ts lo abre en el
+          // navegador del sistema.
+          download=""
           rel={external ? 'noreferrer noopener' : undefined}
           aria-label={t.download.downloadOf(title)}
         >

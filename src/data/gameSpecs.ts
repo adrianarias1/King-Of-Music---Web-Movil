@@ -462,7 +462,7 @@ export const repositories: Repository[] = [
       en: 'Unity project: C# code, scenes, catalogs and the Windows build.',
     },
     stack: 'Unity · C#',
-    url: 'https://github.com/tic-310019-alt/KingOfMusic',
+    url: 'https://github.com/tic-310019-alt/KOM',
   },
   {
     id: 'web-mobile',
