@@ -1,0 +1,158 @@
+# =====================================================================
+# KING OF MUSIC — APK Android → GitHub Releases
+#
+# Compila el sitio (Vite), lo copia al proyecto Android (Capacitor),
+# genera el APK y lo publica como Release sobre la rama main.
+#
+# Se ejecuta a mano: Actions → "APK Android (Release)" → Run workflow.
+# La versión sale de android/app/build.gradle (versionName); súbela
+# (y versionCode) antes de cada release nuevo.
+#
+# Firma:
+#   - Si el repositorio tiene los secretos ANDROID_KEYSTORE_BASE64,
+#     ANDROID_KEYSTORE_PASSWORD, ANDROID_KEY_ALIAS y ANDROID_KEY_PASSWORD,
+#     se genera el APK de release firmado con la clave del equipo.
+#   - Si no, se genera el APK firmado con la clave de depuración
+#     (se instala igual en cualquier Android).
+# =====================================================================
+
+name: APK Android (Release)
+
+on:
+  workflow_dispatch:
+    inputs:
+      notes:
+        description: 'Notas adicionales del release (opcional)'
+        required: false
+        default: ''
+
+permissions:
+  contents: write
+
+concurrency:
+  group: android-release
+  cancel-in-progress: false
+
+jobs:
+  apk:
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Node 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Dependencias
+        run: npm ci
+
+      - name: Build del sitio (incluye revisión de traducciones)
+        run: npm run build
+
+      - name: Copiar el sitio a Android (Capacitor)
+        run: npx cap sync android
+
+      - name: Java 21
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 21
+          cache: gradle
+
+      - name: Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Versión
+        id: version
+        run: |
+          VERSION=$(grep -oP 'versionName "\K[^"]+' android/app/build.gradle)
+          CODE=$(grep -oP 'versionCode \K[0-9]+' android/app/build.gradle)
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+          echo "code=$CODE" >> "$GITHUB_OUTPUT"
+          echo "sha=$(git rev-parse --short HEAD)" >> "$GITHUB_OUTPUT"
+          if gh release view "v$VERSION" >/dev/null 2>&1; then
+            echo "::error::Ya existe el release v$VERSION. Sube versionName y versionCode en android/app/build.gradle."
+            exit 1
+          fi
+        env:
+          GH_TOKEN: ${{ github.token }}
+
+      - name: Clave de firma (si está configurada)
+        id: signing
+        env:
+          KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+          KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+          KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+        run: |
+          if [ -n "$KEYSTORE_BASE64" ]; then
+            echo "$KEYSTORE_BASE64" | base64 -d > android/app/release.jks
+            {
+              echo "storeFile=app/release.jks"
+              echo "storePassword=$KEYSTORE_PASSWORD"
+              echo "keyAlias=$KEY_ALIAS"
+              echo "keyPassword=$KEY_PASSWORD"
+            } > android/keystore.properties
+            echo "mode=release" >> "$GITHUB_OUTPUT"
+          else
+            echo "mode=debug" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Compilar APK
+        working-directory: android
+        run: |
+          if [ "${{ steps.signing.outputs.mode }}" = "release" ]; then
+            bash ./gradlew --no-daemon assembleRelease
+            cp app/build/outputs/apk/release/app-release.apk ../KingOfMusic-v${{ steps.version.outputs.version }}.apk
+          else
+            bash ./gradlew --no-daemon assembleDebug
+            cp app/build/outputs/apk/debug/app-debug.apk ../KingOfMusic-v${{ steps.version.outputs.version }}.apk
+          fi
+          ls -la ../KingOfMusic-v*.apk
+
+      - name: Publicar release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          VERSION: ${{ steps.version.outputs.version }}
+          CODE: ${{ steps.version.outputs.code }}
+          SHA: ${{ steps.version.outputs.sha }}
+          MODE: ${{ steps.signing.outputs.mode }}
+          EXTRA: ${{ github.event.inputs.notes }}
+        run: |
+          if [ "$MODE" = "release" ]; then
+            FIRMA="Firmado (release) con la clave del equipo."
+          else
+            FIRMA="Firmado con clave de depuración. Si tienes instalada una versión anterior firmada con otra clave, desinstálala antes de instalar esta."
+          fi
+          cat > notes.md <<NOTES
+          ## King of Music — APK Android v$VERSION
+
+          Aplicación Android (Capacitor) de **King of Music**, generada desde \`main\` ($SHA).
+
+          ### Novedades
+          - Sitio completo en **español e inglés** (selector ES | EN).
+          - Sección **Desarrollo**: ficha técnica, requisitos del sistema, especificaciones, hitos, pruebas y repositorios.
+          - **Tráiler oficial** y botón de descarga del juego para PC.
+          - Visor 3D con flechas en el selector, videos de habilidades y combos.
+
+          ### Descarga e instalación
+          1. Descarga **KingOfMusic-v$VERSION.apk** desde *Assets*.
+          2. Si Android lo pide, permite **instalar apps de origen desconocido**.
+          3. Abre el archivo y pulsa **Instalar**.
+
+          ### Detalles técnicos
+          - Paquete: \`com.kingofmusic.app\`
+          - Versión: $VERSION (versionCode $CODE)
+          - Android 7.0 (API 24) o superior.
+          - $FIRMA
+
+          $EXTRA
+          NOTES
+          sed -i 's/^          //' notes.md
+          gh release create "v$VERSION" "KingOfMusic-v$VERSION.apk" \
+            --target "${{ github.sha }}" \
+            --title "King of Music v$VERSION — APK Android" \
+            --notes-file notes.md
