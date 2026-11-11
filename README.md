@@ -66,15 +66,23 @@ docs/            # Documentacion del proyecto (ver mas abajo)
 
 ### Instalar la PWA
 
-La web genera un manifiesto y un Service Worker con Workbox al ejecutar `npm run build`. Los recursos estáticos se precargan para que la interfaz principal pueda abrirse sin conexión después de la primera visita; los modelos GLB de Cloudflare R2 se solicitan en línea y no forman parte del caché. `src/main.tsx` registra el Service Worker solo en navegadores web, no en Capacitor Android. El proyecto incluye `wrangler.jsonc` para servir `dist/` como assets estáticos de Cloudflare Workers con fallback SPA.
+La PWA usa un **manifiesto escrito a mano** (`public/manifest.webmanifest`, enlazado en `index.html`) y un **service worker propio** (`src/sw.js` → `dist/sw.js`), registrado en `src/pwa/registerServiceWorker.ts`. Al instalarse precarga la página principal, el código, los íconos, las imágenes y `offline.html`. Al activarse borra las cachés de versiones anteriores, y sin conexión muestra el aviso **Sin conexión**. No se registra en `npm run dev` ni dentro de la app Android.
 
-En Chrome o Edge de Windows, abre el sitio desplegado por HTTPS y usa el icono **Instalar King of Music** de la barra de direcciones, o el menú **Instalar aplicación**. Para revisar el manifiesto y la instalación, abre DevTools → **Application** → **Manifest**; en **Service Workers** verifica que `sw.js` esté activo y en **Cache Storage** revisa el precaché `workbox-precache`. Activa **Offline** desde la pestaña Network y recarga para comprobar la interfaz guardada.
+Para probarla en local:
+
+```bash
+npm run preview:pwa
+```
+
+Luego abre http://localhost:4173 → DevTools → **Application** (Manifest, Service workers, Cache storage) y prueba **Offline** en la pestaña Network. Para instalarla: ícono **Instalar** de la barra de direcciones, o **Descargar → App web → Instalar app**.
+
+La revisión punto por punto de la lista de cotejo está en [`docs/PWA.md`](docs/PWA.md).
 
 ### Anadir un personaje
 
 1. Editar `src/data/characters.ts` y añadir una entrada `Character`.
 2. Subir el modelo 3D a Cloudflare R2 bajo `models/characters/<archivo>.glb`.
-3. Colocar la ilustracion en `public/images/characters/<id>.jpg`.
+3. Colocar la ilustracion en `public/images/characters/<id>.webp` (900 × 1200).
 4. El visor detecta automaticamente si el `.glb` existe. Si no, usa un placeholder 3D propio.
 
 ### Anadir un modelo GLB

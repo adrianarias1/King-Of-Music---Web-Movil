@@ -40,6 +40,7 @@ import { Account } from './features/auth/Account'
 import { useAuth } from './features/auth/authContext'
 import type { AuthErrorCode } from './features/auth/authContext'
 import { useI18n } from './i18n'
+import { ConnectionStatus } from './pwa/ConnectionStatus'
 
 // Manejo de errores
 import { ErrorBoundary } from './components/ui/ErrorBoundary'
@@ -120,6 +121,9 @@ export default function App() {
       {/* Navegación superior */}
 
       <Header onLogin={openAccount} />
+
+      {/* PWA: aviso cuando no hay conexión */}
+      <ConnectionStatus />
 
       <main id="contenido">
 

@@ -8,6 +8,20 @@
 import type { Messages } from './es'
 
 export const en: Messages = {
+  pwa: {
+    offlineTitle: 'You\'re offline',
+    offlineText:
+      'You\'re viewing the version saved on this device. Reviews, sign-in and videos need an internet connection.',
+    onlineTitle: 'Back online',
+    installTitle: 'Web app',
+    installDesc: 'Install King of Music on this device and browse it even without internet.',
+    installDetails: 'PWA · Computer and phone',
+    installButton: 'Install app',
+    installed: 'Already installed on this device.',
+    iosHint: 'On iPhone or iPad: tap Share and choose “Add to Home Screen”.',
+    browserHint: 'Open it in Chrome or Edge and use “Install” in the address bar or the browser menu.',
+  },
+
   meta: {
     title: 'King of Music — Fighting game',
     description:

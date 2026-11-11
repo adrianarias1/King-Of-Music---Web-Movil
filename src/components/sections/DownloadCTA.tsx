@@ -1,9 +1,10 @@
-import { Clock, Download, Monitor, Smartphone } from 'lucide-react'
+import { CheckCircle2, Clock, Download, MonitorSmartphone, Monitor, Smartphone } from 'lucide-react'
 import { comingSoonLabel, downloads, siteConfig } from '../../config'
 import type { DownloadTarget } from '../../config'
 import { isNativeApp } from '../../lib/native'
 import { Reveal } from '../ui/Reveal'
 import { useI18n } from '../../i18n'
+import { usePwaInstall } from '../../pwa/install'
 import '../ui/Button.css'
 import './DownloadCTA.css'
 
@@ -32,12 +33,18 @@ export function DownloadCTA() {
         <h2 className="download__title display">{siteConfig.name}</h2>
         <p className="download__lead lead">{l(siteConfig.tagline)}</p>
 
-        <ul className={`download__cards${targets.length === 1 ? ' is-single' : ''}`}>
+        <ul className={`download__cards is-${targets.length + (isNativeApp ? 0 : 1)}`}>
           {targets.map((target) => (
             <li key={target.id}>
               <DownloadCard target={target} />
             </li>
           ))}
+          {/* App web (PWA): se instala desde el navegador */}
+          {isNativeApp ? null : (
+            <li>
+              <InstallCard />
+            </li>
+          )}
         </ul>
       </Reveal>
     </section>
@@ -90,6 +97,38 @@ function DownloadCard({ target }: { target: DownloadTarget }) {
             <span>{l(comingSoonLabel)}</span>
           </p>
         </>
+      )}
+    </article>
+  )
+}
+
+/** Instalar la app web (PWA) en este dispositivo desde el navegador. */
+function InstallCard() {
+  const { t } = useI18n()
+  const copy = t.pwa
+  const { state, install } = usePwaInstall()
+
+  return (
+    <article className="download__card download__card--pwa">
+      <MonitorSmartphone className="download__card-icon" size={28} strokeWidth={1.4} aria-hidden="true" />
+      <h3 className="download__card-title">{copy.installTitle}</h3>
+      <p className="download__card-desc">{copy.installDesc}</p>
+      <p className="download__card-details label">{copy.installDetails}</p>
+
+      {state === 'available' ? (
+        <button type="button" className="btn btn--primary btn--lg download__btn" onClick={() => void install()}>
+          <span className="btn__label">
+            <Download size={20} strokeWidth={1.5} aria-hidden="true" />
+            {copy.installButton}
+          </span>
+        </button>
+      ) : state === 'installed' ? (
+        <p className="download__soon notice download__installed">
+          <CheckCircle2 size={16} strokeWidth={1.6} aria-hidden="true" />
+          <span>{copy.installed}</span>
+        </p>
+      ) : (
+        <p className="download__hint">{state === 'ios' ? copy.iosHint : copy.browserHint}</p>
       )}
     </article>
   )

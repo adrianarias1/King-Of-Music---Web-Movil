@@ -14,6 +14,20 @@
    ========================================================================== */
 
 export const es = {
+  pwa: {
+    offlineTitle: 'Sin conexión',
+    offlineText:
+      'Estás viendo la versión guardada en este dispositivo. Las reseñas, el inicio de sesión y los videos necesitan internet.',
+    onlineTitle: 'Conexión restablecida',
+    installTitle: 'App web',
+    installDesc: 'Instala King of Music en este dispositivo y consúltalo incluso sin internet.',
+    installDetails: 'PWA · Computadora y teléfono',
+    installButton: 'Instalar app',
+    installed: 'Ya está instalada en este dispositivo.',
+    iosHint: 'En iPhone o iPad: toca Compartir y elige «Agregar a pantalla de inicio».',
+    browserHint: 'Ábrela en Chrome o Edge y usa «Instalar» en la barra de direcciones o en el menú del navegador.',
+  },
+
   meta: {
     title: 'King of Music — Videojuego de combate',
     description:

@@ -1,0 +1,84 @@
+{
+  "id": "./",
+  "name": "King of Music",
+  "short_name": "KOM",
+  "description": "Videojuego de combate inspirado en la escena musical mexicana: personajes en 3D, historia, mapa, requisitos y descargas.",
+  "lang": "es-MX",
+  "dir": "ltr",
+  "start_url": "./?source=pwa",
+  "scope": "./",
+  "display": "standalone",
+  "display_override": ["standalone", "minimal-ui"],
+  "orientation": "any",
+  "theme_color": "#000000",
+  "background_color": "#000000",
+  "categories": ["games", "entertainment"],
+  "icons": [
+    {
+      "src": "icons/king-of-music-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icons/king-of-music-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icons/king-of-music-maskable-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "icons/king-of-music-maskable-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "screenshots/escritorio.webp",
+      "sizes": "1280x720",
+      "type": "image/webp",
+      "form_factor": "wide",
+      "label": "King of Music en computadora"
+    },
+    {
+      "src": "screenshots/movil.webp",
+      "sizes": "540x1170",
+      "type": "image/webp",
+      "form_factor": "narrow",
+      "label": "King of Music en el teléfono"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Personajes",
+      "short_name": "Personajes",
+      "url": "./?source=shortcut#personajes",
+      "icons": [{ "src": "icons/king-of-music-192.png", "sizes": "192x192", "type": "image/png" }]
+    },
+    {
+      "name": "Historia",
+      "short_name": "Historia",
+      "url": "./?source=shortcut#historia",
+      "icons": [{ "src": "icons/king-of-music-192.png", "sizes": "192x192", "type": "image/png" }]
+    },
+    {
+      "name": "Mapa del juego",
+      "short_name": "Mapa",
+      "url": "./?source=shortcut#mapa",
+      "icons": [{ "src": "icons/king-of-music-192.png", "sizes": "192x192", "type": "image/png" }]
+    },
+    {
+      "name": "Descargar el juego",
+      "short_name": "Descargar",
+      "url": "./?source=shortcut#descargar",
+      "icons": [{ "src": "icons/king-of-music-192.png", "sizes": "192x192", "type": "image/png" }]
+    }
+  ]
+}

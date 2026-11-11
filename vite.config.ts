@@ -1,74 +1,32 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 import { VitePWA } from 'vite-plugin-pwa'
-import { MODELS_CACHE } from './src/modelsVersion.ts'
 
 // https://vite.dev/config/
 export default defineConfig({
   plugins: [
     react(),
+    // PWA (lista de cotejo, sección 3):
+    //  - Manifiesto escrito a mano: public/manifest.webmanifest, enlazado en
+    //    index.html (por eso manifest: false).
+    //  - Service worker propio: src/sw.js → dist/sw.js. El plugin solo le
+    //    inyecta la lista de archivos a precargar (self.__WB_MANIFEST).
+    //  - Registro explícito: src/pwa/registerServiceWorker.ts.
     VitePWA({
-      registerType: 'autoUpdate',
-      // La app registra el SW solo en navegador web, nunca en la WebView nativa.
+      strategies: 'injectManifest',
+      srcDir: 'src',
+      filename: 'sw.js',
       injectRegister: null,
-      includeAssets: ['icons/favicon.svg', 'icons/king-of-music-32.png'],
-      manifest: {
-        name: 'King of Music',
-        short_name: 'King of Music',
-        display: 'standalone',
-        start_url: './',
-        scope: './',
-        theme_color: '#002F61',
-        background_color: '#050505',
-        lang: 'es-MX',
-        icons: [
-          {
-            src: './icons/king-of-music-192.png',
-            sizes: '192x192',
-            type: 'image/png',
-            purpose: 'any',
-          },
-          {
-            src: './icons/king-of-music-512.png',
-            sizes: '512x512',
-            type: 'image/png',
-            purpose: 'any',
-          },
-        ],
-      },
-      workbox: {
+      manifest: false,
+      injectManifest: {
+        // Página principal, offline.html, JS, CSS, iconos, manifiesto e
+        // imágenes (historia, personajes, mapa, escenarios): todo lo
+        // necesario para consultar el sitio sin conexión.
         globPatterns: ['**/*.{js,css,html,ico,png,svg,webp,jpg,jpeg,woff2,json,webmanifest}'],
-        // Storyboard e ilustraciones de personajes son pesadas y no hacen
-        // falta para arrancar: se excluyen de la precarga y se guardan en
-        // caché la primera vez que el usuario las ve (runtimeCaching).
-        globIgnores: ['**/*.glb', 'images/storyboard/**', 'images/characters/**'],
+        // Los modelos 3D (.glb) se guardan aparte (src/lib/modelCache.ts) y
+        // las capturas del manifiesto solo las usa el diálogo de instalación.
+        globIgnores: ['**/*.glb', 'screenshots/**'],
         maximumFileSizeToCacheInBytes: 8 * 1024 * 1024,
-        cleanupOutdatedCaches: true,
-        skipWaiting: true,
-        clientsClaim: true,
-        navigateFallback: 'index.html',
-        runtimeCaching: [
-          {
-            // Modelos 3D: se sirven desde la caché aunque no haya internet.
-            // La página los precarga en esta misma caché al abrirse
-            // (src/lib/modelCache.ts). La versión va en la URL (?v=…).
-            urlPattern: /\/models\/characters\/[^/?]+\.glb(?:\?.*)?$/i,
-            handler: 'CacheFirst',
-            options: {
-              cacheName: MODELS_CACHE,
-              cacheableResponse: { statuses: [200] },
-              matchOptions: { ignoreVary: true },
-            },
-          },
-          {
-            urlPattern: /\/images\/(?:storyboard|characters)\/[^?]+\.(?:webp|png|jpe?g)(?:\?.*)?$/i,
-            handler: 'CacheFirst',
-            options: {
-              cacheName: 'kom-artwork',
-              expiration: { maxEntries: 60, maxAgeSeconds: 60 * 60 * 24 * 30 },
-            },
-          },
-        ],
       },
     }),
   ],

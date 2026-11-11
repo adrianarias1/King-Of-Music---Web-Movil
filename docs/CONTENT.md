@@ -22,7 +22,7 @@ public/videos/  public/models/  public/fonts/  public/downloads/
 | Storyboard | `public/images/storyboard/page-01..06.jpg` | **Pendiente** | `src/data/storyboard.ts` |
 | Mapa | `public/images/map.webp` | Listo | `src/config.ts` (`mapAsset`) |
 | Modelos 3D | `public/models/<id>.glb` | **Pendiente** | `src/data/characters.ts` |
-| Ilustraciones | `public/images/characters/<id>.jpg` | **Pendiente** | `src/data/characters.ts` |
+| Ilustraciones | `public/images/characters/<id>.webp` | Listo | `src/data/characters.ts` |
 | Preview habilidad | `public/images/abilities/<personaje>/<habilidad>.jpg` | **Pendiente** | `src/data/characters.ts` |
 | Fotos de lugares | `public/images/locations/<id>.webp` | Listo (3 de 5) | `src/data/locations.ts` |
 | Fotos del equipo | `public/images/team/<id>.jpg` | **Pendiente** | `src/data/team.ts` |
@@ -62,7 +62,7 @@ public/videos/  public/models/  public/fonts/  public/downloads/
 
 ## Personajes
 1. Editar `src/data/characters.ts` para anadir o ajustar personajes.
-2. Colocar ilustraciones en `public/images/characters/<id>.jpg`.
+2. Colocar ilustraciones en `public/images/characters/<id>.webp` (900 × 1200).
 3. Las habilidades viven en el mismo archivo, con `preview` opcional para imagenes.
 
 ## Equipo

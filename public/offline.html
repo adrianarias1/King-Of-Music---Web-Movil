@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="es-MX">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#000000" />
+  <title>Sin conexión — King of Music</title>
+  <link rel="icon" type="image/png" href="./icons/king-of-music-32.png" />
+  <!--
+    KING OF MUSIC — Página sin conexión
+    La muestra el service worker (src/sw.js) cuando no hay internet y la
+    página principal todavía no está guardada en el dispositivo.
+    Es autónoma: no depende de ningún otro archivo para verse bien.
+  -->
+  <style>
+    :root { color-scheme: dark; }
+    * { box-sizing: border-box; margin: 0; }
+    body {
+      min-height: 100svh; display: grid; place-items: center; padding: 24px;
+      color: #f2f2f2; text-align: center;
+      font-family: 'Inter', 'Segoe UI', Roboto, Arial, sans-serif;
+      background: radial-gradient(60% 50% at 50% 30%, rgba(197,164,91,.16), transparent 70%), #000;
+    }
+    main { max-width: 440px; }
+    img { width: 112px; height: 112px; margin-bottom: 26px; filter: drop-shadow(0 0 24px rgba(197,164,91,.35)); }
+    .kicker { color: #c5a45b; font-size: 12px; font-weight: 700; letter-spacing: .2em; text-transform: uppercase; }
+    h1 { margin: 10px 0 14px; font-family: Georgia, 'Times New Roman', serif; font-weight: 400;
+         font-size: clamp(28px, 7vw, 40px); letter-spacing: .06em; text-transform: uppercase; }
+    p { color: #bdbdbd; line-height: 1.6; }
+    p + p { margin-top: 10px; font-size: 14px; color: #8f8f8f; }
+    button {
+      margin-top: 28px; min-height: 48px; padding: 0 28px; border: 0; border-radius: 4px; cursor: pointer;
+      color: #000; background: #c5a45b; font: 700 14px/1 inherit; letter-spacing: .14em; text-transform: uppercase;
+    }
+    button:hover { background: #e3c57b; }
+    button:focus-visible { outline: 2px solid #e3c57b; outline-offset: 3px; }
+  </style>
+</head>
+<body>
+  <main>
+    <img src="./icons/king-of-music-192.png" alt="" width="112" height="112" />
+    <p class="kicker">King of Music</p>
+    <h1>Sin conexión</h1>
+    <p>No hay internet en este momento. Cuando vuelva la conexión, King of Music se cargará de nuevo.</p>
+    <p lang="en">You're offline. King of Music will load again once you're back online.</p>
+    <button type="button" onclick="location.href='./'">Reintentar</button>
+  </main>
+  <script>
+    // Vuelve a la página principal en cuanto regresa la conexión.
+    window.addEventListener('online', function () { location.href = './' })
+  </script>
+</body>
+</html>

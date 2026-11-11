@@ -59,7 +59,7 @@
   display: grid;
   grid-template-columns: 1fr;
   gap: clamp(0.9rem, 2.5vw, 1.5rem);
-  width: min(100%, 860px);
+  width: min(100%, 1180px);
   margin-top: clamp(1rem, 3vw, 2rem);
   text-align: left;
 }
@@ -69,10 +69,38 @@
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
-  .download__cards.is-single {
+  .download__cards.is-1 {
     grid-template-columns: minmax(0, 420px);
     justify-content: center;
   }
+}
+
+@media (min-width: 1024px) {
+  .download__cards.is-3 {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+/* Tarjeta de la app web (PWA): acento dorado */
+.download__card--pwa {
+  border-color: rgba(197, 164, 91, 0.7);
+  background: linear-gradient(160deg, rgba(197, 164, 91, 0.18), rgba(255, 255, 255, 0.02) 60%);
+}
+
+.download__hint {
+  margin-top: auto;
+  padding: 0.75rem 0.9rem;
+  font-size: var(--fs-small);
+  line-height: 1.55;
+  color: var(--color-gray-light);
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px dashed rgba(197, 164, 91, 0.45);
+  border-radius: 4px;
+}
+
+.download__installed {
+  margin-top: auto;
+  color: #7fd6a2;
 }
 
 .download__card {

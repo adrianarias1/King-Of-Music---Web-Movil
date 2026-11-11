@@ -7,7 +7,7 @@ import { isNativeApp } from './native'
    --------------------------------------------------------------------------
    Al abrir la página, en segundo plano, se descargan los .glb de todos los
    personajes a la Cache Storage "kom-models-<versión>". El service worker
-   (vite.config.ts, regla CacheFirst con el mismo nombre) los sirve desde ahí:
+   (src/sw.js, "caché primero" con el mismo nombre) los sirve desde ahí:
      - cambiar de personaje ya no vuelve a descargar nada;
      - la carga es más rápida;
      - sin internet los modelos siguen cargando.

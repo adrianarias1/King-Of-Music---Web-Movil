@@ -1,22 +1,21 @@
-/// <reference types="vite-plugin-pwa/client" />
-
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import { Capacitor } from '@capacitor/core'
-import { registerSW } from 'virtual:pwa-register'
 import App from './App'
 import { AuthProvider } from './features/auth/AuthProvider'
 import { I18nProvider } from './i18n'
 import { installExternalLinkHandler } from './lib/native'
+import { registerServiceWorker } from './pwa/registerServiceWorker'
+import { listenForInstallPrompt } from './pwa/install'
 import { prefetchCharacterModels } from './lib/modelCache'
 import { characters } from './data/characters'
 import './styles/index.css'
 
 document.documentElement.classList.toggle('android-app', Capacitor.getPlatform() === 'android')
 
-if (import.meta.env.PROD && !Capacitor.isNativePlatform() && 'serviceWorker' in navigator) {
-  registerSW({ immediate: true })
-}
+// PWA: service worker propio (src/sw.js → ./sw.js).
+registerServiceWorker()
+listenForInstallPrompt()
 
 // App Android: los enlaces externos se abren en el navegador del sistema.
 installExternalLinkHandler()
