@@ -62,7 +62,7 @@ export const downloads: DownloadTarget[] = [
   {
     id: 'app',
     // APK publicado en GitHub Releases (flujo .github/workflows/android-release.yml).
-    url: 'https://github.com/adrianarias1/King-Of-Music---Web-Movil/releases/download/v1.2.0/KingOfMusic-v1.2.0.apk',
+    url: 'https://github.com/adrianarias1/King-Of-Music---Web-Movil/releases/download/v1.2.1/KingOfMusic-v1.2.1.apk',
     title: { es: 'App para Android', en: 'Android app' },
     description: {
       es: 'Este sitio como app: personajes en 3D, historia, mapa y reseñas.',

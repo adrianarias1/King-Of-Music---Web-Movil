@@ -47,7 +47,9 @@
   </main>
   <script>
     // Vuelve a la página principal en cuanto regresa la conexión.
-    window.addEventListener('online', function () { location.href = './' })
+    window.addEventListener('online', function () {
+      if (navigator.onLine) location.href = './'
+    })
   </script>
 </body>
 </html>
