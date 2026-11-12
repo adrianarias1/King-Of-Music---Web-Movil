@@ -5,7 +5,7 @@ import type { TeamMember } from '../types'
    --------------------------------------------------------------------------
    Fuente: portada del documento del proyecto (alumnos) y roles confirmados
    por el equipo.
-   Para activar una foto: coloca el archivo en public/images/team/<id>.jpg
+   Fotos: public/images/team/<id>.webp (800 × 800, recortadas en cuadrado).
    Mientras no exista, la tarjeta muestra un placeholder.
    ========================================================================== */
 
@@ -21,7 +21,7 @@ export const team: TeamMember[] = [
       es: 'Desarrollo del videojuego en Unity: mecánicas de combate, integración de recursos y programación en C#.',
       en: 'Game development in Unity: combat mechanics, asset integration and C# programming.',
     },
-    image: '/images/team/cristopher-larios.jpg',
+    image: '/images/team/cristopher-larios.webp',
   },
   {
     id: 'carlos-lopez',
@@ -34,7 +34,7 @@ export const team: TeamMember[] = [
       es: 'Sistema de reseñas y sesiones de usuario del sitio con Supabase.',
       en: 'The site\'s review system and user sessions with Supabase.',
     },
-    image: '/images/team/carlos-lopez.jpg',
+    image: '/images/team/carlos-lopez.webp',
   },
   {
     id: 'adrian-arias',
@@ -47,7 +47,7 @@ export const team: TeamMember[] = [
       es: 'Recursos gráficos en Photoshop y conversión de la aplicación web en app móvil y aplicación web progresiva.',
       en: 'Graphic assets in Photoshop and conversion of the web app into a mobile app and a progressive web app.',
     },
-    image: '/images/team/adrian-arias.jpg',
+    image: '/images/team/adrian-arias.webp',
   },
   {
     id: 'yoel-ramos',
@@ -60,7 +60,7 @@ export const team: TeamMember[] = [
       es: 'Codificación del esqueleto principal de la página web.',
       en: 'Coding of the website\'s core structure.',
     },
-    image: '/images/team/yoel-ramos.jpg',
+    image: '/images/team/yoel-ramos.webp',
   },
   {
     id: 'gael-zamora',
@@ -73,7 +73,7 @@ export const team: TeamMember[] = [
       es: 'Música y efectos de sonido en FL Studio, y animaciones del sitio con GSAP y ScrollTrigger.',
       en: 'Music and sound effects in FL Studio, and site animations with GSAP and ScrollTrigger.',
     },
-    image: '/images/team/gael-zamora.jpg',
+    image: '/images/team/gael-zamora.webp',
   },
 ]
 

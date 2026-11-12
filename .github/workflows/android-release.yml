@@ -142,6 +142,7 @@ jobs:
           - **Tráiler oficial** y botón de descarga del juego para PC.
           - Visor 3D con flechas en el selector, videos de habilidades y combos.
           - PWA: funciona sin conexión, aviso de conexión e instalación desde el navegador.
+          - Fotos de los integrantes del equipo.
 
           ### Descarga e instalación
           1. Descarga **KingOfMusic-v$VERSION.apk** desde *Assets*.
