@@ -11,19 +11,6 @@ import type { TeamMember } from '../types'
 
 export const team: TeamMember[] = [
   {
-    id: 'cristopher-larios',
-    name: 'Cristopher Larios García',
-    role: {
-      es: 'Programación en Unity',
-      en: 'Unity programming',
-    },
-    description: {
-      es: 'Desarrollo del videojuego en Unity: mecánicas de combate, integración de recursos y programación en C#.',
-      en: 'Game development in Unity: combat mechanics, asset integration and C# programming.',
-    },
-    image: '/images/team/cristopher-larios.webp',
-  },
-  {
     id: 'carlos-lopez',
     name: 'Carlos Eduardo López Castillo',
     role: {
@@ -74,6 +61,19 @@ export const team: TeamMember[] = [
       en: 'Music and sound effects in FL Studio, and site animations with GSAP and ScrollTrigger.',
     },
     image: '/images/team/gael-zamora.webp',
+  },
+  {
+    id: 'cristopher-larios',
+    name: 'Cristopher Larios García',
+    role: {
+      es: 'Programación en Unity',
+      en: 'Unity programming',
+    },
+    description: {
+      es: 'Desarrollo del videojuego en Unity: mecánicas de combate, integración de recursos y programación en C#.',
+      en: 'Game development in Unity: combat mechanics, asset integration and C# programming.',
+    },
+    image: '/images/team/cristopher-larios.webp',
   },
 ]
 
